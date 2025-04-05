@@ -1,0 +1,50 @@
+
+<%-include("../../views/partials/userPartial/header")%>
+
+    <section class="hero text-center py-5 bg-light">
+        <div class="container">
+            <h1 class="display-4">Elevate Your Style, Embrace the Elegance</h1>
+            <p class="lead">Luxury fashion at your fingertips.</p>
+            <input class="form-control w-50 mx-auto" type="text" placeholder="Search...">
+        </div>
+    </section>
+
+    <section class="features py-5 text-center">
+        <div class="container row mx-auto">
+            <div class="col-md-4">
+                <h3>🚚 Free Shipping</h3>
+                <p>Enjoy hassle-free shopping with free worldwide delivery.</p>
+            </div>
+            <div class="col-md-4">
+                <h3>📞 Support 24/7</h3>
+                <p>Dedicated customer service for support and assistance.</p>
+            </div>
+            <div class="col-md-4">
+                <h3>💰 Secure Payments</h3>
+                <p>Shop without worries, your data is safe with us.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="bestsellers py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Our Bestsellers</h2>
+            <div class="row">
+                <% if(products) { %>
+                    <% products.forEach(product => { %>
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <img src="<%= product.image %>" class="card-img-top" alt="<%= product.name %>">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title"><%= product.name %></h5>
+                                    <p class="card-text">$<%= product.price %></p>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </div>
+    </section>
+
+    <%-include("../../views/partials/userPartial/footer")%>
