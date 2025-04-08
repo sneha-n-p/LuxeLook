@@ -5,7 +5,7 @@ const env = require("dotenv").config()
 const connectDB = async () => {
     try {
 
-      await mongoose.connect('mongodb://0.0.0.0:27017/yourdbname');
+      await mongoose.connect('mongodb://0.0.0.0:27017/LuxeLook');
       console.log('MongoDB Connected');
 
     } catch (err) {
