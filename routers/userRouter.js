@@ -9,6 +9,9 @@ router.get("/",userController.loadHomePage)
 router.get("/signup",userController.loadSignup)
 router.post("/signup",userController.postSignup)
 
+router.post("/verify-otp",userController.verifyOtp)
+router.post("/resend-otp",userController.resendOtp)
+
 
 
 module.exports = router
