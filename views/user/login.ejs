@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login - LuxeLook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .split {
+            display: flex;
+            height: 100vh;
+        }
+
+        .left-side {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            padding: 40px;
+        }
+
+        .right-side {
+            flex: 1;
+            background: url('/images/login-image.png') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-form h2 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .login-form p {
+            color: #6c757d;
+            margin-bottom: 25px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .btn-login {
+            background-color: #04384c;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .btn-login:hover {
+            background-color: #032c3b;
+        }
+
+        .forgot-link {
+            float: right;
+            font-size: 0.9rem;
+            color: #26c6da;
+            text-decoration: none;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #ccc;
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: .5em;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: .5em;
+        }
+
+        .google-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .google-btn img {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        .signup-text {
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .signup-text a {
+            color: #26c6da;
+            text-decoration: none;
+        }
+
+        .signup-text a:hover {
+            text-decoration: underline;
+        }
+
+        .logo {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+        }
+
+        .logo img {
+            width: 120px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="split">
+        <div class="left-side">
+            <div class="login-form">
+                <h2>Welcome back!</h2>
+                <p>Enter your Credentials to access your account</p>
+
+                <form action="/login" method="POST">
+                    <div class="mb-3">
+                        <label>Email address</label>
+                        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Password</label> <a href="/forgot-password" class="forgot-link">forgot password</a>
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <%if(message){%>
+                        <div class="alert alert-danger text-center">
+                            <%=message%>
+                        </div>
+                        <% } %>
+                        <button type="submit" class="btn btn-login w-100">Login</button>
+                </form>
+
+                <div class="divider">or</div>
+
+                <a href="/auth/google" class="google-btn">
+                    <img src="https://img.icons8.com/color/16/000000/google-logo.png" />
+                    Sign in with Google
+                  </a>
+
+                <div class="signup-text text-center">
+                    Don’t have an account? <a href="/signup">Sign Up</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-side">
+            <div class="logo">
+                <img src="images\logo_forWhite.png" alt="LuxeLook Logo">
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

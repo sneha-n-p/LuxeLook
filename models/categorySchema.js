@@ -8,22 +8,28 @@ const categorySchema = new mongoose.Schema({
         required:true,
         unique:true
     },
-    duscription:{
+    description:{
         type:String,
         required:true
     },
-    isListed:{
-        type:Boolean,
-        default:true
-    },
-    categoryOffer:{
-        type:Number,
-        default:0
+    status:{
+        type:String,
+        required:true,
+        enum:['Listed','Unlisted']
     },
     createdAt:{
         type:Date,
         default:Date.now
     },
+    offerPrice:{
+        type:Number,
+        required:false
+
+    },
+    offer:{
+        type:Number,
+        required:false
+    }
     
 })
 const Category = mongoose.model("Category",categorySchema)

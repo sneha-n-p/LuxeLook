@@ -1,0 +1,202 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/product-details.css">
+<style>
+    body {
+        background: #f8e9e9;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .banner {
+        background: url('/images/product-banner.jpg') no-repeat center;
+        background-size: cover;
+        height: 250px;
+    }
+
+    .banner h1 {
+        color: #000;
+        padding-top: 160px;
+        font-size: 3rem;
+        text-align: center;
+    }
+    .main-image {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        border-radius: 8px;
+        border: 2px solid var(--accent-gold);
+    }
+
+    .main-image img {
+        width: 100%;
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .main-image:hover img {
+        transform: scale(1.5);
+    }
+    .product-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.main-image {
+  position: relative;
+  overflow: hidden;
+  width: 350px;
+  max-width: 100%;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+.main-image img {
+  width: 100%;
+  transition: transform 0.3s ease-in-out;
+}
+
+.main-image:hover img {
+  transform: scale(1.3);
+}
+
+.thumbnail img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border 0.3s ease;
+}
+
+.thumbnail.active img {
+  border-color: #000;
+}
+.review-input {
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  min-height: 150px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  font-size: 16px;
+}
+
+
+</style>
+</head>
+
+<body>
+
+    <%-include("../../views/partials/userPartial/header")%>
+        <div class="banner">
+            <h1>PRODUCT</h1>
+        </div>
+
+        <div class="container mt-5">
+
+            <div class="row">
+                <div class="col-md-6 d-flex flex-column align-items-start">
+                  <div class="main-image mb-3">
+                    <img id="main-img" src="<%= product.productImage[0] %>" alt="<%= product.productName %>">
+                  </div>
+                  <div class="d-flex flex-wrap gap-2">
+                    <% product.productImage.forEach((image, index) => { %>
+                      <div class="thumbnail <%= index === 0 ? 'active' : '' %>">
+                        <img src="<%= image %>" alt="Thumbnail <%= index + 1 %>" onclick="changeImage('<%= image %>')">
+                      </div>
+                    <% }); %>
+                  </div>
+                </div>
+              
+                <div class="col-md-6">
+                  <h2><%= product.productName %></h2>
+                  <p class="price-tag">₹<%= product.regularPrice %></p>
+                  <p><%= product.description %></p>
+              
+                  <h6>Sizes</h6>
+                  <select class="form-select mb-3" style="width: 200px;">
+                    <option><%= product.size %></option>
+                  </select>
+              
+                  <h6>Quantity : <%=product.quatity%></h6>
+                  <input type="number" value="1" class="form-control mb-3" style="width: 100px;" min="1" max="<%=product.quatity%>">
+              
+                  <button class="btn btn-dark">Add to Cart</button>
+                  <button class="btn btn-dark">Add to wishlist</button>
+                </div>
+              </div>
+              
+
+            <div class="mt-5">
+                <h4>Review</h4>
+                <textarea class="review-input mb-3" placeholder="Write your review..." rows="3"></textarea>
+                <button class="btn btn-primary">Submit</button>
+            </div>
+
+            <div class="mt-5">
+                <h4 class="mb-4">Recommended</h4>
+                <div class="row">
+                    <% recommendedProducts.forEach(recommended=> { %>
+                        <div class="col-md-3">
+                            <div class="recommended-card">
+                                <img src="<%= recommended.productImage[0] %>" class="w-100">
+                                <h6 class="mt-2">
+                                    <%= recommended.productName %>
+                                </h6>
+                                <p class="price-tag">₹<%= recommended.regularPrice %>
+                                </p>
+                                <a href="/product-details/<%= recommended._id %>"
+                                    class="btn btn-outline-dark btn-sm w-100">View</a>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </div>
+
+        </div>
+        <script>
+            const productImg = document.getElementById("productImg");
+            const zoomResult = document.getElementById("zoomResult");
+
+            productImg.addEventListener("mouseenter", () => {
+                zoomResult.style.display = "block";
+                zoomResult.style.backgroundImage = `url('${productImg.src}')`;
+            });
+
+            productImg.addEventListener("mouseleave", () => {
+                zoomResult.style.display = "none";
+            });
+        </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function changeImage(newSrc) {
+    const mainImg = document.getElementById('main-img');
+    mainImg.src = newSrc;
+
+    document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+    event.target.parentElement.classList.add('active');
+}
+
+document.getElementById('main-img').addEventListener('mousemove', function (event) {
+    const img = event.target;
+    const { left, top, width, height } = img.getBoundingClientRect();
+    const x = (event.clientX - left) / width * 100;
+    const y = (event.clientY - top) / height * 100;
+    img.style.transformOrigin = `${x}% ${y}%`;
+});
+
+document.querySelectorAll('.thumbnail img').forEach(thumb => {
+    thumb.addEventListener('click', () => {
+        const mainImg = document.querySelector('.main-image img');
+        mainImg.src = thumb.src;
+        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+        thumb.parentElement.classList.add('active');
+    });
+});
+        </script>
+</body>
+
+<%-include("../../views/partials/userPartial/footer")%>

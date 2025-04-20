@@ -149,19 +149,24 @@
             <label class="form-check-label" for="terms">
               I agree to the <a href="#">terms & policy</a>
             </label>
+            <%if(message){%>
+              <div class="alert alert-danger text-center">
+                  <%=message%>
+              </div>
+              <% } %>
           </div>
           <button type="submit" class="btn btn-signup w-100">Signup</button>
         </form>
 
         <div class="divider"><span>or</span></div>
 
-        <button class="google-btn">
+        <a href="/auth/google" class="google-btn">
           <img src="https://img.icons8.com/color/16/000000/google-logo.png" />
-          Sign in with Google
-        </button>
+          Sign up with Google
+        </a>
 
         <p class="mt-4 text-center">
-          Have an account? <a href="/signin" class="text-info">Sign In</a>
+          Have an account? <a href="/login" class="text-info">Login</a>
         </p>
       </div>
 

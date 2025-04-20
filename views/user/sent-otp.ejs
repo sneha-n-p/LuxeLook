@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP | LuxeLook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .verify-container {
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            background-color: #fff;
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h4 {
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 22px;
+        }
+
+        .form-control {
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .btn-submit {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 8px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+        }
+
+        .btn-custom:hover {
+            background-color: #1e293b;
+        }
+
+        .timer-text {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .resend-text {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .resend-text a {
+            text-decoration: none;
+            color: #0f766e;
+            font-weight: 500;
+        }
+
+        .resend-text a:hover {
+            text-decoration: underline;
+        }
+
+        .text-small {
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .text-small a {
+            color: #26c6da;
+            text-decoration: none;
+        }
+
+        .text-small a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="verify-container">
+        <h4>Please enter the OTP in the mail:</h4>
+
+        <form id="otpForm" action="/verifying-forgetpass-otp" method="post" onsubmit="return validateOTPform()">
+            <input type="text" name="otp" id="otpInput" class="form-control" placeholder="Enter OTP" required>
+            <div id="timer" class="timer-text">Please wait <span id="countdown">30</span> seconds before requesting
+                another code.</div>
+            <div class="expired-msg" id="expiredMsg" style="display: none; color: red;">OTP expired</div>
+            <div>
+                <button type="submit" class="btn btn-submit">Submit</button>
+            </div>
+            <div class="text-small">
+                <button id="resend-btn" type="button" onclick="resendOTP()">Resend</button>
+            </div>
+        </form>
+
+    </div>
+    <script>
+
+        let countdown = 30;
+        const countdownEl = document.getElementById('countdown');
+        const otpInput = document.getElementById('otpInput');
+        const submitBtn = document.querySelector('.btn-submit');
+        const expiredMsg = document.getElementById('expiredMsg');
+        const resendBtn = document.getElementById("resend-btn");
+
+        let timer = setInterval(updateTimer, 1000);
+
+        function updateTimer() {
+            countdown--;
+            countdownEl.innerText = countdown;
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                otpInput.disabled = true;
+                submitBtn.disabled = true;
+                expiredMsg.style.display = 'block';
+            }
+        }
+
+        function validateOTPform() {
+            const otpValue = otpInput.value.trim();
+
+            if (otpValue === "") {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Please enter an OTP!"
+                });
+                return false;
+            }
+
+            axios.post('/verifying-forgetpass-otp', { otp: otpValue })
+                .then(function (response) {
+                    if (response.data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "OTP verified successfully",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        }).then(() => {
+                            window.location.href = response.data.redirectUrl;
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Invalid OTP",
+                            text: response.data.message,
+                        });
+                    }
+                })
+                .catch(function (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Server Error",
+                        text: "Please try again"
+                    });
+                });
+
+            return false;
+        }
+
+        function resendOTP() {
+            resendBtn.disabled = true;
+            countdown = 30;
+            otpInput.disabled = false;
+            submitBtn.disabled = false;
+            expiredMsg.style.display = "none";
+            countdownEl.innerText = countdown;
+
+            if (timer) clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+
+            axios.post("/send-otp")
+                .then(function (response) {
+                    if (response.data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "OTP resent successfully",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: response.data.message || "An error occurred while resending OTP.",
+                        });
+                    }
+                    resendBtn.disabled = false;
+                })
+                .catch(function (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Server Error",
+                        text: error.response?.data?.message || "Please try again.",
+                    });
+                    resendBtn.disabled = false;
+                });
+
+            return false;
+        }
+
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+
+</body>
+
+</html>

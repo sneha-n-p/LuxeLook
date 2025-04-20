@@ -13,7 +13,7 @@ const productSchema = new Schema({
     },
     brand: {
         type: String,
-        required: true
+        required: false
     },
     category: {
         type: Schema.Types.ObjectId,
@@ -38,7 +38,7 @@ const productSchema = new Schema({
     },
     color: {
         type: String,
-        required: true
+        required: false
     },
     productImage: {
         type: [String],
@@ -47,6 +47,10 @@ const productSchema = new Schema({
     isBlocked: {
         type: Boolean,
         default: false
+    },
+    size:{
+        type: String,
+        required:true
     },
     status: {
         type: String,
@@ -57,23 +61,23 @@ const productSchema = new Schema({
     variant: [{
         size: {
             type: String,
-            required: true
+            required: false
         },
         color: {
             type: String,
-            required:true
+            required:false
         },
         salePrice:{
             type:Number,
-            required:true
+            required:false
         },
         quantity:{
             type:Number,
-            required:true
+            required:false
         }
     }]
 
-}, { timeseries: ture })
+})
 
 
 const Product = mongoose.model("Product", productSchema)

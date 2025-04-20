@@ -1,0 +1,343 @@
+<%-include("../../views/partials/adminPartial/header")%>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .form-control {
+            background-color: #f8fafc;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 12px;
+        }
+
+        .form-control:focus {
+            background-color: #f8fafc;
+            box-shadow: none;
+            border-color: #38bdf8;
+        }
+
+        .form-label {
+            color: #f1f5f9;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .btn-submit {
+            background-color: #2dd4bf;
+            color: #0f172a;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+        }
+
+        .btn-submit:hover {
+            background-color: #14b8a6;
+        }
+
+        .category-image-box {
+            width: 160px;
+            height: 160px;
+            background-color: #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-image-box:hover {
+            background-color: #94a3b8;
+        }
+
+        .product-form {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+    </style>
+
+
+<div class="product-form">
+    <form name="productForm" action="/admin/edit-product/<%=product._id%>" method="POST" enctype="multipart/form-data">
+        <div class="col-12 col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Product Name:</label>
+                <p id="name-error"></p>
+                <input type="text" class="form-control" id="name" name="name" value="<%=product.productName%>" required pattern="^[A-Za-z ]+$" title="Only alphabets and spaces allowed." />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Product Description:</label>
+                <p id="description-error"></p>
+                <textarea class="form-control" id="description" name="description" rows="3" required pattern="^[A-Za-z]+$" title="Only alphabets allowed, no spaces or numbers.">
+                    <%= product.description %>
+                </textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Product Category:</label>
+                <p id="category-error"></p>
+                <select class="form-select" id="category" name="category" required>
+                    <option disabled>Select categories</option>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category._id %>" <%= category.name === product.category.name ? 'selected' : '' %>>
+                            <%= category.name %>
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Offer (%):</label>
+                <p id="offer-error"></p>
+                <input type="number" class="form-control" id="offer" value="<%=product.offer%>" name="offer" min="0" max="99" placeholder="Optional" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Price</label>
+                <p id="price-error"></p>
+                <input type="number" class="form-control" id="price" value="<%=product.regularPrice%>" name="price" min="0" placeholder="Greater than SalesPrice" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Sales Price</label>
+                <p id="salesPrice-error"></p>
+                <input type="number" class="form-control" id="salesPrice" value="<%=product.salePrice%>" name="salesPrice" min="0" placeholder="Optional" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Size</label>
+                <p id="size-error"></p>
+                <input type="text" class="form-control" id="size" value="<%=product.size%>" name="Size" placeholder="Enter the Size" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Stock</label>
+                <p id="stock-error"></p>
+                <input type="number" class="form-control" id="stock" value="<%=product.quatity%>" name="Stock" min="0" placeholder="Enter the Stock" />
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Product Images</label>
+            <div class="row">
+                <% for(let i = 0; i < 4; i++) { %>
+                    <div class="col-md-3 mb-3">
+                        <div class="card">
+                            <% if(product.productImage[i]) { %>
+                                <img src="<%= product.productImage[i] %>" class="card-img-top" alt="Product Image">
+                                <div class="card-body">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteSingleImage('<%= product.productImage[i] %>', '<%= product._id %>', <%= i %>)">Delete</button>
+                                    <!-- Hidden input to preserve existing image -->
+                                    <input type="hidden" name="existingImage<%= i+1 %>" value="<%= product.productImage[i] %>">
+                                </div>
+                            <% } else { %>
+                                <div class="card-body">
+                                    <div class="image-upload-container">
+                                        <p id="image<%= i+1 %>-error"></p>
+                                        <input type="file" name="image<%= i+1 %>" accept="image/*" class="form-control image-input" data-index="<%= i %>" onchange="previewImage(event, <%= i %>)">
+                                        <div class="preview-container" style="margin-top: 10px; display: none;">
+                                            <img id="preview<%= i %>" src="#" alt="Image preview" style="max-width: 100%; height: auto;">
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-submit">EDIT PRODUCT</button>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script>
+let croppers = [];
+
+function previewImage(event, index) {
+    const input = event.target;
+    const file = input.files[0];
+    if (file) {
+        console.log(`File selected for image${index + 1}:`, file.name);
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const previewContainer = input.parentElement.querySelector('.preview-container');
+            const preview = document.getElementById(`preview${index}`);
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+
+            if (croppers[index]) {
+                croppers[index].destroy();
+            }
+
+            croppers[index] = new Cropper(preview, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 1,
+                ready: function () {
+                    console.log(`Cropper initialized for image${index + 1}`);
+                    this.cropper.crop();
+                }
+            });
+        };
+        reader.readAsDataURL(file);
+    } else {
+        console.log(`No file selected for image${index + 1}`);
+    }
+}
+
+async function deleteSingleImage(imageName, productId, index) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch('/admin/deleteImage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        imageNameToServer: imageName,
+                        productIdToServer: productId,
+                        imageIndex: index
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Image deleted successfully.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                    const card = document.querySelector(`.col-md-3:nth-child(${index + 1}) .card`);
+                    card.innerHTML = `
+                        <div class="card-body">
+                            <div class="image-upload-container">
+                                <p id="image${index + 1}-error"></p>
+                                <input type="file" name="image${index + 1}" accept="image/*" class="form-control image-input" data-index="${index}" onchange="previewImage(event, ${index})">
+                                <div class="preview-container" style="margin-top: 10px; display: none;">
+                                    <img id="preview${index}" src="#" alt="Image preview" style="max-width: 100%; height: auto;">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || 'Failed to delete the image.',
+                        icon: 'error',
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while deleting the image.',
+                    icon: 'error',
+                });
+            }
+        }
+    });
+}
+
+function validateInput(input) {
+    const errorElement = document.getElementById(`${input.id}-error`);
+    if (!errorElement) {
+        return true;
+    }
+    if (!input.checkValidity()) {
+        errorElement.textContent = input.validationMessage;
+        return false;
+    } else {
+        errorElement.textContent = '';
+        return true;
+    }
+}
+
+const form = document.forms['productForm'];
+form.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    let isValid = true;
+
+    document.querySelectorAll('input:not([type="file"]), textarea, select').forEach((input) => {
+        if (!validateInput(input)) {
+            isValid = false;
+        }
+    });
+
+    if (!isValid) {
+        console.log('Validation failed, form not submitted');
+        return;
+    }
+
+    const formData = new FormData(this);
+
+    console.log('FormData before images:');
+    for (let pair of formData.entries()) {
+        console.log(`${pair[0]}:`, pair[1]);
+    }
+
+    for (let i = 0; i < 4; i++) {
+        if (croppers[i] && croppers[i].getCroppedCanvas()) {
+            try {
+                console.log(`Processing image ${i + 1}`);
+                const blob = await new Promise((resolve) => {
+                    croppers[i].getCroppedCanvas({ width: 500, height: 500 }).toBlob(resolve, 'image/jpeg', 0.9);
+                });
+                console.log(`Blob for image${i + 1}:`, blob);
+                formData.set(`image${i + 1}`, blob, `image-${Date.now()}-${i}.jpg`);
+            } catch (error) {
+                console.error(`Error processing image ${i + 1}:`, error);
+                Swal.fire('Error', `Failed to process image ${i + 1}.`, 'error');
+                return;
+            }
+        } else {
+            console.log(`No cropper or canvas for image ${i + 1}`);
+        }
+    }
+
+    console.log('Final FormData:');
+    for (let pair of formData.entries()) {
+        console.log(`${pair[0]}:`, pair[1]);
+    }
+
+    try {
+        console.log('Submitting to:', this.action);
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData
+        });
+
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Product updated successfully.',
+                icon: 'success'
+            }).then(() => window.location.href = '/admin/products');
+        } else {
+            Swal.fire('Error', data.message || 'Failed to update product.', 'error');
+        }
+    } catch (error) {
+        console.error('Submission error:', error);
+        Swal.fire('Error', `An error occurred during submission: ${error.message}`, 'error');
+    }
+});
+</script>

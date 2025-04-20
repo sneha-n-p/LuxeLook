@@ -1,0 +1,99 @@
+
+<%-include("../../views/partials/userPartial/header")%>
+
+<body>
+<br><br>
+  <!-- Header Banner -->
+  <div class="banner d-flex justify-content-center align-items-center">
+    <h1 class="text-center fw-bold">SHOP NOW</h1>
+  </div>
+
+  <div class="container mt-5">
+    <div class="row">
+
+      <!-- Filter Sidebar -->
+      <div class="col-md-3">
+        <div class="filter-section">
+            <h5>Categories</h5>
+            <ul class="list-unstyled">
+              <% categories.forEach((category) => { %>
+                <li>
+                  <a href="#" class="text-decoration-none text-dark d-block py-1">
+                    <%= category.name %>
+                  </a>
+                </li>
+              <% }) %>
+            </ul>
+            <hr>
+            
+          <h5>Product Size</h5>
+          <div><input type="checkbox"> S</div>
+          <div><input type="checkbox"> M</div>
+          <div><input type="checkbox"> L</div>
+          <div><input type="checkbox"> XL</div>
+          <hr>
+          <h5>Price Range</h5>
+          <input type="range" class="form-range">
+          <p>₹500 - ₹3000</p>
+        </div>
+      </div>
+
+      <div class="col-md-9">
+        <div class="d-flex mb-3">
+          <input type="text" class="form-control me-2" placeholder="Search products...">
+          <button class="btn btn-dark">Search</button>
+        </div>
+
+        <div class="row">
+          <% products.forEach(product => { %>
+            <div class="col-md-4">
+              <div class="product-card">
+                <img src="<%= product.productImage[0] %>" class="w-100">
+                <h5><%= product.productName %></h5>
+                <p class="price-tag">₹<%= product.regularPrice %></p>
+                <p><%= product.description %></p>
+                <div class="d-flex justify-content-between">
+                  <small>Available Size : <%= product.size %></small>
+                  <a href="/product-details/<%=product._id%>"><button class="btn btn-outline-dark btn-sm">View Details</button></a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div style="color: #fff;">Showing 1 of <%= totalPages %>
+            </div>
+            <nav>
+              <ul class="pagination mb-0">
+                <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+                  <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+                </li>
+  
+                <% for (let i=1; i <=totalPages; i++) { %>
+                  <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                      <%= i %>
+                    </a>
+                  </li>
+                  <% } %>
+  
+                    <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                      <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+                    </li>
+              </ul>
+            </nav>
+  
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <%-include("../../views/partials/userPartial/footer")%>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

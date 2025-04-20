@@ -98,16 +98,15 @@
   </div>
 
   <script>
-    let countdown = 30;
+    let countdown = 60;
     const countdownEl = document.getElementById('countdown');
     const otpInput = document.getElementById('otpInput');
     const submitBtn = document.querySelector('.btn-submit');
     const expiredMsg = document.getElementById('expiredMsg');
     const otpForm = document.getElementById('otpForm');
 
-    // function startTimer() {
       
-    const timer = setInterval(() => {
+    let timer = setInterval(() => {
       countdown--;
       countdownEl.innerText = countdown;
 
@@ -118,7 +117,6 @@
         expiredMsg.style.display = 'block';
       }
     }, 1000);
-    // }
 
     function validateOTPform() {
       const otpInput = document.getElementById("otpInput").value.trim()
@@ -164,22 +162,26 @@
 
     function resendOTP() {
       document.getElementById("resend-btn").disabled = true
-      countdown = 30
-      document.getElementById("otpInput").disabled = false
-      document.getElementById("timer").classList.remove("expired");
-      
-      const timer = setInterval(() => {
+      countdown = 30;
+      otpInput.disabled = false
+      submitBtn.disabled = false;
+      expiredMsg.style.display = "none"
+      countdownEl.innerText = countdown;
+      if(timer)clearInterval(timer);
+
+      timer = setInterval(() => {
         countdown--;
+        console.log(countdown)
         countdownEl.innerText = countdown;
 
         if (countdown <= 0) {
-          clearInterval(timer);
+          clearInterval(timer); 
           otpInput.disabled = true;
           submitBtn.disabled = true;
           expiredMsg.style.display = 'block';
         }
       }, 1000);
-      clearInterval(timer)
+      // clearInterval(timer)
       axios.post("/resend-otp")
         .then(function (response) {
           
@@ -198,7 +200,7 @@
               text: response.data.message || "An error occurred while resending OTP.",
             });
           }
-          document.getElementById("sanjaySundharan").disabled = false
+          document.getElementById("resend-btn").disabled = false
         })
         .catch(function (error) {
           Swal.fire({

@@ -1,0 +1,97 @@
+<%-include("../../views/partials/adminPartial/header")%>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #f1f5f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .main-content {
+      padding: 50px 30px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .card {
+      background-color: #1e293b;
+      border: none;
+      padding: 30px;
+      border-radius: 12px;
+    }
+    .form-label {
+      color: #f1f5f9;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    .form-control, .form-select {
+      background-color: #f8fafc;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .form-control:focus, .form-select:focus {
+      background-color: #f8fafc;
+      box-shadow: none;
+      border-color: #38bdf8;
+    }
+    .btn-add {
+      background-color: #22d3ee;
+      color: #0f172a;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      margin-top: 20px;
+    }
+    .btn-add:hover {
+      background-color: #06b6d4;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="main-content">
+    <h3 class="mb-4">Add Categories</h3>
+    
+    <div class="card">
+      <form action="/admin/add-category" method="POST">
+        <div class="mb-3">
+          <label for="categoryName" class="form-label">Category Name:</label>
+          <input type="text" class="form-control" id="categoryName" name="name" required pattern="^[A-Za-z]+$"
+          title="Only alphabets allowed, no spaces or numbers.">
+        </div>
+
+        <div class="mb-3">
+          <label for="categoryDescription" class="form-label">Description:</label>
+          <textarea class="form-control" id="categoryDescription" name="description" rows="3" required pattern="^[A-Za-z]+$"
+          title="Only alphabets allowed, no spaces or numbers."><%= Category.description %>></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="categoryOffer" class="form-label">Offer (%):</label>
+          <input type="number" class="form-control" id="categoryOffer" name="offer" min="0" max="100" >
+        </div>
+
+        <div class="mb-3">
+          <label for="offerPrice" class="form-label">Offer Price (₹):</label>
+          <input type="number" class="form-control" id="offerPrice" name="offerPrice" min="0" >
+        </div>
+
+        <div class="mb-3">
+          <label for="status" class="form-label">Status:</label>
+          <select class="form-select" id="status" name="status" required>
+            <option value="" selected disabled>Select status</option>
+            <option value="Listed">Listed</option>
+            <option value="Unlisted">Unlisted</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-add">ADD CATEGORY</button>
+      </form>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+</body>
+</html>
+

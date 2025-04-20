@@ -1,0 +1,288 @@
+<%-include("../../views/partials/adminPartial/header")%>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f1f5f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .table {
+            color: #f1f5f9;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            background-color: #1e293b;
+            border-bottom: 2px solid #334155;
+        }
+
+        .table tbody tr {
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
+        }
+
+        .btn-add-product {
+            background-color: #22d3ee;
+            color: #0f172a;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+        }
+
+        .btn-add-product:hover {
+            background-color: #06b6d4;
+        }
+
+        .status-listed {
+            background-color: #22c55e;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+        }
+
+        .status-unlisted {
+            background-color: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+        }
+
+        .search-bar {
+            background-color: #1e293b;
+            border: none;
+            color: #f1f5f9;
+        }
+
+        .search-bar::placeholder {
+            color: #cbd5e1;
+        }
+
+        .pagination .page-link {
+            background-color: #1e293b;
+            color: #f1f5f9;
+            border: none;
+        }
+
+        .pagination .page-link.active {
+            background-color: #22d3ee;
+            color: #0f172a;
+        }
+    </style>
+    </head>
+
+    <body>
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>Products</h3>
+                <a href="/admin/add-product" class="btn btn-add" style="background-color: #06b6d4;">ADD PRODUCT +</a>
+            </div>
+
+            <div class="mb-4">
+                <input type="text" class="form-control search-bar" placeholder="Search for Products">
+            </div>
+
+            <table class="table table-hover table-borderless">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>IMAGE</th>
+                        <th>NAME</th>
+                        <th>DESCRIPTION</th>
+                        <th>CATEGORY</th>
+                        <th>AMOUNT</th>
+                        <th>OFFER</th>
+                        <th>STOCK</th>
+                        <th>ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% products.forEach(function(product) { %>
+                        <tr>
+                            <td style="color: #000;">#<%= product.id %>
+                            </td>
+                            <td>
+                                <img src="<%= product.productImage[0] %>" alt="Product Image" width="45" height="60"
+                                    style="object-fit: cover; border-radius: 4px;">
+                            </td>
+                            <td style="color: #000;">
+                                <%= product.productName %>
+                            </td>
+                            <td style="color: #000;">
+                                <%= product.description %>
+                            </td>
+                            <td style="color: #000;">
+                                <%= product.category %>
+                            </td>
+                            <td style="color: #000;">₹ <%= product.salePrice %>
+                            </td>
+                            <td style="color: #000;">₹ <%= product.offer %>
+                            </td>
+                            <td style="color: #000;">
+                                <%= product.quatity %>
+                            </td>
+
+                            <td>
+
+                                <button class="btn btn-sm btn-outline-light"><a class="bi bi-pencil"
+                                        href="/admin/edit-product/<%=product._id%>"></a></button>
+                                <%if(product.isBlocked===false){%>
+                                    <button class="btn btn-danger">
+                                        <a href="#"
+                                            onclick="confirmBlockProduct(event, '<%= product._id.toString() %>')"
+                                            class="text-white" style="text-decoration: none;">Block</a>
+                                    </button>
+                                    <%} else{%>
+                                        <button class="btn btn-success">
+                                            <a href="#"
+                                                onclick="confirmUnblockProduct(event, '<%= product._id.toString() %>')"
+                                                class="text-white" style="text-decoration: none;">Unblock</a>
+                                        </button>
+                                        <%}%>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div style="color: #fff;">Showing 1 of <%= totalPages %>
+                </div>
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+                        </li>
+
+                        <% for (let i=1; i <=totalPages; i++) { %>
+                            <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                            <% } %>
+
+                                <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+                                </li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+        <!-- Bootstrap 5 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+
+            function confirmBlockProduct(event, productId) {
+                event.preventDefault();
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You are about to block this product!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Block!",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/admin/blockProduct?id=${productId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: productId })
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Success!',
+                                        text: data.message,
+                                        icon: 'success'
+                                    }).then(() => {
+                                        location.reload()
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        title: 'Failed!',
+                                        text: data.message,
+                                        icon: 'error'
+                                    }).then(() => {
+                                        location.reload()
+                                    })
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("error occur on blocking ajax", error)
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'Something went wrong in server Side',
+                                    icon: 'error'
+                                })
+                            })
+                    }
+                });
+            }
+
+            function confirmUnblockProduct(event, productId) {
+                event.preventDefault();
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You are about to unblock this product!",
+                    icon: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#28a745",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Unblock!",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/admin/unblockProduct?id=${productId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: productId })
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Success!',
+                                        text: data.message,
+                                        icon: 'success'
+                                    }).then(() => {
+                                        location.reload()
+                                    })
+                                } else {
+                                    Swal.fire({
+                                        title: 'Failed!',
+                                        text: data.message,
+                                        icon: 'error'
+                                    }).then(() => {
+                                        location.reload()
+                                    })
+                                }
+                            }).catch((error) => {
+                                console.error("error occur on unblocking ajax", error)
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: 'something went wrong on serverSide',
+                                    icon: 'error'
+                                })
+                            })
+                    }
+                });
+            }
+
+        </script>
+
+    </body>
+
+    </html>
