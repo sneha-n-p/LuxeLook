@@ -46,30 +46,37 @@ const loadAddCategory = async (req, res) => {
 };
 
 
-const addCategory = async (req, res) => {
-    const { name, description, offer, offerPrice, status } = req.body
-    try {
-        console.log(req.body)
-        const existingCategory = await category.findOne({ name })
-        if (existingCategory) {
-            return res.status(400).json({ error: "Category alresdy exists" })
-        }
-        const newCategory = new category({
-            name,
-            description,
-            offer,
-            offerPrice,
-            status
-        })
-        await newCategory.save()
-        req.session.category = newCategory._id
-        res.redirect("/admin/categories")
 
-    } catch (error) {
-        console.log("error:", error)
-        return res.status(500).json({ error: "Internal Server Error" })
+const addCategory = async (req, res) => {
+  const { name, description, offer, offerPrice, status } = req.body;
+
+  try {
+    console.log(req.body);
+    const existingCategory = await category.findOne({ name });
+    if (existingCategory) {
+      return res.status(400).json({ error: "Category already exists" });
     }
-}
+
+    const newCategory = new category({
+      name,
+      description,
+      offer,
+      offerPrice,
+      status
+    });
+
+    await newCategory.save();
+
+    return res.status(200).json({ success: true, message: "Category added successfully" });
+
+  } catch (error) {
+    console.error("Error adding category:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
+
 const unlistCategory = async (req, res) => {
     try {
         let id = req.body.id
@@ -136,7 +143,8 @@ const editCategory = async (req, res) => {
         },{new:true})
 
         if(updateCategory){
-            res.redirect("/admin/categories")
+            return res.status(200).json({ success: true, message: "Category updated successfully" });
+
         }else{
             res.status(404).json({error:"Category Not Found"})
         }

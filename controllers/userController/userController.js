@@ -22,7 +22,7 @@ const loadHomePage = async (req, res) => {
     try {
         const user = req.session.user
         if (user) {
-            const products = await Product.find()
+            const products = await Product.find({isBlocked:false})
             const userData = await User.findOne({ _id: user })
             res.render('home', { user: userData, products })
         } else {

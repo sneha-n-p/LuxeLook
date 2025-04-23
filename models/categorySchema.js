@@ -28,7 +28,7 @@ const categorySchema = new mongoose.Schema({
     },
     offer:{
         type:Number,
-        required:false
+        required:0
     }
     
 })

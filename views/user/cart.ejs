@@ -1,0 +1,230 @@
+<style>
+    body {
+        background: #fff;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .banner {
+        background: url('/images/cart-banner.jpg') no-repeat center;
+        background-size: cover;
+        height: 250px;
+    }
+
+    .banner h1 {
+        color: #000;
+        padding-top: 160px;
+        font-size: 3rem;
+        text-align: center;
+    }
+
+    .cart-table {
+        background: #e1f7f7;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .cart-table th {
+        background: #30cfcf;
+        color: #fff;
+        padding: 15px;
+    }
+
+    .cart-table td {
+        vertical-align: middle;
+        padding: 15px;
+    }
+
+    .cart-product-img {
+        height: 120px;
+        width: 100px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .quantity-input {
+        width: 60px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .pagination-btn {
+        background: #30cfcf;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+    }
+
+    .cart-totals-box {
+        border: 1px solid #ddd;
+        padding: 20px;
+        background: #fff;
+    }
+
+    .checkout-btn {
+        background: #30cfcf;
+        color: #fff;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+
+    .checkout-btn:hover {
+        background: #2fb3b3;
+    }
+
+    .Empty-cart {
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    .Empty-cart span {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .Empty-cart button {
+        background-color: #30cfcf;
+        color: #fff;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .Empty-cart button:hover {
+        background-color: #2fb3b3;
+    }
+</style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <%-include("../../views/partials/userPartial/header")%>
+
+        <!-- Banner -->
+        <div class="banner">
+            <h1>MY CART</h1>
+        </div>
+
+        <!-- Cart Table -->
+        <div class="container my-5">
+            <%if(cart.length>0){%>
+                <table class="table cart-table text-center">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let product of cart) { %>
+                            <tr>
+                                <td>
+                                    <img src="<%= product.productImage[0] %>" class="cart-product-img">
+                                </td>
+                                <td>
+                                    <strong>
+                                        <%= product.productName %>
+                                    </strong><br>
+                                    <small>
+                                        <%= product.description %>
+                                    </small>
+                                </td>
+                                <td>₹<%= product.salePrice %>
+                                </td>
+                                <td>
+                                    <input type="number" value="1" class="quantity-input" min="1"
+                                        max="<%=product.quatity%>" data-price="<%= product.salePrice %>"
+                                        data-id="<%= product.productId %>">
+
+                                </td>
+                                <td class="product-total">₹<%= product.salePrice * product.quantity %>
+                                </td>
+                            </tr>
+                            <% }%>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <p class="m-0">Showing 1 to <%= totalPages %>
+                    </p>
+                    <div class="d-flex gap-2">
+                        <ul class="pagination mb-0">
+                            <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+                            </li>
+
+                            <% for (let i=1; i <=totalPages; i++) { %>
+                                <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                                    <a class="page-link" style="text-decoration: none;background-color:#30cfcf;"
+                                        href="?page=<%= i %>&search=<%= search %>">
+                                        <%= i %>
+                                    </a>
+                                </li>
+                                <% } %>
+
+                                    <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                                        <a class="page-link"
+                                            href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+                                    </li>
+                        </ul>
+                    </div>
+                </div>
+                <%}else{%>
+                    <div class="Empty-cart">
+                        <span>Your Cart Is Empty</span>
+                        <br><br>
+                        <a href="/shop"><button>Discover Now</button></a>
+                    </div>
+                    <%}%>
+
+
+
+
+
+        </div>
+
+        <!-- Footer -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            const quantityInputs = document.querySelectorAll(".quantity-input");
+
+            quantityInputs.forEach(input => {
+                input.addEventListener("input", function () {
+                    let quantity = parseInt(this.value);
+                    let max = parseInt(this.getAttribute("max"));
+                    let min = parseInt(this.getAttribute("min"));
+                    let price = parseFloat(this.getAttribute("data-price"));
+                    let totalCell = this.closest("tr").querySelector(".product-total");
+
+                    // Validate within limits
+                    if (quantity > max) {
+                        this.value = max;
+                        quantity = max;
+                    }
+                    if (quantity < min || isNaN(quantity)) {
+                        this.value = min;
+                        quantity = min;
+                    }
+
+                    // Update total price for this product
+                    totalCell.textContent = "₹" + (price * quantity);
+                });
+            });
+        </script>
+
+        <%-include("../../views/partials/userPartial/footer")%>

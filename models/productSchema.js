@@ -75,7 +75,15 @@ const productSchema = new Schema({
             type:Number,
             required:false
         }
-    }]
+    }],
+    offer:{
+        type:Number,
+        default:0
+    },
+    createdAt:{
+        type:Date,
+        default:Date.now
+    }
 
 })
 

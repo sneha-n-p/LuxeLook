@@ -62,17 +62,17 @@
     <div class="main-content">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Categories</h2>
-        <div class="d-flex align-items-center gap-3">
-          <input type="text" class="form-control search-bar" placeholder="Search for User Name" style="width: 250px;">
-          <div>Admin</div>
-        </div>
+        <div>Admin</div>
+      </div>
+
+      <div class="d-flex justify-content-end mb-3">
+        <a href="/admin/add-category" class="btn btn-add">ADD CATEGORY +</a>
+      </div>
+      <div class="mb-4">
+        <input type="text" id="productSearch" class="form-control search-bar" placeholder="Search for Categories">
       </div>
 
       <div class="card">
-        <div class="d-flex justify-content-end mb-3">
-          <a href="/admin/add-category" class="btn btn-add">ADD CATEGORY +</a>
-        </div>
-
         <table class="table">
           <thead>
             <tr>
@@ -104,15 +104,15 @@
                     <%= category.offer %>
                   </td>
                   <td>
-                    <%if(category.status == "Unlisted"){%>
+                    <%if(category.status=="Unlisted" ){%>
                       <button class="btn btn-unlist btn-sm" style="background-color: green; color: #fff;"
                         onClick="Listed('<%=category._id%>','<%=category.name%>')">List</button>
                       <%}else{%>
                         <button class="btn btn-list btn-sm" style="background-color: rgb(255, 0, 0); color: #fff;"
                           onClick="Unlisted('<%=category._id%>','<%=category.name%>')">Unlist</button>
                         <%}%>
-                    <a href="/admin/edit-category/<%= category._id %>" class="text-dark me-2"><i
-                        class="bi bi-pencil"></i></a>
+                          <a href="/admin/edit-category/<%= category._id %>" class="text-dark me-2"><i
+                              class="bi bi-pencil"></i></a>
                   </td>
                 </tr>
                 <% }) %>
@@ -149,6 +149,23 @@
 
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
       <script>
+
+        document.getElementById('productSearch').addEventListener('keyup', function () {
+          let searchValue = this.value.toLowerCase();
+          let rows = document.querySelectorAll('tbody tr');
+
+          rows.forEach(row => {
+            let categoryName = row.children[1].textContent.toLowerCase();
+            if (categoryName.includes(searchValue)) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        });
+
+      
+
         function Unlisted(id, name) {
           Swal.fire({
             title: 'Unlisted',

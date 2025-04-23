@@ -1,0 +1,210 @@
+<style>
+  body {
+    background: #fff;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .banner {
+    background: url('/images/wishlist-banner.jpg') no-repeat center;
+    background-size: cover;
+    height: 250px;
+  }
+
+  .banner h1 {
+    color: #000;
+    padding-top: 160px;
+    font-size: 3rem;
+    text-align: center;
+  }
+
+  .wishlist-table {
+    background: #e1f7f7;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .wishlist-table th {
+    background: #30cfcf;
+    color: #fff;
+    padding: 15px;
+  }
+
+  .wishlist-table td {
+    vertical-align: middle;
+    padding: 15px;
+  }
+
+  .wishlist-product-img {
+    height: 120px;
+    width: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+
+  .add-cart-btn {
+    background: #30cfcf;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+
+  .add-cart-btn:hover {
+    background: #2fb3b3;
+  }
+
+  .delet-cart-btn {
+    background: rgb(150, 39, 39);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+
+  .delet-cart-btn:hover {
+    background: #390303;
+  }
+
+  .pagination-btn {
+    background: #30cfcf;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+  }
+
+  .Empty-wishlist {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin: 50px auto;
+    max-width: 500px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .Empty-wishlist span {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .Empty-wishlist button {
+    background-color: #30cfcf;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .Empty-wishlist button:hover {
+    background-color: #2fb3b3;
+  }
+</style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <%-include("../../views/partials/userPartial/header")%>
+
+
+    <!-- Banner -->
+    <div class="banner">
+      <h1>WISHLIST</h1>
+    </div>
+
+    <!-- Wishlist Table -->
+    <div class="container my-5">
+      <%if(wishlist.length>0) { %>
+        <table class="table wishlist-table text-center">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <%for(let product of wishlist){%>
+              <tr>
+                <td>
+                  <img src="<%= product.productImage[0] %>" class="wishlist-product-img">
+                </td>
+                <td>
+                  <strong>
+                    <%= product.productName %>
+                  </strong><br>
+                  <p class="product-cat">
+                    <%=product.category.name %>
+                  </p>
+                  <small>
+                    <%= product.description %>
+                  </small>
+                </td>
+                <td>₹<%= product.salePrice %>
+                </td>
+                <td>
+                  <button class="add-cart-btn">Add to Cart</button>
+                  <button class="delet-cart-btn" herf="#" onclick="confirmRemove('<%=product._id%>')">&#128465;</button>
+                </td>
+
+              </tr>
+              <%}%>
+          </tbody>
+        </table>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <p class="m-0">Showing 1 to <%= totalPages %>
+          </p>
+          <div class="d-flex gap-2">
+            <ul class="pagination mb-0">
+              <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+              </li>
+
+              <% for (let i=1; i <=totalPages; i++) { %>
+                <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                  <a class="page-link" style="text-decoration: none;background-color:#30cfcf;"
+                    href="?page=<%= i %>&search=<%= search %>">
+                    <%= i %>
+                  </a>
+                </li>
+                <% } %>
+
+                  <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                    <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+                  </li>
+            </ul>
+          </div>
+        </div>
+        <% }else{ %>
+          <div class="Empty-wishlist">
+            <span>Your Wishlist Is Empty</span>
+            <br><br>
+            <a href="/shop"><button>Discover Now</button></a>
+          </div>
+          <%}%>
+
+
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+      function confirmRemove(productId) {
+        Swal.fire({})
+      }
+
+
+    </script>
+
+    <!-- Footer -->
+    <%-include("../../views/partials/userPartial/footer")%>

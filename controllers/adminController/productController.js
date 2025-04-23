@@ -8,7 +8,7 @@ const mongoose = require("mongoose")
 
 
 const productInfo = async (req, res) => {
-  try {
+  try{
     let search = ""
     if (req.query.search) {
       search = req.query.search
@@ -149,7 +149,7 @@ const addproduct = async (req, res) => {
       quatity: Stock,
       size: Size,
       category: categoryDoc._id,
-      offer: Math.round(((price - salesPrice) / price) * 100),
+      offer: 0,
       regularPrice: parseFloat(price),
       salePrice: parseFloat(salesPrice),
       productImage: imagesPaths
@@ -158,7 +158,7 @@ const addproduct = async (req, res) => {
 
     await newProduct.save()
     console.log("Product saved successfully!")
-    return res.status(200).json({ success: true, message: 'Product added successfully' })
+    return res.status(200).json({ success: true, message: 'Product added successfully',url:"/admin/products" })
   } catch (error) {
     console.error("Error adding product:", error)
   }

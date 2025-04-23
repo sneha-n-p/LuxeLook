@@ -28,7 +28,7 @@ router.patch("/Unlist-category",adminAuth,categoryController.unlistCategory)
 router.get("/edit-category/:id",adminAuth,categoryController.loadEditCategory)
 router.post("/edit-category/:id",categoryController.editCategory)
 
-router.get("/Products",productController.productInfo)
+router.get("/Products",adminAuth,productController.productInfo)
 router.get("/add-product",adminAuth,productController.loadAddProduct)
 router.post("/add-product",upload.any(),productController.addproduct)
 router.get("/edit-product/:id",adminAuth,productController.editProduct)
