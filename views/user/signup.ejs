@@ -225,19 +225,21 @@
     }
 
     function phonevalidateCheking(e) {
-      const phoneValue = phoneNum.value
+  const phoneValue = phoneNum.value.trim()
 
-      if (phoneValue.trim() === "") {
-        signupError3.style.display = "block"
-        signupError3.innerHTML = "Enter valid number"
-      } else if (phoneValue.length < 10 || phoneValue.length > 10) {
-        signupError3.style.display = "block"
-        signupError3.innerHTML = "Enter 10 digit"
-      } else {
-        signupError3.style.display = "none"
-        signupError3.innerHTML = ""
-      }
-    }
+  const phoneRegex = /^(?!0{10})\d{10}$/
+
+  if (phoneValue === "") {
+    signupError3.style.display = "block"
+    signupError3.innerHTML = "Enter a valid number"
+  } else if (!phoneRegex.test(phoneValue)) {
+    signupError3.style.display = "block"
+    signupError3.innerHTML = "Enter a valid 10-digit number (not all zeros)"
+  } else {
+    signupError3.style.display = "none"
+    signupError3.innerHTML = ""
+  }
+}
 
     function passwordValidateChecking(e) {
       const PasswordVlaue = passwordID.value

@@ -1,0 +1,269 @@
+<%- include('../partials/userPartial/header') %>
+
+    <style>
+        .account-banner {
+            background: url('/images/account-banner.jpg') center/cover no-repeat;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .order-info-box {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .order-info-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .product-detail-card {
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .product-detail-card img {
+            width: 70px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 20px;
+        }
+
+        .product-detail-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .product-detail-text {
+            flex: 1;
+        }
+
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge-delivered {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .badge-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .action-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-return {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: #fff;
+        }
+    </style>
+
+    <div class="account-banner">ORDER DETAILS</div>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="order-info-box">
+                    <div class="order-info-title">Order #<%= order.orderId %>
+                    </div>
+                    <p><strong>Status:</strong>
+                        <% if (order.status.trim()==='Delivered' ) { %>
+                            <span class="badge-status badge-delivered">DELIVERED</span>
+                            <% } else if (order.status.trim()==='Pending' ) { %>
+                                <span class="badge-status badge-pending">PENDING</span>
+                                <% } else { %>
+                                    <span class="badge-status bg-secondary text-white">
+                                        <%= order.status.toUpperCase() %>
+                                    </span>
+                                    <% } %>
+                    </p>
+                    <p><strong>Total Price:</strong> ₹<%= order.totalPrice %>
+                    </p>
+                    <p><strong>Final Amount:</strong> ₹<%= order.finalAmount %>
+                    </p>
+                    <% if (order.address && order.address.length > 0) { %>
+                        <p><strong>Address:</strong>
+                            <%= order.address[0].name %>, 
+                            <%= order.address[0].streetAddress %><% if(order.address[0].apartment) { %>, <%= order.address[0].apartment %><% } %>,
+                            <%= order.address[0].city %>, 
+                            <%= order.address[0].state %> - 
+                            <%= order.address[0].pincode %><br>
+                            Phone: <%= order.address[0].phone %>
+                            <% if(order.address[0].altPhone){ %><br>Alt Phone: <%= order.address[0].altPhone %><% } %>
+                        </p>
+                    <% } %>
+                    <p><strong>Coupon Applied:</strong>
+                        <%= order.couponApplied ? 'Yes' : 'No' %>
+                    </p>
+                    <p><strong>Order Date:</strong>
+                        <%= order.createdOn.toDateString() %>
+                    </p>
+
+                    <hr>
+                    <h5 class="mb-3">Ordered Items</h5>
+                    <% order.orderedItems.forEach(item=> { %>
+                        <div class="product-detail-card">
+                            <div class="product-detail-left">
+                                <img src="<%= item.product.productImage[0] %>" alt="Product Image">
+                                <div class="product-detail-text">
+                                    <h6>
+                                        <%= item.product.productName %>
+                                    </h6>
+                                    <p>Quantity: <%= item.quantity %> | Price: ₹<%= item.price   %> | Status: <%= item.status   %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <% if (item.status.trim()==='Delivered' ) { %>
+                                        <button type="button" onclick="returned('<%= order._id %>','<%= item.product._id %>')" class="action-btn btn-return">RETURN</button>
+                                    <% } else if (item.status.trim()==='Ordered') { %>
+                                        <button onclick="cancelSingleProduct('<%= item.product._id %>','<%= order._id %>')"
+                                            class="action-btn btn-cancel">CANCEL</button>
+                                        <% } else { %>
+                                            <span>N/A</span>
+                                            <% } %>
+                            </div>
+                        </div>
+                        <% }) %>
+
+                            <a href="/orders" class="back-btn">← Back to Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function cancelSingleProduct(productId,orderId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You wont cancel the order!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Cancel it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('/orders/details', { productId,orderId })
+                        .then(response => {
+                            if (response.data.success) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Cancelled!",
+                                    text: "Order Cancel Successfully.",
+                                    showConfirmButton: false,
+                                    timer: 1200
+                                })
+                            }else{
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Cancelled!",
+                                    text: responce.data.message,
+                                    showConfirmButton: false,
+                                    timer: 1200
+                                })
+                            }
+                        })
+                }
+            })
+            .catch((error)=>{
+                Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong while cancel the order!"
+            })
+        })
+    }
+
+    function returned(orderId,productId) {
+        Swal.fire({
+        title: 'Return: Product',
+        input: 'textarea',
+        inputLabel: 'Reason for return',
+        inputPlaceholder: 'Enter your reason here...',
+        inputAttributes: {
+          'aria-label': 'Reason for return'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        preConfirm: (reason) => {
+          if (!reason.trim()) {
+            Swal.showValidationMessage('Reason is required');
+          } else {
+            return reason;
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.patch('/orders/return', {
+            orderId,
+            productId,
+            reason: result.value
+          }).then(response => {
+            if (response.data.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Return Requested!",
+                text: "Your return request has been submitted.",
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops!",
+                text: response.data.message || "Return request failed.",
+              });
+            }
+          }).catch(error => {
+            Swal.fire({
+              icon: "error",
+              title: "Oops!",
+              text: "Something went wrong while submitting return request.",
+            });
+          });
+        }
+      });
+    }
+    </script>
+    <%- include('../partials/userPartial/footer') %>

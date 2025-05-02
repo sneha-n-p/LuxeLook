@@ -101,6 +101,7 @@
                   <a href="/product-details/<%=products[i]._id%>"><button class="btn btn-outline-dark btn-sm">View
                       Details</button></a>
                   <button class="wishlist-symbol" onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
+                  <button class="wishlist-symbol" onclick="addToCart('<%=products[i]._id%>')">&#128722;</button>
 
 
                 </div>
@@ -144,6 +145,36 @@
           })
         })
     }
+    function addToCart(productId) {
+
+axios.post("/addToCart", { productId })
+  .then(function (responce) {
+    if (responce.data.success) {
+      Swal.fire({
+        title: `Add To Cart`,
+        icon: 'success',
+        showConfirmButton:false,
+        timer: 1500
+      })
+    } else {
+      Swal.fire({
+        title: "Error Occured",
+        icon: "error",
+        showConfirmButton:false,
+        text: responce.data.message,
+        timer: 1500
+      })
+    }
+  }).catch((error)=>{
+    Swal.fire({
+        title: "Error Occured",
+        icon: "error",
+        showConfirmButton:false,
+        text:"Internal Server Error",
+        timer: 1500
+      })
+  })
+}
 
 
   </script>

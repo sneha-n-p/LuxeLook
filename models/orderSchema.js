@@ -1,63 +1,123 @@
 const mongoose = require("mongoose")
-const { schema } = mongoose
+const { Schema } = mongoose
 const { v4: uuidv4 } = require("uuid")
 
 const orderSchema = new Schema({
-    orderId:{
-        type:String,
-        default:()=>uuidv4(),
-        unique:true
+    orderId: {
+        type: String,
+        default: () => uuidv4(),
+        unique: true
     },
-    orderedItems:[{
-        product:{
-            type:Schema.types.orderId,
-            ref:"Product",
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "user",
+        required: true
+    },
+    orderedItems: [{
+        product: {
+            type: Schema.Types.ObjectId,
+            ref: "Product",
+            required: true
+        },
+        productName:{
+            type:String,
+            required:false
+        },
+        productImage:{
+            type:String,
+            required:false
+        },
+        quantity: {
+            type: Number,
+            required: true
+        },
+        price: {
+            type: Number,
+            default: 0
+        },
+        status: {
+            type: String,
+            enum: ['Ordered', 'Cancelled','Delivered','Return Request','Returned'],
+            default: 'Ordered',
+        },
+        returnReason: {
+            type:String,
+            required:false,
+        }
+    }],
+    totalPrice: {
+        type: Number,
+        required: true
+    },
+    discount: {
+        type: Number,
+        default: 0
+    },
+    finalAmount: {
+        type: Number,
+        required: true
+    },
+  
+    address: [{
+        addressType: {
+            type: String,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        },
+        city: {
+            type: String,
+            required: true
+        },
+        streetAddress: {
+            type: String,
+            required: true
+        },
+        apartment: {
+            type: String,
+            required: false  
+        },
+        state: {
+            type: String,
+            required: true
+        },
+        pincode:{
+            type:Number,
             required:true
         },
-        quantity:{
-            type:Number,
-            require:true
+        phone:{
+            type:String,
+            reuired:true
         },
-        price:{
-            type:Number,
-            default:0
-        },
+        altPhone:{
+            type:String,
+            required:false
+        }
     }],
-    totalPrice:{
-        type:Number,
-        required:true
+    invoiceDate: {
+        type: Date
     },
-    disconut:{
-        type:Number,
-        default:0
+    status: {
+        type: String,
+        required: true,
+        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled','Out For Delivery', 'Return Request', 'Returned']
     },
-    finalAmount:{
-        type:Number,
-        required:true
+    createdOn: {
+        type: Date,
+        default: Date.now,
+        required: true
     },
-    address:{
-        type:Schema.types.ObjectId,
-        ref:"User",
-        required:true
+    couponApplied: {
+        type: Boolean,
+        default: false
     },
-    invoiceDate:{
-        type:Date
-    },
-    status:{
+    returnReason :{
         type:String,
-        required:true,
-        enum:['Pending','Processing','Shipped','Delivered','Cancelled','Preturn Request','Returned']
-    },
-    createdOn:{
-        type:Date,
-        default:Date.now,
-        required:true
-    },
-    couponApplied:{
-        type:Boolean,
-        default:false
+        required:false
     }
 })
 
-const Order = mongoose.model("Order",orderSchema)
+const Order = mongoose.model("Order", orderSchema)
 module.exports = Order

@@ -1,0 +1,353 @@
+<%-include("../../views/partials/userPartial/header")%>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #fff;
+        }
+
+        .account-banner {
+            background: url('/images/banner-add-address.jpg') center/cover no-repeat;
+            height: 300px;
+            position: relative;
+        }
+
+        .account-title {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 42px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .account-wrapper {
+            display: flex;
+            margin-top: 40px;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: #f3f3f3;
+            padding: 30px 20px;
+        }
+
+        .sidebar h6 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .sidebar ul {
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            padding: 8px 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sidebar ul li.active {
+            font-weight: bold;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px 40px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            background-color: #57c9d5;
+            border: none;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 25px;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #44b0bb;
+        }
+
+        .Error-message {
+            color: red;
+            font-size: 0.75rem;
+            display: none;
+        }
+    </style>
+    </head>
+
+    <body>
+
+        <!-- Banner -->
+        <div class="account-banner">
+            <div class="account-title">ACCOUNT</div>
+        </div>
+
+        <!-- Wrapper -->
+        <div class="container-fluid account-wrapper">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h6>SETTINGS</h6>
+                <ul>
+                    <li><a href="/orders" style="text-decoration: none;">Orders</a></li>
+                    <li><a href="/profile" style="text-decoration: none;">Personal Info</a></li>
+                    <li><a href="/addresses" style="text-decoration: none;">Addresses</a></li>
+                    <li><a href="/wallet" style="text-decoration: none;">Wallet</a></li>
+                </ul>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <h5 class="mb-4 fw-bold">ADD ADDRESS</h5>
+
+                <form id="addAddressForm" class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Name</label>
+                        <input type="text" id="name" class="form-control" value="<%=address.name%>" name="name"
+                            required>
+                        <div id="Error1" class="Error-message"></div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">State</label>
+                            <select class="form-select" id="state" name="state" required>
+                                <option>
+                                    <%=address.state%>
+                                </option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                <option value="Assam">Assam</option>
+                                <option value="Bihar">Bihar</option>
+                                <option value="Chhattisgarh">Chhattisgarh</option>
+                                <option value="Goa">Goa</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Haryana">Haryana</option>
+                                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                <option value="Jharkhand">Jharkhand</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Kerala">Kerala</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Manipur">Manipur</option>
+                                <option value="Meghalaya">Meghalaya</option>
+                                <option value="Mizoram">Mizoram</option>
+                                <option value="Nagaland">Nagaland</option>
+                                <option value="Odisha">Odisha</option>
+                                <option value="Punjab">Punjab</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Sikkim">Sikkim</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Tripura">Tripura</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Uttarakhand">Uttarakhand</option>
+                                <option value="West Bengal">West Bengal</option>
+                                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                <option value="Chandigarh">Chandigarh</option>
+                                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and
+                                    Daman and Diu</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                <option value="Ladakh">Ladakh</option>
+                                <option value="Lakshadweep">Lakshadweep</option>
+                                <option value="Puducherry">Puducherry</option>
+                            </select>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <label class="form-label">Street Address</label>
+                            <input type="text" id="streetAddress" class="form-control"
+                                value="<%=address.streetAddress%>" name="streetAddress" required>
+                            <div id="Error2" class="Error-message"></div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apartment, suite, unit etc (optional)</label>
+                            <input type="text" id="apartment" class="form-control" value="<%=address.apartment%>"
+                                name="apartment">
+                            <div id="Error3" class="Error-message"></div>
+
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Town / City</label>
+                            <input type="text" id="city" class="form-control" value="<%=address.city%>" name="city"
+                                required>
+                            <div id="Error4" class="Error-message"></div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">pincode / ZIP</label>
+                            <input type="text" id="pincode" class="form-control" value="<%=address.pincode%>"
+                                name="pincode" required>
+                            <div id="Error5" class="Error-message"></div>
+
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="text" id="phone" class="form-control" value="<%=address.phone%>" name="phone"
+                                required>
+                            <div id="Error6" class="Error-message"></div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Alternative Phone</label>
+                            <input type="text" id="altPhone" class="form-control" value="<%=address.altPhone%>"
+                                name="altPhone">
+                            <div id="Error7" class="Error-message"></div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="addressType">Select Address Type</label>
+                            <select id="addressType" name="addressType" class="form-control" required>
+                                <option value="<%=address.addressType%>" disabled selected>
+                                    <%=address.addressType%>
+                                </option>
+                                <option value="Home">Home</option>
+                                <option value="Work">Work</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div id="Error8" class="Error-message"></div>
+                        </div>
+
+                        <div class="col-12 mt-3">
+                            <button type="submit" onclick="editAddress('<%=address._id%>')" class="submit">Edit
+                                Address</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+
+
+        <script>
+
+
+
+            const addAddressForm = document.getElementById('addAddressForm');
+
+            addAddressForm.addEventListener('submit', function (e) {
+                e.preventDefault()
+                const name = document.getElementById('name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const altPhone = document.getElementById('altPhone').value.trim();
+                const streetAddress = document.getElementById('streetAddress').value.trim();
+                const apartment = document.getElementById('apartment').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const state = document.getElementById('state').value.trim();
+                const pincode = document.getElementById('pincode').value.trim();
+                const addressType = document.getElementById('addressType').value;
+
+
+                if (!/^[A-Za-z\s]+$/.test(name) || name.length < 3) {
+                    Error1.style.display = 'block'
+                    Error1.innerHTML = 'Name should contain only alphabets and be at least 3 characters long.';
+                    return;
+                }
+
+
+                if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
+                    Error6.style.display = 'block'
+                    Error6.innerHTML = 'Phone number must be 10 digits and not all same digits.';
+                    return;
+                }
+
+                if (altPhone && (!/^\d{10}$/.test(altPhone) || /^(\d)\1{9}$/.test(altPhone || altPhone !== phone))) {
+                    Error7.style.display = 'block'
+                    Error7.innerHTML = 'Alternate Phone number must be 10 digits and not all same digits.and Not same to phone.';
+                    return;
+                }
+                if (!streetAddress || !city || !state) {
+                    Error4.style.display = 'block'
+                    Error2.style.display = 'block'
+                    Error2.innerHTML = 'Please fill  the address fields.';
+                    Error4.innerHTML = 'Please fill  the City fields.';
+                    return;
+                }
+
+                if (!/^\d{6}$/.test(pincode) || /^(\d)\1{5}$/.test(pincode)) {
+                    Error5.style.display = 'block'
+                    Error5.innerHTML = 'Pincode must be 6 digits and not all same digits.';
+                    return;
+                }
+
+                if (!addressType) {
+                    Error5.style.display = 'block'
+                    Error5.innerHTML = 'Please select an address type.';
+                    return;
+                }
+                addAddressForm.submit();
+            });
+
+
+            function editAddress(addressId) {
+                const name = document.getElementById('name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const altPhone = document.getElementById('altPhone').value.trim();
+                const streetAddress = document.getElementById('streetAddress').value.trim();
+                const apartment = document.getElementById('apartment').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const state = document.getElementById('state').value.trim();
+                const pincode = document.getElementById('pincode').value.trim();
+                const addressType = document.getElementById('addressType').value;
+
+                const addAddressForm = document.getElementById('addAddressForm');
+                axios.post('/edit-address', {
+                    addressId,
+                    name,
+                    phone,
+                    altPhone,
+                    streetAddress,
+                    apartment,
+                    city,
+                    state,
+                    pincode,
+                    addressType
+                })
+                    .then(function (response) {
+                        if (response.data.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Updated!",
+                                text: "Address updated successfully!",
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.href = "/addresses"
+                            });
+                        }
+                    })
+                    .catch(function (error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Something went wrong while updating address!"
+                        });
+                        console.error("Update Address Error:", error);
+                    });
+            }
+
+
+
+        </script>
+        <%-include("../../views/partials/userPartial/footer")%>

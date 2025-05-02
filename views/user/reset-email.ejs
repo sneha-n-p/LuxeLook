@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Reset Email | LuxeLook</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff;
+    }
+
+    .email-banner {
+      background: url('/images/profile-banner.jpg') center/cover no-repeat;
+      height: 300px;
+      position: relative;
+    }
+
+    .email-header {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 42px;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .email-box {
+      max-width: 500px;
+      margin: 60px auto;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .email-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .submit-btn {
+      background-color: #57c9d5;
+      color: white;
+      padding: 10px 30px;
+      border: none;
+      border-radius: 25px;
+      display: block;
+      margin: 20px auto 10px;
+      transition: 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #44b0bb;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Banner/Header -->
+  <div class="email-banner">
+    <div class="email-header">RESET EMAIL</div>
+  </div>
+
+  <!-- Reset Email Box -->
+  <div class="email-box">
+    <div class="email-title">Enter your new email address</div>
+    <form action="/reset-email" id="resetEmailForm" method="POST">
+      <div class="mb-3">
+        <input type="email" name="newEmail" class="form-control" id='newEmail' placeholder="New Email Address" required>
+      </div>
+      <button type="submit" class="submit-btn">Update Email</button>
+    </form>
+  </div>
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    document.getElementById('resetEmailForm').addEventListener('submit', async function (e) {
+      console.log('hiii')
+      e.preventDefault();
+      const newEmail = document.getElementById('newEmail').value.trim();
+
+      const emailPattern = /^[a-zA-Z0-9._%+-]{1,}@gmail\.com$/;
+
+
+      if (!emailPattern.test(newEmail)) {
+        return Swal.fire("Error", "Email must end with @gmail.com", "error");
+      }
+
+      try {
+        axios.post('/reset-email', { newEmail })
+          .then((response) => {
+            if (response.data.success) {
+              Swal.fire("Success", "Email changed successfully!", "success").then(() => {
+                window.location.href = "/profile";
+              });
+            } else {
+              Swal.fire("Error", response.data.message || "Something went wrong", "error");
+            }
+          })
+          .catch((error) => {
+            Swal.fire("Error", error.response?.data?.message || "Server error", "error");
+          });
+
+      } catch (error) {
+        console.error("Something went wrong:", error);
+      }
+    })
+  </script>
+
+</body>
+
+</html>

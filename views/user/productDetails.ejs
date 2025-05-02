@@ -134,9 +134,8 @@
           </h6>
           <input type="number" value="1" class="form-control mb-3" style="width: 100px;" min="1"
             max="<%=product.quatity%>">
-
-          <button class="btn btn-dark">Add to Cart</button>
           <button class="btn btn-dark" onclick="addToWishlist('<%=product._id%>')">Add to wishlist</button>
+          <button class="btn btn-dark" onclick="addToCart('<%=product._id%>')">Add to Cart</button>
         </div>
       </div>
 
@@ -241,6 +240,37 @@
             })
           })
       }
+
+      function addToCart(productId) {
+
+axios.post("/addToCart", { productId })
+  .then(function (responce) {
+    if (responce.data.success) {
+      Swal.fire({
+        title: `Add To Cart`,
+        icon: 'success',
+        showConfirmButton:false,
+        timer: 1500
+      })
+    } else {
+      Swal.fire({
+        title: "Error Occured",
+        icon: "error",
+        showConfirmButton:false,
+        text: responce.data.message,
+        timer: 1500
+      })
+    }
+  }).catch((error)=>{
+    Swal.fire({
+        title: "Error Occured",
+        icon: "error",
+        showConfirmButton:false,
+        text:"Internal Server Error",
+        timer: 1500
+      })
+  })
+}
 
     </script>
   </body>

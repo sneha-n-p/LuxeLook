@@ -2,6 +2,7 @@ const User = require("../../models/userSchema")
 const Product = require("../../models/productSchema")
 const Wishlist = require("../../models/wishlistSchema")
 const Category = require("../../models/categorySchema")
+const { connect } = require("mongoose")
 const env = require("dotenv").config()
 
 
@@ -69,11 +70,27 @@ const addToWishlist = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server Error" })
     }
 }
+const removeProduct = async (req, res) => {
+    try {
+        const productId = req.body.productId
+        const userId = req.session.user
+        const user = await User.findById(userId)
+        const index = user.wishlist.indexOf(productId)
+        user.wishlist.splice(index,1)
+        await user.save()
+        return res.status(200).json({ success: true, wishlistCount: user.wishlist.length });
+
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({success:false,message:"Server Error"})
+    }
+}
 
 
 
 module.exports = {
     loadwishlist,
-    addToWishlist
+    addToWishlist,
+    removeProduct
 
 }

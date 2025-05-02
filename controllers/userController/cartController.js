@@ -3,19 +3,15 @@ const Wishlist = require("../../models/wishlistSchema")
 const Product = require("../../models/productSchema")
 const Category = require("../../models/cartSchema")
 const Cart = require("../../models/cartSchema")
+const Address = require("../../models/addressSchema")
 const env = require("dotenv")
 
-const loadcart = async(req,res)=>{
+const loadcart = async (req, res) => {
     try {
-        let search = ""
-        if (req.query.search) {
-            search = req.query.search
-        }
-        let page = 1
-        if (req.query.page) {
-            page = req.query.page
-        }
+        let search = req.query.search || ""
+        let page = parseInt(req.query.page) || 1
         const limit = 5
+
         const productData = await Product.find({
             isBlocked: false,
             $or: [
@@ -32,17 +28,28 @@ const loadcart = async(req,res)=>{
                 { productName: { $regex: ".*" + search + ".*", $options: "i" } }
             ],
         }).countDocuments()
+
         const totalPages = Math.ceil(count / limit);
+
         if (req.session.user) {
             const id = req.session.user
             const user = await User.findById(id)
-            const products = await Product.find({ _id: { $in: user.cart } }).populate('category')
-            const categories = await Category.find({ isBlocked: false })
-            const availableQuantity = await Product.find({quantity:products.quatity})
-            res.render("cart", {cart: products, user, totalPages, categories, currentPage: page, search, productData,availableQuantity })
-        } else {
-            res.redirect("/login", { products, productData, user: null, totalPages, currentPage: page, search, categories,availableQuandity })
-            console.log(products)
+            const cart = await Cart.findOne({ userId: id }).populate("items.productId")
+
+            const items = cart ? cart.items : []
+            console.log('items:', items)
+            const subTotal = items.reduce((acc, curr) => {
+                return acc + (curr.totalPrice || 0);
+            }, 0);
+
+            res.render("cart", {
+                cart: items,
+                user,
+                totalPages,
+                currentPage: page,
+                search,
+                subTotal
+            })
         }
     } catch (error) {
         console.error(error)
@@ -50,17 +57,86 @@ const loadcart = async(req,res)=>{
     }
 }
 
-const addToCart = async(req,res)=>{
+const procedToCheckOut = async (req, res) => {
+    try {
+        const userId = req.session.user;
+        const cartItems = req.body.cartItems;
+        console.log(cartItems)
+        let allUpdatesSuccessful = true;
+
+        for (let item of cartItems) {
+            const totalPrice = item.price * item.quantity;
+            console.log(cartItems)
+            const updateResult = await Cart.updateOne(
+                { userId: userId, "items.productId": item.productId },
+                {
+                    $set: {
+                        "items.$.quantity": item.quantity,
+                        "items.$.totalPrice": totalPrice
+                    }
+                }
+            );
+
+            if (updateResult.modifiedCount === 0) {
+                allUpdatesSuccessful = false;
+            }
+        }
+
+        if (allUpdatesSuccessful) {
+            return res.json({ success: true });
+        } else {
+            return res.json({ success: false, message: "Some items failed to update" });
+        }
+
+    } catch (error) {
+        console.error("Error updating cart quantities:", error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+};
+
+
+
+
+
+
+const addToCart = async (req, res) => {
     try {
         const productId = req.body.productId
+        const productData = await Product.findById(productId)
         const userId = req.session.user
-
-        const user = await User.findById(userId)
-        if (user.cart.includes(productId)) {
-            return res.status(200).json({ success: false, message: "Product Already In Cart" })
+        const cart = await Cart.findOne({ userId })
+        const newCart = {
+            productId: productId,
+            quantity: 1,
+            price: productData.salePrice,
+            totalPrice: productData.salePrice * 1
         }
-        user.cart.push(productId)
-        await user.save()
+        const user = await User.findById(userId)
+        const wishlistIndex = user.wishlist.indexOf(productId);
+        if (wishlistIndex !== -1) {
+            user.wishlist.splice(wishlistIndex, 1);
+            await user.save();
+        }
+        if (cart) {
+
+            const existingItem = cart.items.find(item =>
+                item.productId.toString() === productId
+            )
+            if (existingItem) {
+                existingItem.quantity += 1
+                existingItem.totalPrice = existingItem.quantity * existingItem.price
+                await cart.save()
+                return res.status(200).json({ success: true, message: "Product Added Succesfully" })
+            }
+            cart.items.push(newCart)
+            await cart.save()
+            return res.status(200).json({ success: true, message: "Product Added Succesfully" })
+        }
+        const saveCartData = new Cart({
+            userId: userId,
+            items: [newCart]
+        })
+        await saveCartData.save()
         return res.status(200).json({ success: true, message: "Product Added To Cart" })
 
     } catch (error) {
@@ -69,10 +145,91 @@ const addToCart = async(req,res)=>{
     }
 }
 
+const removeProductCart = async (req, res) => {
+    try {
+        const productId = req.body.productId
+        const userId = req.session.user
+        const cart = await Cart.findOne({ userId: userId })
+        const index = cart.items.findIndex(item => item.productId.toString() === productId);
+        console.log('index:', index);
+        await cart.items.splice(index, 1)
+        await cart.save()
+        return res.status(200).json({ success: true, cartCount: cart.items.length });
+
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({ success: false, message: "Server Error" })
+    }
+}
+
+const loadCheckOut = async (req, res) => {
+    try {
+        const userId = req.session.user
+        const user = await User.findById(userId)
+        const address = await Address.findOne({ userId: userId })
+        const cart = await Cart.findOne({ userId: userId }).populate("items.productId")
+        let cartItems = [];
+        let subtotal = 0;
+
+        if (cart && cart.items.length > 0) {
+            cartItems = cart.items.map(item => {
+                const totalPrice = item.productId.salePrice * item.quantity;
+                subtotal += totalPrice;
+                return {
+                    product: {
+                        name: item.productId.productName,
+                        imageUrl: item.productId.productImage[0],
+                    },
+                    quantity: item.quantity,
+                    totalPrice: totalPrice
+                };
+            });
+        }
+        if(address){
+            const addresses = address.address
+            console.log('cartItems:', cartItems)
+            const delivery = subtotal > 1000 ? 0 : 50
+            const discount = 0
+            const finalTotal = subtotal  + delivery - discount;
+    
+            res.render('checkout', {
+                user,
+                addresses,
+                cartItems,
+                subtotal,
+                delivery,
+                discount,
+                finalTotal
+            });
+        }else{
+            const delivery = subtotal > 1000 ? 0 : 50
+            const discount = 0
+            const finalTotal = subtotal  + delivery - discount;
+    
+            res.render('checkout', {
+                user,
+                addresses:null,
+                cartItems,
+                subtotal,
+                delivery,
+                discount,
+                finalTotal
+            });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.redirect('/pageNotFound');
+    }
+}
+
 
 
 
 module.exports = {
     loadcart,
-    addToCart
+    procedToCheckOut,
+    addToCart,
+    removeProductCart,
+    loadCheckOut
 }

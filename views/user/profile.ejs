@@ -1,0 +1,217 @@
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fff;
+  }
+
+  .sidebar {
+    background-color: #f5f5f5;
+    padding: 30px 20px;
+    height: 100%;
+  }
+
+  .sidebar h5 {
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .sidebar a {
+    display: block;
+    color: #333;
+    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .profile-header {
+    background-image: url('wallpaper/wall3.jpg');
+    /* Optional decorative background */
+    background-size: cover;
+    padding: 60px 0 30px;
+    text-align: center;
+    height: 350px;
+  }
+
+  .profile-header h2 {
+    font-size: 40px;
+    font-weight: bold;
+  }
+
+  .profile-container {
+    padding: 40px;
+  }
+
+  .profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ccc;
+    margin-bottom: 15px;
+  }
+
+  .btn-custom {
+    background: linear-gradient(90deg, #00b4db, #0083b0);
+    color: white;
+    border-radius: 25px;
+    padding: 6px 20px;
+    margin-right: 10px;
+    text-decoration: none;
+  }
+
+  .order-box {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+
+  .order-box h6 {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+
+<body>
+  <%-include("../../views/partials/userPartial/header")%>
+
+    <!-- Cropper.js JS -->
+
+    <!-- Profile Header -->
+    <div class="profile-header " >
+      <h2>PROFILE</h2>
+    </div>
+    
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+      <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar " style="height: auto;">
+          <h5>SETTINGS</h5>
+          <a href="/orders" style="text-decoration: none;">Orders</a>
+          <a href="/profile" style="text-decoration: none;">Personal Info</a>
+          <a href="/addresses" style="text-decoration: none;">Addresses</a>
+          <a href="/wallet" style="text-decoration: none;">Wallet</a>
+          <a href="referals" style="text-decoration: none;">Referals</a>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="col-md-10 profile-container">
+          <div class="col-md-2 text-center">
+            <!-- Preview container -->
+            <img id="profilePreview" class="profile-image" src="<%= user.image || '/images/default-user.png' %>"
+              alt="Profile Image">
+            <input type="file" name="profileImage" id="profileInput" class="form-control mt-2" accept="image/*">
+          </div>
+
+          <!-- Hidden canvas output -->
+          <input type="hidden" name="croppedImage" id="croppedImage">
+
+          <div class="row justify-content-center user-info mb-4">
+            <div class="col-md-4">
+              <div class="info-label"><strong> Name:</strong>
+                <%= user.name %>
+              </div>
+              <div class="info-label"><strong>Last Name:</strong>
+                <%= user.lastName %>
+              </div>
+              <div class="info-label"><strong>Phone:</strong>
+                <%= user.phone %>
+              </div>
+              <div class="info-label"><strong>Gender:</strong>
+                <%= user.gender %>
+              </div>
+              <div class="info-label"><strong>Email:</strong>
+                <%= user.email %>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="text-center mb-4">
+            <a href="/profile/edit" class="btn btn-custom">Edit Profile</a>
+            <a href="/profile/change-email" class="btn btn-custom">Change Email</a>
+            <a href="/profile/change-password" class="btn btn-custom">Change Password</a>
+          </div>
+
+          <!-- Recent Orders -->
+          <h5 class="text-center mb-3">Recent Orders</h5>
+          <div class="row justify-content-center">
+            <% latestOrders.forEach(order=> { %>
+              <div class="col-md-4 order-box">
+                <h6>Order ID: <%= order.orderId %>
+                </h6>
+                <p><strong>Date:</strong> <span class="order-date" data-date="<%= order.createdOn %>"></span></p>
+                <p><strong>Status:</strong>
+                  <%= order.status %>
+                </p>
+                <p><strong>Total:</strong> ₹<%= order.finalAmount %>
+                </p>
+              </div>
+              <% }) %>
+          </div>
+          <a href="/add-address" class="btn btn-custom">Add Address</a>
+        </div>
+
+      </div>
+    </div>
+
+    <script>
+      document.querySelectorAll('.order-date').forEach(el => {
+        const rawDate = el.getAttribute('data-date');
+        const dateObj = new Date(rawDate);
+
+        const formattedDate = dateObj.toLocaleString('en-IN', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+
+        el.textContent = formattedDate;
+      });
+
+
+      let cropper;
+      const profileInput = document.getElementById('profileInput');
+      const profilePreview = document.getElementById('profilePreview');
+
+      profileInput.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            profilePreview.src = event.target.result;
+
+            if (cropper) {
+              cropper.destroy();
+            }
+
+            cropper = new Cropper(profilePreview, {
+              aspectRatio: 1,
+              viewMode: 1,
+              autoCropArea: 1,
+              crop(event) {
+                const canvas = cropper.getCroppedCanvas({
+                  width: 300,
+                  height: 300,
+                });
+
+                document.getElementById('croppedImage').value = canvas.toDataURL('image/png');
+              }
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    </script>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <%-include("../../views/partials/userPartial/footer")%>

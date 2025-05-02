@@ -58,7 +58,7 @@ const loadProductDetails = async (req, res) => {
         if (req.session.user) {
             const id = req.session.user
             const user = await User.findById(id)
-            const product = await Product.findById(req.params.id);
+            const product = await Product.findById(req.params.id)
             const recommendedProducts = await Product.find({ _id: { $ne: product._id } }).limit(4);
             res.render('productDetails', { product, recommendedProducts ,user});
         } else {

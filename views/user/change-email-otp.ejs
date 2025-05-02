@@ -1,99 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <title>Verify OTP - LuxeLook</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Bootstrap CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <title>OTP Verification | LuxeLook</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
     body {
-      background-color: #e9ecef;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff;
     }
-
-    .otp-container {
+    .otp-banner {
+      background: url('/images/profile-banner.jpg') center/cover no-repeat;
+      height: 300px;
+      position: relative;
+    }
+    .otp-header {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 42px;
+      font-weight: 600;
+      color: #000;
+    }
+    .otp-box {
+      max-width: 500px;
+      margin: 60px auto;
       padding: 30px;
-      text-align: center;
-      max-width: 400px;
-      width: 100%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      background: #fff;
     }
-
-    .otp-container h5 {
+    .otp-title {
+      font-size: 20px;
       font-weight: 600;
       margin-bottom: 20px;
+      text-align: center;
     }
-
     .otp-input {
-      width: 100%;
+      text-align: center;
+      font-size: 20px;
+      letter-spacing: 10px;
       padding: 10px;
-      font-size: 18px;
-      border: none;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
+      height: 50px;
+      border-radius: 10px;
     }
-
-    .btn-submit {
-      background-color: #04384c;
-      color: #fff;
+    .submit-btn {
+      background-color: #57c9d5;
+      color: white;
       padding: 10px 30px;
       border: none;
-      border-radius: 6px;
-      font-weight: 600;
+      border-radius: 25px;
+      display: block;
+      margin: 20px auto 10px;
+      transition: 0.3s;
     }
-
-    .text-small {
-      margin-top: 15px;
-      font-size: 0.9rem;
+    .submit-btn:hover {
+      background-color: #44b0bb;
     }
-
-    .text-small a {
-      color: #26c6da;
-      text-decoration: none;
-    }
-
-    .text-small a:hover {
-      text-decoration: underline;
-    }
-
-    #timer {
+    .resend-text {
+      text-align: center;
       margin-top: 10px;
       font-size: 14px;
-      color: #555;
     }
-
-    .expired-msg {
-      color: red;
-      margin-top: 10px;
+    .resend-text a {
+      color: #57c9d5;
       font-weight: 500;
+      text-decoration: none;
     }
   </style>
 </head>
-
 <body>
 
-  <div class="otp-container">
-    <h5>Please enter the otp in the mail:</h5>
+  <!-- Banner/Header -->
+  <div class="otp-banner">
+    <div class="otp-header">VERIFY OTP</div>
+  </div>
 
-    <form id="otpForm" action="/verify-otp" method="POST" onsubmit="return validateOTPform()">
-      <input type="text" id="otpInput" name="otp" class="otp-input" placeholder="Enter OTP" required />
-      <button type="submit" class="btn btn-submit">Submit</button>
+  <!-- OTP Box -->
+  <div class="otp-box">
+    <div class="otp-title">Enter the OTP sent to your email</div>
+    <form  id="otpForm" action="/verifying-changeEmail-otp" method="POST" onsubmit="return validateOTPform()">
+      <input type="text" name="otp" maxlength="6" class="form-control otp-input mb-3" id="otpInput" placeholder="------" required>
+     
+      <button type="submit" class="submit-btn" id="btn-submit">Verify OTP</button>
     </form>
 
-    <div id="timer" style="text-align: center;">OTP valid for: <span id="countdown">30</span> seconds</div>
-    <div class="expired-msg" id="expiredMsg" style="display: none;">OTP expired</div>
+    <div id="timer">OTP valid for: <span id="countdown">60</span> seconds</div>
+    <div class="expired-msg" id="expiredMsg" style="display: none; color:red">OTP expired</div>
 
-    <div class="text-small">
-      Wrong Email? <button id="resend-btn" onclick="resendOTP() ">Resend
+    <div class="resend-text">
+      Didn't get the code? <button  id="resend-btn" onclick="resendOTP() " >Resend OTP</button>
     </div>
   </div>
 
@@ -104,6 +102,8 @@
     const submitBtn = document.querySelector('.btn-submit');
     const expiredMsg = document.getElementById('expiredMsg');
     const otpForm = document.getElementById('otpForm');
+
+
 
       
     let timer = setInterval(() => {
@@ -128,7 +128,7 @@
           text: "Please enter an OTP!",
         });
       } else {
-        axios.post('/verify-otp', { otp: otpInput })
+        axios.post('/verifying-changeEmail-otp', { otp: otpInput })
           .then(function (response) {
             if (response.data.success) {
               Swal.fire({
@@ -161,10 +161,11 @@
 
 
     function resendOTP() {
+      console.log('clicked')
       document.getElementById("resend-btn").disabled = true
       countdown = 30;
       otpInput.disabled = false
-      submitBtn.disabled = false;
+      // submitBtn.disabled = false;
       expiredMsg.style.display = "none"
       countdownEl.innerText = countdown;
       if(timer)clearInterval(timer);
@@ -182,7 +183,8 @@
         }
       }, 1000);
       // clearInterval(timer)
-      axios.post("/resend-otp")
+      console.log("axios Send")
+      axios.post("/send-otp")
         .then(function (response) {
           
           console.log("resend otp response:", response);
@@ -211,13 +213,12 @@
         });
       return false
     }
+    
 
-
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 </body>
-
 </html>

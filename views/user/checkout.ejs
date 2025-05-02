@@ -1,0 +1,243 @@
+<%-include("../../views/partials/userPartial/header")%>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff;
+    }
+
+    .checkout-banner {
+      background: url('/images/banner-checkout.jpg') center/cover no-repeat;
+      height: 300px;
+      position: relative;
+    }
+
+    .checkout-title {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 42px;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .address-box {
+      background: #f7f7f7;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .address-box.active {
+      border: 2px solid #57c9d5;
+      background-color: #e6f8fa;
+    }
+
+    .add-address-btn {
+      background: #57c9d5;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      border-radius: 25px;
+      font-size: 14px;
+    }
+
+    .add-address-btn:hover {
+      background: #44b0bb;
+    }
+
+    .cart-summary {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .cart-item img {
+      width: 60px;
+      height: 80px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+
+    .continue-btn {
+      background: #57c9d5;
+      border: none;
+      padding: 10px 50px;
+      color: white;
+      border-radius: 25px;
+      font-size: 16px;
+    }
+
+    .continue-btn:hover {
+      background: #44b0bb;
+    }
+
+    footer {
+      background: #111;
+      color: #fff;
+      padding: 40px 0;
+      font-size: 14px;
+    }
+
+    .footer-title {
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .footer-link {
+      color: #aaa;
+      text-decoration: none;
+    }
+
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+  </head>
+
+  <body>
+
+    <div class="checkout-banner">
+      <div class="checkout-title">CHECKOUT</div>
+    </div>
+
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-md-7">
+          <h5 class="fw-bold mb-3">SELECT ADDRESS</h5>
+
+          <form action="/placeOrder" method="POST">
+            <%if(addresses){%>
+            <% addresses.forEach((address, index)=> { %>
+              <div class="address-box <%= index === 0 ? 'active' : '' %>" onclick="selectAddress(<%= address._id %>)"
+                id="address-<%= address._id %>">
+                <input type="radio" name="addressId" value="<%= address._id %>" class="d-none" <%=index===0 ? 'checked'
+                  : '' %>>
+                <div><strong>
+                    <%= address.name %>
+                  </strong></div>
+                <div>
+                  <%= address.streetAddress %>, <%= address.apartment %>
+                </div>
+                <div>
+                  <%= address.city %>, <%= address.state %> - <%= address.zip %>
+                </div>
+                <div>Phone: <%= address.phone %>
+                </div>
+              </div>
+              <% }) %>
+              <%}%>
+                <a href="/add-address" class="btn add-address-btn my-3">Add Address</a>
+
+                <div class="input-group mb-3">
+                  <input type="text" class="form-control" name="coupon" placeholder="Coupon Code">
+                  <button class="btn btn-dark" type="button">Available Coupon</button>
+                </div>
+
+                <!-- Payment Method Section -->
+                <h5 class="fw-bold mb-3 mt-4">SELECT PAYMENT METHOD</h5>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
+                  <label class="form-check-label" for="cod">
+                    Cash on Delivery
+                  </label>
+                </div>
+                <input type="number" name="Total" value="<%= finalTotal %>"  hidden>
+
+                <button type="submit" class="btn continue-btn w-100 mt-3">Place Order</button>
+          </form>
+        </div>
+
+        <div class="col-md-5">
+          <div class="cart-summary">
+            <h5 class="fw-bold mb-4">CONFIRM DETAILS</h5>
+
+            <% cartItems.forEach(item=> { %>
+              <div class="cart-item">
+                <img src="<%= item.product.imageUrl %>" alt="Product">
+                <div>
+                  <div>
+                    <%= item.product.name %>
+                  </div>
+                  <div>Qty: <%= item.quantity %>
+                  </div>
+                  <div>₹<%= item.totalPrice %>
+                  </div>
+                </div>
+              </div>
+              <% }) %>
+
+                <hr>
+
+                <h6 class="fw-bold mb-2">CART TOTAL</h6>
+                <div class="d-flex justify-content-between">
+                  <span>Subtotal</span>
+                  <span>₹<%= subtotal %></span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Delivery</span>
+                  <span>₹<%= delivery %></span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Discount</span>
+                  <span>₹<%= discount %></span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold">
+                  <span>Total</span>
+                  <span>₹<%= finalTotal %></span>
+                </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+      function selectAddress(addressId) {
+        document.querySelectorAll('.address-box').forEach(box => box.classList.remove('active'));
+        document.getElementById('address-' + addressId).classList.add('active');
+
+        document.querySelectorAll('input[name="addressId"]').forEach(input => input.checked = false);
+        document.querySelector('#address-' + addressId + ' input[name="addressId"]').checked = true;
+      }
+
+      const checkoutForm = document.querySelector('form[action="/placeOrder"]');
+  checkoutForm.addEventListener('submit', function (e) {
+    const addressInputs = document.querySelectorAll('input[name="addressId"]');
+    
+    if (addressInputs.length === 0) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Address Found',
+        text: 'Please add your address before placing an order.'
+      });
+      return;
+    }
+
+    const selected = [...addressInputs].some(input => input.checked);
+    if (!selected) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Address Selected',
+        text: 'Please select an address to continue.'
+      });
+    }
+  });
+
+    </script>
+
+    <%-include("../../views/partials/userPartial/footer")%>

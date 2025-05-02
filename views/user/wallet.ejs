@@ -1,0 +1,167 @@
+<%- include("../../views/partials/userPartial/header") %>
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fff;
+  }
+
+  .wallet-banner {
+    background: url('/images/banner-wallet.jpg') center/cover no-repeat;
+    height: 300px;
+    position: relative;
+  }
+
+  .wallet-title {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 42px;
+    font-weight: 600;
+    color: #000;
+  }
+
+  .wallet-card {
+    background: #0b3b4a;
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    position: relative;
+  }
+
+  .wallet-card .balance {
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  .wallet-card .card-number {
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+
+  .wallet-card .valid-thru {
+    position: absolute;
+    bottom: 20px;
+    right: 25px;
+    font-size: 14px;
+  }
+
+  .add-amount {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .add-amount input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .add-amount button {
+    background-color: #57c9d5;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 6px;
+  }
+
+  .add-amount button:hover {
+    background-color: #44b0bb;
+  }
+
+  .table thead th {
+    background-color: #f7f7f7;
+  }
+
+  .pagination {
+    margin-top: 10px;
+  }
+
+  .pagination .page-item .page-link {
+    color: #000;
+  }
+
+  .pagination .active .page-link {
+    background-color: #57c9d5;
+    color: white;
+    border: none;
+  }
+</style>
+
+<div class="wallet-banner">
+  <div class="wallet-title">WALLET</div>
+</div>
+
+<div class="container py-5">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 mb-4">
+      <div class="bg-light p-3 rounded">
+        <h6 class="fw-bold">SETTINGS</h6>
+        <ul class="list-unstyled mt-3">
+          <li><a href="/orders" class="text-dark d-block mb-2">Orders</a></li>
+          <li><a href="/profile" class="text-dark d-block mb-2">Personal Info</a></li>
+          <li><a href="/addresses" class="text-dark d-block mb-2">Addresses</a></li>
+          <li><a href="/wallet" class="fw-bold text-dark d-block">Wallet</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Wallet Section -->
+    <div class="col-md-9">
+      <div class="wallet-card">
+        <div class="card-number">**** **** **** <%= wallet.cardLast4 || '1234' %></div>
+        <div class="balance">₹<%= wallet.balance.toFixed(2) %></div>
+        <div class="valid-thru">Valid Thru: <%= wallet.validThru || '12/26' %></div>
+      </div>
+
+      <form action="/wallet/add" method="POST" class="add-amount">
+        <input type="number" name="amount" placeholder="Enter amount" required>
+        <button type="submit">Add</button>
+      </form>
+
+      <!-- Transactions Table -->
+      <div class="table-responsive">
+        <table class="table align-middle text-center">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Amount</th>
+              <th>Type</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% transactions.forEach((txn, index) => { %>
+              <tr>
+                <td><%= index + 1 %></td>
+                <td>₹<%= txn.amount %></td>
+                <td><%= txn.type %></td>
+                <td><%= new Date(txn.date).toISOString().split('T')[0] %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination (Static for now) -->
+      <nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item"><a class="page-link" href="#">«</a></li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item active"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">4</a></li>
+          <li class="page-item"><a class="page-link" href="#">5</a></li>
+          <li class="page-item"><a class="page-link" href="#">»</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<%- include("../../views/partials/userPartial/footer") %>

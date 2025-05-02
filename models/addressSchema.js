@@ -9,7 +9,7 @@ const addressSchema = new Schema({
     },
     address: [{
         addressType: {
-            Type: String,
+            type: String,
             required: true
         },
         name: {
@@ -20,9 +20,17 @@ const addressSchema = new Schema({
             type: String,
             required: true
         },
-        landMark: {
+        streetAddress: {
             type: String,
             required: true
+        },
+        apartment: {
+            type: String,
+            required: false  
+        },
+        isDefault: {
+            type: Boolean,
+            required: true  
         },
         state: {
             type: String,
@@ -38,7 +46,7 @@ const addressSchema = new Schema({
         },
         altPhone:{
             type:String,
-            required:true
+            required:false
         }
     }]
 })
