@@ -152,6 +152,45 @@ const deleteAddress = async (req, res) => {
     }
 }
 
+const loadcartAddAddress = async(req,res)=>{
+    try {
+        const user = req.session.user
+        res.render("cartAdd-address", { user: user })
+    } catch (error) {
+        console.error(error)
+        res.redirect("/pageNotFound")
+    }
+}
+const cartAddAddress = async(req,res)=>{
+    try {
+        const userId = req.session.user
+        const userData = await User.findById(userId)
+        const { addressType, name, state, streetAddress, apartment, city, pincode, phone, altPhone,isDefault } = req.body
+        const userAddress = await Address.findOne({ userId: userData._id })
+        console.log(req.body)
+        if (!userAddress) {
+            const NewAddress = new Address({
+                userId: userData._id,
+                address: [{ addressType, name, streetAddress, apartment, city, state, pincode, phone, altPhone,isDefault }]
+            })
+            await NewAddress.save()
+        } else {
+            if(isDefault == true){
+               for(let address of userAddress.address){
+                address.isDefault = false
+               } 
+            }
+            userAddress.address.push({ addressType, name, streetAddress, apartment, city, state, pincode, phone, altPhone,isDefault })
+            await userAddress.save()
+        }
+        res.redirect("/checkout")
+    } catch (error) {
+        console.error(error)
+
+        res.redirect('/pageNotFound')
+    }
+}
+
 
 module.exports = {
     loadAddress,
@@ -159,5 +198,7 @@ module.exports = {
     AddAddress,
     editAddress,
     loadEditAddress,
-    deleteAddress
+    deleteAddress,
+    loadcartAddAddress,
+    cartAddAddress
 }

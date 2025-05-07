@@ -14,7 +14,6 @@ const upload = require("../helpers/multer")
 
 
 
-
 router.get("/pageNotFound",userAuth,userController.pageNotFound)
 router.get("/",userAuth,userController.loadHomePage)
 router.get("/signup",userAuthCheck,userController.loadSignup)
@@ -65,6 +64,7 @@ router.get("/verifying-changePassword-otp",profileController.loadPasswordVerifyi
 router.post("/changePassword-otp",profileController.PasswordVerifyingOtp)
 router.get("/profile/reset-password",userAuth,profileController.loadresetPassword)
 router.post("/profile/reset-password",userAuth,profileController.resetPassword)
+router.post('/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
 
 
 router.get("/addresses",userAuth,addressController.loadAddress)
@@ -73,7 +73,8 @@ router.post('/add-address',userAuth,addressController.AddAddress)
 router.get('/edit-address/:id',userAuth,addressController.loadEditAddress)
 router.post('/edit-address',addressController.editAddress)
 router.post("/delete-address",addressController.deleteAddress)
-
+router.get("/cart-add-address",userAuth,addressController.loadcartAddAddress)
+router.post("/cart-add-address",userAuth,addressController.cartAddAddress)
 
 router.get("/wishlist",userAuth,wishlistController.loadwishlist)
 router.post("/addToWishlist",wishlistController.addToWishlist)

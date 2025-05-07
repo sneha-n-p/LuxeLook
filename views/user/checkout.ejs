@@ -1,5 +1,4 @@
 <%-include("../../views/partials/userPartial/header")%>
-
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -108,9 +107,14 @@
 
   <body>
 
-    <div class="checkout-banner">
-      <div class="checkout-title">CHECKOUT</div>
-    </div>
+    <section class="hero text-center bg-light p-0 mb-4">
+      <!-- <div class="banner position-relative"> -->
+          <img src="wallpaper\luxelook-wall8.jpg" alt="Shop Banner" class="img-fluid w-100"
+              style="height: 400px; object-fit: cover;">
+          <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">CHECKOUT
+          </h1>
+      <!-- </div> -->
+  </section>
 
     <div class="container py-5">
       <div class="row">
@@ -119,26 +123,17 @@
 
           <form action="/placeOrder" method="POST">
             <%if(addresses){%>
-            <% addresses.forEach((address, index)=> { %>
-              <div class="address-box <%= index === 0 ? 'active' : '' %>" onclick="selectAddress(<%= address._id %>)"
-                id="address-<%= address._id %>">
-                <input type="radio" name="addressId" value="<%= address._id %>" class="d-none" <%=index===0 ? 'checked'
-                  : '' %>>
-                <div><strong>
-                    <%= address.name %>
-                  </strong></div>
-                <div>
-                  <%= address.streetAddress %>, <%= address.apartment %>
-                </div>
-                <div>
-                  <%= address.city %>, <%= address.state %> - <%= address.zip %>
-                </div>
-                <div>Phone: <%= address.phone %>
-                </div>
+              <div class="mb-3">
+                <select class="form-select" name="addressId" required>
+                  <% addresses.forEach((address, index)=> { %>
+                    <option value="<%= address._id %>" <%=index===0 ? 'selected' : '' %>>
+                      <%= address.name %> - <%= address.streetAddress %>, <%= address.city %>
+                    </option>
+                    <% }) %>
+                </select>
               </div>
-              <% }) %>
               <%}%>
-                <a href="/add-address" class="btn add-address-btn my-3">Add Address</a>
+                <a href="/cart-add-address" class="btn add-address-btn my-3">Add Address</a>
 
                 <div class="input-group mb-3">
                   <input type="text" class="form-control" name="coupon" placeholder="Coupon Code">
@@ -153,7 +148,7 @@
                     Cash on Delivery
                   </label>
                 </div>
-                <input type="number" name="Total" value="<%= finalTotal %>"  hidden>
+                <input type="number" name="Total" value="<%= finalTotal %>" hidden>
 
                 <button type="submit" class="btn continue-btn w-100 mt-3">Place Order</button>
           </form>
@@ -202,42 +197,4 @@
         </div>
       </div>
     </div>
-
-
-    <script>
-      function selectAddress(addressId) {
-        document.querySelectorAll('.address-box').forEach(box => box.classList.remove('active'));
-        document.getElementById('address-' + addressId).classList.add('active');
-
-        document.querySelectorAll('input[name="addressId"]').forEach(input => input.checked = false);
-        document.querySelector('#address-' + addressId + ' input[name="addressId"]').checked = true;
-      }
-
-      const checkoutForm = document.querySelector('form[action="/placeOrder"]');
-  checkoutForm.addEventListener('submit', function (e) {
-    const addressInputs = document.querySelectorAll('input[name="addressId"]');
-    
-    if (addressInputs.length === 0) {
-      e.preventDefault();
-      Swal.fire({
-        icon: 'warning',
-        title: 'No Address Found',
-        text: 'Please add your address before placing an order.'
-      });
-      return;
-    }
-
-    const selected = [...addressInputs].some(input => input.checked);
-    if (!selected) {
-      e.preventDefault();
-      Swal.fire({
-        icon: 'warning',
-        title: 'No Address Selected',
-        text: 'Please select an address to continue.'
-      });
-    }
-  });
-
-    </script>
-
     <%-include("../../views/partials/userPartial/footer")%>

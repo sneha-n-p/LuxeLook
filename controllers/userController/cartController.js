@@ -61,12 +61,10 @@ const procedToCheckOut = async (req, res) => {
     try {
         const userId = req.session.user;
         const cartItems = req.body.cartItems;
-        console.log(cartItems)
-        let allUpdatesSuccessful = true;
+        console.log('cartItems:',cartItems)
 
         for (let item of cartItems) {
             const totalPrice = item.price * item.quantity;
-            console.log(cartItems)
             const updateResult = await Cart.updateOne(
                 { userId: userId, "items.productId": item.productId },
                 {
@@ -76,17 +74,8 @@ const procedToCheckOut = async (req, res) => {
                     }
                 }
             );
-
-            if (updateResult.modifiedCount === 0) {
-                allUpdatesSuccessful = false;
-            }
         }
-
-        if (allUpdatesSuccessful) {
             return res.json({ success: true });
-        } else {
-            return res.json({ success: false, message: "Some items failed to update" });
-        }
 
     } catch (error) {
         console.error("Error updating cart quantities:", error);

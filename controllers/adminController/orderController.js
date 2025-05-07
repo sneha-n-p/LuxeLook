@@ -2,7 +2,7 @@ const User = require('../../models/userSchema')
 const Product = require('../../models/productSchema')
 const Order = require("../../models/orderSchema")
 const mongoose = require('mongoose')
-
+const Wallet = require('../../models/walletSchema')
 
 const loadOrder = async (req, res) => {
     try {
@@ -49,12 +49,13 @@ const loadViewDetails = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
     try {
         const { orderId, newStatus } = req.body;
+        console.log(req.body)
 
         if (!['Pending', 'Shipped', 'Out For Delivery', 'Delivered'].includes(newStatus)) {
             return res.status(400).json({ success: false, message: 'Invalid status value' });
         }
 
-        const order = await Order.findOne({ orderId });
+        const order = await Order.findById( orderId );
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
@@ -66,7 +67,7 @@ const updateOrderStatus = async (req, res) => {
             order.orderedItems.forEach((item) => {
                 item.status = 'Delivered';
             });
-            order.markModified('orderedItems'); // Ensure Mongoose detects array changes
+            order.markModified('orderedItems'); 
         }
 
         order.status = newStatus;
@@ -81,25 +82,69 @@ const updateOrderStatus = async (req, res) => {
 
 const verifyRequest = async (req, res) => {
     try {
-        const { orderId, productId, action } = req.body
-        const order = await Order.findById(orderId)
-        const id = new mongoose.Types.ObjectId(productId);
-        const productItem = order.orderedItems.find(item => item.product.equals(id));
-        if (order.orderedItems.length > 1) {
-            productItem.status = action
-            await order.save();
-            return res.status(200).json({ success: true, message: 'Status submitted successfully' });
+        const { orderId, productId, action } = req.body;
+        console.log('Request received');
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
         }
-        productItem.status = action
-        order.status = action
+
+        const id = new mongoose.Types.ObjectId(productId);
+        let productItem;
+        let itemFound = false;
+
+        order.orderedItems = order.orderedItems.map(item => {
+            if (item.product.equals(id)) {
+                item.status = action;
+                productItem = item;
+                itemFound = true;
+            }
+            return item;
+        });
+
+        if (!itemFound) {
+            return res.status(404).json({ success: false, message: 'Product not found in order' });
+        }
+
+        if (order.orderedItems.length === 1) {
+            order.status = action;
+        }
+
+        if (action === 'Returned') {
+            const userId = order.userId;
+            let wallet = await Wallet.findOne({ userId });
+
+            const refundAmount = productItem.price * productItem.quantity;
+            const transaction = {
+                type: 'credit',
+                amount: refundAmount,
+                description: `Refund of ${orderId}`,
+                date: new Date()
+            };
+
+            if (!wallet) {
+                wallet = new Wallet({
+                    userId,
+                    balance: refundAmount,
+                    transactions: [transaction],
+                    date: new Date(),
+                });
+            } else {
+                wallet.balance += refundAmount;
+                wallet.transactions.push(transaction);
+            }
+
+            await wallet.save();
+        }
+
         await order.save();
-        res.status(200).json({ success: true, message: 'Status submitted successfully' });
-        console.log(req.body)
+        return res.status(200).json({ success: true, message: `Return request ${action === 'Returned' ? 'accepted' : 'rejected'} successfully.` });
     } catch (error) {
-        console.log(error)
+        console.error('Return verification error:', error);
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
-}
+};
 
 module.exports = {
     loadOrder,

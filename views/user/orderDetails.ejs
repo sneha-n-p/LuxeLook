@@ -86,7 +86,14 @@
     }
   </style>
 
-  <div class="account-banner">ACCOUNT</div>
+<section class="hero text-center bg-light p-0 mb-4">
+  <!-- <div class="banner position-relative"> -->
+      <img src="wallpaper\wall3.jpg" alt="Shop Banner" class="img-fluid w-100"
+          style="height: 400px; object-fit: cover;">
+      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">ORDERS 
+      </h1>
+  <!-- </div> -->
+</section>
 
   <div class="container-fluid account-container">
     <div class="row">
@@ -140,13 +147,12 @@
                 </td>
                 <td>
                   <% if (order.status.trim()==='Delivered' ) { %>
-                    <% order.orderedItems.forEach(item=> { %>
-                      <button class="action-btn btn-return"
-                        onclick="returnOrder('<%= order._id %>', '<%= item.product._id %>', '<%= item.product.productName %>')">
-                        RETURN
-                      </button>
-
-                      <% }) %>
+                      <div style="margin-bottom: 5px;">
+                        <button class="action-btn btn-return"
+                          onclick="returnOrder('<%= order._id %>')">
+                          RETURN
+                        </button>
+                      </div>
                         <% } else if (['Pending', 'Shipped' , 'Out For Delivery' ].includes(order.status.trim())) { %>
                           <button onclick="fullCancellation('<%= order._id %>')"
                             class="action-btn btn-cancel">CANCEL</button>
@@ -156,7 +162,7 @@
 
                               <!-- View details button -->
                               <a href="/order/details/<%= order._id %>" class="action-btn btn-primary"
-                                style="background:#007bff; color:white;">VIEW</a>
+                                style="background:#007bff; color:white; text-decoration: none; ">VIEW</a>
                 </td>
 
                 <td style="display: flex; gap: 5px; justify-content: center;">
@@ -246,9 +252,9 @@
     }
 
 
-    function returnOrder(orderId, productId, productName) {
+    function returnOrder(orderId) {
       Swal.fire({
-        title: 'Return: ' + productName,
+        title: 'Return!',
         input: 'textarea',
         inputLabel: 'Reason for return',
         inputPlaceholder: 'Enter your reason here...',
@@ -268,7 +274,6 @@
         if (result.isConfirmed) {
           axios.patch('/orders/return', {
             orderId,
-            productId,
             reason: result.value
           }).then(response => {
             if (response.data.success) {

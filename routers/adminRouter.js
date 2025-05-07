@@ -28,17 +28,25 @@ router.patch("/list-category",adminAuth,categoryController.listCategory)
 router.patch("/Unlist-category",adminAuth,categoryController.unlistCategory)
 router.get("/edit-category/:id",adminAuth,categoryController.loadEditCategory)
 router.post("/edit-category/:id",categoryController.editCategory)
+router.post('/add-category-offer',categoryController.addCategoryOffer)
+router.post('/remove-category-offer',categoryController.removeCategoryOffer)
+router.get('/get-category-offer/:id',categoryController.getCategoryEdit);
+router.patch('/edit-category-offer',categoryController.editCategoryOffer)
 
 router.get("/Products",adminAuth,productController.productInfo)
 router.get("/add-product",adminAuth,productController.loadAddProduct)
 router.post("/add-product",upload.any(),productController.addproduct)
 router.get("/edit-product/:id",adminAuth,productController.editProduct)
 router.post('/edit-product/:id', upload.fields([
-    { name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }
-  ]), productController.postProduct);
-  router.post('/blockProduct',productController.blockProduct)
+  { name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }
+]), productController.postProduct);
+router.post('/blockProduct',productController.blockProduct)
 router.post('/unblockProduct',productController.unblockProduct)
 router.post("/deleteImage",productController.deleteSingleImage)
+router.post('/add-product-offer',productController.addProductOffer)
+router.post('/remove-product-offer',productController.removeProductOffer)
+router.get('/get-product-offer/:id',productController.getProductEdit);
+router.patch('/edit-product-offer',productController.editProductOffer)
 
 router.get('/orders',adminAuth,orderController.loadOrder)
 router.get("/orderDetails/:id",adminAuth,orderController.loadViewDetails)

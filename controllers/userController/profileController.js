@@ -167,7 +167,7 @@ const loadProfile = async (req, res) => {
     const orderData = await Order.find({ userId: userId }).sort({createdOn:-1}).limit(3)
     console.log('orderData:', orderData)
     const addressData = await Address.findById(userId)
-
+    console.log(userData.image[0])
     res.render('profile', {
       user: userData,
       userAddress: addressData,
@@ -238,7 +238,7 @@ const loadChangeEmail = async (req, res) => {
 
     if (!userId) {
       console.log("No user in session.");
-      return res.redirect("/login"); // or show error
+      return res.redirect("/login");
     }
 
     const userData = await User.findById(userId);
@@ -468,7 +468,18 @@ const resetPassword = async (req, res) => {
   }
 }
 
+const addProfile =  async (req, res) => {
+  try {
+      const userId = req.params.id
+      const imagePath = `/uploads/${req.file.filename}`
 
+      await User.findByIdAndUpdate(userId, { image: imagePath })
+
+      res.json({ success: true, imagePath })
+  } catch (error) {
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Error uploading image' })
+  }
+}
 
 module.exports = {
   loadForgotPassword,
@@ -491,5 +502,6 @@ module.exports = {
   loadPasswordVerifyingOtp,
   PasswordVerifyingOtp,
   loadresetPassword,
-  resetPassword
+  resetPassword,
+  addProfile
 }

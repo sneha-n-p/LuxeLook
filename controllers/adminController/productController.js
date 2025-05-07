@@ -99,49 +99,6 @@ const addproduct = async (req, res) => {
     console.log(imagesPaths);
 
 
-    // let parsedVariants = []
-    // if (variants) {
-    //   try {
-    //     parsedVariants = JSON.parse(variants)
-
-    //     if (!Array.isArray(parsedVariants)) {
-    //       return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "Variants must be an array." })
-    //     }
-
-    //     for (const variant of parsedVariants) {
-    //       if (!variant.size || !variant.color ||
-    //         variant.price === undefined || variant.stock === undefined) {
-    //         return res.status(HttpStatus.BAD_REQUEST).json({
-    //           success: false,
-    //           message: "Each variant must include size, color, price, and stock."
-    //         })
-    //       }
-
-    //       variant.price = parseFloat(variant.price)
-    //       variant.stock = parseInt(variant.stock)
-
-    //       if (isNaN(variant.price) || variant.price < 0) {
-    //         return res.status(HttpStatus.BAD_REQUEST).json({
-    //           success: false,
-    //           message: "Price must be a positive number."
-    //         })
-    //       }
-
-    //       if (isNaN(variant.stock) || variant.stock < 0) {
-    //         return res.status(HttpStatus.BAD_REQUEST).json({
-    //           success: false,
-    //           message: "Stock cannot be negative."
-    //         })
-    //       }
-    //     }
-    //   } catch (err) {
-    //     console.error("Error parsing variants:", err)
-    //     return res.status(HttpStatus.BAD_REQUEST).json({
-    //       success: false,
-    //       message: "Invalid variants format. Please check your input."
-    //     })
-    //   }
-    // }
 
     const newProduct = new Product({
       productName: name,
@@ -335,10 +292,103 @@ const unblockProduct = async (req, res) => {
     }
   } catch (error) {
     console.error("Error blocking product:", error)
-    res.status(HttpStatus.INTERNAL_SERVER_ERROR).redirect("/pageerror")
+    res.status(500).redirect("/pageerror")
   }
 }
 
+const addProductOffer = async(req,res)=>{
+  try {
+    const { id, offer } = req.body;
+
+    const product = await Product.findById(id);
+    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+
+    const category = await Category.findOne({ name: product.category });
+    const categoryOffer = category?.offer || 0;
+
+    const finalOffer = Math.max(offer, categoryOffer);
+    const discount = product.regularPrice * (finalOffer / 100);
+    const salePrice = Math.round(product.regularPrice - discount);
+
+    product.offer = finalOffer;
+    product.salePrice = salePrice;
+
+    await product.save();
+
+    res.json({ success: true, finalOffer, salePrice });
+  } catch (err) {
+    console.error('Error in addProductOffer:', err);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+}
+
+const getProductEdit = async(req,res)=>{
+  try {
+    const product = await Product.findById(req.params.id);
+    res.json({ offer: product.offer });
+  } catch (err) {
+      console.log(err)
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+const editProductOffer = async(req,res)=>{
+ try {
+    const { id, offer: newOffer } = req.body;
+
+    const product = await Product.findById(id).populate('category')
+
+    if (!product) {
+      return res.json({ success: false, message: "Product not found" });
+    }
+
+    const categoryOffer = product.category.offer || 0;
+    const effectiveOffer = Math.max(categoryOffer, newOffer);
+    const salePrice = Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100);
+
+    product.offer = newOffer;
+    product.salePrice = salePrice;
+
+    await product.save();
+
+    res.json({
+      success: true,
+      finalOffer: effectiveOffer,
+      salePrice: salePrice,
+      message: 'Offer updated successfully'
+    });
+
+  } catch (error) {
+    console.error("Offer update error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+const removeProductOffer = async(req,res)=>{
+  try {
+    const productId = req.body.id;
+    const product = await Product.findById(productId);
+    if (!product) return res.json({ success: false, message: 'Product not found' });
+
+    const category = await Category.findById(product.category)
+
+    let appliedOffer = 0;
+    let salePrice = product.regularPrice;
+
+    // if (category && category.offer > 0) {
+    //   appliedOffer = category.offer;
+    //   salePrice = Math.round(product.regularPrice - (product.regularPrice * appliedOffer) / 100);
+    // }
+
+    await Product.findByIdAndUpdate(productId, {
+      offer: appliedOffer,
+      salePrice: appliedOffer > 0 ? salePrice : product.regularPrice,
+    });
+
+    res.json({ success: true, message: 'Product offer removed', finalOffer: appliedOffer, salePrice });
+  } catch (error) {
+    console.error('Error removing product offer:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+}
 
 module.exports = {
   productInfo,
@@ -348,5 +398,9 @@ module.exports = {
   deleteSingleImage,
   postProduct,
   unblockProduct,
-  blockProduct
+  blockProduct,
+  addProductOffer,
+  editProductOffer,
+  removeProductOffer,
+  getProductEdit
 }

@@ -92,9 +92,14 @@
   }
 </style>
 
-<div class="wallet-banner">
-  <div class="wallet-title">WALLET</div>
-</div>
+<section class="hero text-center bg-light p-0 mb-4">
+  <!-- <div class="banner position-relative"> -->
+      <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
+          style="height: 400px; object-fit: cover;">
+      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">WALLET
+      </h1>
+  <!-- </div> -->
+</section>
 
 <div class="container py-5">
   <div class="row">
@@ -112,11 +117,10 @@
     </div>
 
     <!-- Wallet Section -->
+     <%if(wallet){%>
     <div class="col-md-9">
       <div class="wallet-card">
-        <div class="card-number">**** **** **** <%= wallet.cardLast4 || '1234' %></div>
         <div class="balance">₹<%= wallet.balance.toFixed(2) %></div>
-        <div class="valid-thru">Valid Thru: <%= wallet.validThru || '12/26' %></div>
       </div>
 
       <form action="/wallet/add" method="POST" class="add-amount">
@@ -136,32 +140,18 @@
             </tr>
           </thead>
           <tbody>
-            <% transactions.forEach((txn, index) => { %>
-              <tr>
-                <td><%= index + 1 %></td>
-                <td>₹<%= txn.amount %></td>
-                <td><%= txn.type %></td>
-                <td><%= new Date(txn.date).toISOString().split('T')[0] %></td>
-              </tr>
-            <% }) %>
+            <%if(transactions){%>
+              <% transactions.forEach((txn, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td>₹<%= txn.amount %></td>
+                  <td><%= txn.type %></td>
+                  <td><%= new Date(txn.date).toISOString().split('T')[0] %></td>
+                </tr>
+              <% }) %>
+            <%}%>
           </tbody>
         </table>
       </div>
-
-      <!-- Pagination (Static for now) -->
-      <nav>
-        <ul class="pagination justify-content-center">
-          <li class="page-item"><a class="page-link" href="#">«</a></li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item active"><a class="page-link" href="#">3</a></li>
-          <li class="page-item"><a class="page-link" href="#">4</a></li>
-          <li class="page-item"><a class="page-link" href="#">5</a></li>
-          <li class="page-item"><a class="page-link" href="#">»</a></li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-</div>
-
+      <%}%>
 <%- include("../../views/partials/userPartial/footer") %>

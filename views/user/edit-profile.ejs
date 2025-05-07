@@ -1,3 +1,4 @@
+<%- include("../../views/partials/userPartial/header") %>
 <style>
   body,
   html {
@@ -83,167 +84,191 @@
       display: none;
     }
 </style>
-</head>
 
-<body>
-  <%- include("../../views/partials/userPartial/header") %>
+<main>
+  <!-- Banner/Header -->
+  <section class="hero text-center bg-light p-0 mb-4">
+    <div class="banner position-relative">
+      <img src="/wallpaper/luxlook-wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
+           style="height: 400px; object-fit: cover;">
+      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">EDIT-PROFILE</h1>
+    </div>
+  </section>
 
-    <main>
-      <!-- Banner/Header -->
-      <div class="container-fluid p-0">
-        <img src="/images/profile-banner.jpg" class="img-fluid w-100" style="height: 300px; object-fit: cover;"
-          alt="Banner">
-        <div class="account-header">ACCOUNT</div>
+  <!-- Profile Section -->
+  <div class="container-fluid mt-5">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 sidebar" style="height: auto;">
+        <h5>SETTINGS</h5>
+        <a href="/orders" style="text-decoration: none;">Orders</a>
+        <a href="/profile" style="text-decoration: none;">Personal Info</a>
+        <a href="/Addresses" style="text-decoration: none;">Addresses</a>
+        <a href="/Wallet" style="text-decoration: none;">Wallet</a>
       </div>
 
-      <!-- Profile Section -->
-      <div class="container-fluid mt-5">
+      <!-- Basic Info -->
+      <div class="col-md-9 px-5">
+        <h5 class="mb-4">BASIC INFO</h5>
         <div class="row">
-          <!-- Sidebar -->
-          <div class="col-md-2 sidebar" style="height: auto;">
-            <h5>SETTINGS</h5>
-            <a href="/orders" style="text-decoration: none;">Orders</a>
-            <a href="/profile" style="text-decoration: none;">Personal Info</a>
-            <a href="Addresses" style="text-decoration: none;">Addresses</a>
-            <a href="/Wallet" style="text-decoration: none;">Wallet</a>
-          </div>
+          <form id="editProfileForm" action="/profile/edit" method="POST" enctype="multipart/form-data" class="w-100">
+            <!-- Profile Image -->
+            <div class="flex flex-col items-center mb-8">
+              <img src="<%= user.image ? user.image : 'images/Messi signup.jpg' %>" 
+     class="profile-picture" 
+     alt="Profile"
+     style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%;">
 
-          <!-- Basic Info -->
-          <div class="col-md-9 px-5">
-            <h5 class="mb-4">BASIC INFO</h5>
-            <div class="row">
-              <!-- Profile Image -->
-              <div class="col-md-2 text-center">
-                <img src="<%= user.image || '/images/default-user.png' %>"  class="profile-image" alt="Profile Image">
-              </div>
-
-              <form action="/profile/edit" method="POST" enctype="multipart/form-data" class="w-100">
-                <!-- Basic Info -->
-                <div class="section-title mt-3">BASIC INFO</div>
-                <div class="row">
-                  <div class="col-md-2">
-                    <div class="image-upload">
-                      <div id="Error1" class="Error-message"></div>
-                      <input type="file" name="profileImage" id="profileImage" class="form-control">
-
-                    </div>
-                  </div>
-                  <label class="form-label d-block">FirstName:</label>
-                  <div id="Error2" class="Error-message"></div>
-                  <input type="text" id="firstName" class="form-control mb-3" name="firstName" placeholder="First Name"
-                    value="<%= user.name %>">
-
-                    <label class="form-label d-block">LastName:</label>
-                    <div id="Error3" class="Error-message"></div>
-                  <input type="text" id="lastName"  class="form-control mb-3" name="lastName" placeholder="Last Name"
-                    value="<%= user.lastName %>">
-
-                    <label class="form-label d-block">Phone:</label>
-                    <div id="Error4" class="Error-message"></div>
-                  <input type="text"  id="phone" class="form-control mb-3" name="phone" placeholder="Phone"
-                    value="<%= user.phone %>">
-
-                    <div class="mb-3">
-                      <label class="form-label d-block">Gender:</label>
-                      <div id="Error5" class="Error-message"></div>
-
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="male" value="Male"
-                          <%= user.gender === 'Male' ? 'checked' : '' %>>
-                        <label class="form-check-label" for="male">Male</label>
-                      </div>
-                    
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="female" value="Female"
-                          <%= user.gender === 'Female' ? 'checked' : '' %>>
-                        <label class="form-check-label" for="female">Female</label>
-                      </div>
-                    
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="gender" id="other" value="Other"
-                          <%= user.gender === 'Other' ? 'checked' : '' %>>
-                        <label class="form-check-label" for="other">Other</label>
-                      </div>
-
-                    </div>
-                    
-
-                  <!-- Buttons -->
-                  <div class="text-center mt-4">
-                    <button type="button" onclick="editProfile()" class="action-btn">Edit Profile</button>
-                    <a href="/profile/change-email" class="action-btn">Change Email</a>
-                  </div>
+              <form id="profilePicForm" enctype="multipart/form-data" class="text-center">
+                <input type="file" id="profileImage" accept="image/*" class="hidden" onchange="handleImageUpload()">
+                <button type="button" onclick="document.getElementById('profileImage').click()" 
+                        class="btn-upload">
+                  <i class="fas fa-camera mr-2"></i>Change Photo
+                </button>
               </form>
             </div>
-          </div>
+
+            <!-- Basic Info -->
+            <div class="section-title mt-3">BASIC INFO</div>
+            <div class="row">
+              <div class="col-md-2"></div>
+              <label class="form-label d-block">FirstName:</label>
+              <div id="Error2" class="Error-message"></div>
+              <input type="text" id="firstName" class="form-control mb-3" name="firstName" placeholder="First Name"
+                value="<%= user.name %>">
+
+              <label class="form-label d-block">LastName:</label>
+              <div id="Error3" class="Error-message"></div>
+              <input type="text" id="lastName" class="form-control mb-3" name="lastName" placeholder="Last Name"
+                value="<%= user.lastName %>">
+
+              <label class="form-label d-block">Phone:</label>
+              <div id="Error4" class="Error-message"></div>
+              <input type="text" id="phone" class="form-control mb-3" name="phone" placeholder="Phone"
+                value="<%= user.phone %>">
+
+              <div class="mb-3">
+                <label class="form-label d-block">Gender:</label>
+                <div id="Error5" class="Error-message"></div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="gender" id="male" value="Male"
+                    <%= user.gender === 'Male' ? 'checked' : '' %>>
+                  <label class="form-check-label" for="male">Male</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="gender" id="female" value="Female"
+                    <%= user.gender === 'Female' ? 'checked' : '' %>>
+                  <label class="form-check-label" for="female">Female</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="gender" id="other" value="Other"
+                    <%= user.gender === 'Other' ? 'checked' : '' %>>
+                  <label class="form-check-label" for="other">Other</label>
+                </div>
+              </div>
+
+              <!-- Buttons -->
+              <div class="text-center mt-4">
+                <button type="button" onclick="editProfile()" class="action-btn">Edit Profile</button>
+                <a href="/profile/change-email" class="action-btn">Change Email</a>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
-    </main>
-    <script>
+    </div>
+  </div>
+</main>
 
-  async function editProfile() {
-    console.log('clicked')
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const gender = document.querySelector('input[name="gender"]:checked')?.value;
-    const image = document.getElementById('profileImage').files[0];
-    const Error1 = document.getElementById("Error1")
-    const Error2 = document.getElementById("Error2")
-    const Error3 = document.getElementById("Error3")
-    const Error4 = document.getElementById("Error4")
-    const Error5 = document.getElementById("Error5")
+<script>
+async function handleImageUpload() {
+  const file = document.getElementById('profileImage').files[0];
+  if (!file) return;
 
+  const formData = new FormData();
+  formData.append('profileImage', file);
 
-    // if (!/^[A-Za-z\s]+$/.test(firstName) || firstName.length < 3) {
-    //          Error2.style.display = 'block'
-    //   Error2.innerHTML ='FirstName should contain only alphabets and be at least 3 characters long.';
-    //   return;
-    // }
-    // if (!/^[A-Za-z\s]+$/.test(lastName) || lastName.length < 3) {
-    //          Error3.style.display = 'block'
-    //   Error3.innerHTML ='Name should contain only alphabets and be at least 3 characters long.';
-    //   return;
-    // }
-    // if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
-    //    Error4.style.display = 'block'
-    //    Error4.innerHTML ='Phone number must be 10 digits and not all same digits.';
-    //   return;
-    // }
+  try {
+    const response = await fetch(`/upload-profile-pic/<%= user._id %>`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await response.json();
 
-    if (!firstName || !lastName || !phone || !gender) {
-      return Swal.fire('All fields are required!', '', 'warning');
+    if (data.success) {
+      document.querySelector('.profile-picture').src = data.imagePath;
+      Swal.fire('Success!', 'Profile picture updated successfully.', 'success');
+    } else {
+      Swal.fire('Error!', 'Failed to upload image.', 'error');
     }
+  } catch (error) {
+    Swal.fire('Error!', 'Something went wrong.', 'error');
+  }
+}
 
-    const formData = new FormData();
-    formData.append('firstName', firstName);
-    formData.append('lastName', lastName);
-    formData.append('phone', phone);
-    formData.append('gender', gender);
-    if (image) {
-      formData.append('profileImage', image);
-    }
+async function editProfile() {
+  const firstName = document.getElementById('firstName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const gender = document.querySelector('input[name="gender"]:checked')?.value;
+  const Error2 = document.getElementById("Error2");
+  const Error3 = document.getElementById("Error3");
+  const Error4 = document.getElementById("Error4");
+  const Error5 = document.getElementById("Error5");
 
-    try {
-      const response = await axios.post('/profile/edit', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+  // Reset error messages
+  Error2.style.display = 'none';
+  Error3.style.display = 'none';
+  Error4.style.display = 'none';
+  Error5.style.display = 'none';
 
-      if (response.data.success) {
-        Swal.fire('Profile updated successfully!', '', 'success').then(() => {
-          window.location.href = '/profile';
-        });
-      } else {
-        Swal.fire('Failed to update profile!', response.data.message || '', 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire('Something went wrong!', '', 'error');
-    }
+  // Validation
+  if (!/^[A-Za-z\s]+$/.test(firstName) || firstName.length < 3) {
+    Error2.style.display = 'block';
+    Error2.innerHTML = 'FirstName should contain only alphabets and be at least 3 characters long.';
+    return;
+  }
+  if (!/^[A-Za-z\s]+$/.test(lastName) || lastName.length < 3) {
+    Error3.style.display = 'block';
+    Error3.innerHTML = 'LastName should contain only alphabets and be at least 3 characters long.';
+    return;
+  }
+  if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
+    Error4.style.display = 'block';
+    Error4.innerHTML = 'Phone number must be 10 digits and not all same digits.';
+    return;
+  }
+  if (!gender) {
+    Error5.style.display = 'block';
+    Error5.innerHTML = 'Please select a gender.';
+    return;
   }
 
-    </script>
+  const formData = new FormData();
+  formData.append('firstName', firstName);
+  formData.append('lastName', lastName);
+  formData.append('phone', phone);
+  formData.append('gender', gender);
 
-    <%-include("../../views/partials/userPartial/footer") %>
+  try {
+    const response = await axios.post('/profile/edit', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    if (response.data.success) {
+      Swal.fire('Profile updated successfully!', '', 'success').then(() => {
+        window.location.href = '/profile';
+      });
+    } else {
+      Swal.fire('Failed to update profile!', response.data.message || '', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire('Something went wrong!', '', 'error');
+  }
+}
+</script>
+
+<%- include("../../views/partials/userPartial/footer") %>

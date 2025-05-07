@@ -21,11 +21,6 @@ const categorySchema = new mongoose.Schema({
         type:Date,
         default:Date.now
     },
-    offerPrice:{
-        type:Number,
-        required:false
-
-    },
     offer:{
         type:Number,
         required:0

@@ -79,8 +79,7 @@
               <th style="color: #000;">NO</th>
               <th style="color: #000;">CATEGORY</th>
               <th style="color: #000;">CATEGORY DESCRIPTION</th>
-              <th style="color: #000;">OFFER PRICE</th>
-              <th style="color: #000;">OFFER</th>
+              <th style="color: #000;">OFFER(%)</th>
               <th style="color: #000;">ACTIONS</th>
             </tr>
           </thead>
@@ -98,11 +97,19 @@
                     <%= category.description %>
                   </td>
                   <td class="text-start" style="color: #000;">
-                    <%= category.offerPrice %>
+                    <div>
+                      <span><%= category.offer ? category.offer + '%' : '0%' %></span>
+                      <div class="mt-2">
+                        <% if (category.offer && category.offer > 0) { %>
+                          <button class="btn btn-sm btn-warning me-1" onclick="editOffer('<%= category._id %>')">Edit Offer</button>
+                          <button class="btn btn-sm btn-danger" onclick="removeOffer('<%= category._id %>')">Remove Offer</button>
+                        <% } else { %>
+                          <button class="btn btn-sm btn-success" onclick="addOffer('<%= category._id %>')">Add Offer</button>
+                        <% } %>
+                      </div>
+                    </div>
                   </td>
-                  <td class="text-start" style="color: #000;">
-                    <%= category.offer %>
-                  </td>
+                                  
                   <td>
                     <%if(category.status=="Unlisted" ){%>
                       <button class="btn btn-unlist btn-sm" style="background-color: green; color: #fff;"
@@ -217,6 +224,132 @@
             }
           })
         }
+
+        function removeOffer(categoryId) {
+  Swal.fire({
+    title: 'Remove Offer',
+    text: "Are you sure you want to remove this offer?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, remove it"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.post("/admin/remove-category-offer", { id: categoryId })
+        .then(response => {
+          if (response.data.success) {
+            Swal.fire({
+              title: 'Offer Removed',
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+              window.location.reload();
+            });
+          }
+        });
+    }
+  });
+}
+
+async function addOffer(categoryId) {
+    const { value: offer } = await Swal.fire({
+      title: 'Add Offer',
+      input: 'number',
+      inputLabel: 'Enter Offer Percentage',
+      inputPlaceholder: '%',
+      inputAttributes: {
+        min: 1,
+        max: 99,
+        step: 1
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Add Offer',
+      preConfirm: (value) => {
+        if (!value || value <= 0 || value >= 100) {
+          Swal.showValidationMessage('Please enter a valid percentage (1–99)');
+        }
+        return value;
+      }
+    });
+
+    if (offer) {
+      try {
+        const response = await axios.post('/admin/add-category-offer', {
+          id: categoryId,
+          offer: offer
+        });
+
+        if (response.data.success) {
+          Swal.fire({
+            title: 'Offer Added!',
+            text: `Offer of ${offer}% added successfully.`,
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 1500
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire('Error', 'Failed to add offer.', 'error');
+        }
+      } catch (error) {
+        console.error('Error adding offer:', error);
+        Swal.fire('Error', 'Something went wrong while adding the offer.', 'error');
+      }
+    }
+  }
+  async function editOffer(categoryId) {
+  try {
+    const response = await axios.get(`/admin/get-category-offer/${categoryId}`);
+    const currentOffer = response.data.offer || 0;
+
+    const { value: newOffer } = await Swal.fire({
+      title: 'Edit Offer',
+      input: 'number',
+      inputLabel: 'Update Offer Percentage',
+      inputValue: currentOffer,
+      inputPlaceholder: '%',
+      inputAttributes: {
+        min: 1,
+        max: 99,
+        step: 1
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Update Offer',
+      preConfirm: (value) => {
+        if (!value || value <= 0 || value >= 100) {
+          Swal.showValidationMessage('Please enter a valid percentage (1–99)');
+        }
+        return value;
+      }
+    });
+
+    if (newOffer !== undefined) {
+      const updateRes = await axios.patch('/admin/edit-category-offer', {
+        id: categoryId,
+        offer: newOffer
+      });
+
+      if (updateRes.data.success) {
+        Swal.fire({
+          title: 'Offer Updated!',
+          text: `New offer of ${newOffer}% saved successfully.`,
+          icon: 'success',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire('Error', 'Failed to update offer.', 'error');
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', 'Something went wrong while editing the offer.', 'error');
+  }
+}
+
       </script>
   </body>
 

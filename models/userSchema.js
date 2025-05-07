@@ -75,6 +75,9 @@ const userSchema = new Schema({
         type:Boolean,
         // default:false
     },
+    image:{
+        type:[String],
+    },
     redeemedUsers:[{
         type:Schema.Types.ObjectId,
         ref:"User",

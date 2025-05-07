@@ -1,7 +1,7 @@
 
 const category = require('../../models/categorySchema')
 const mongoose = require('mongoose')
-
+const Product = require('../../models/productSchema')
 
 const categoryInfo = async (req, res) => {
     try {
@@ -48,7 +48,7 @@ const loadAddCategory = async (req, res) => {
 
 
 const addCategory = async (req, res) => {
-  const { name, description, offer, offerPrice, status } = req.body;
+  const { name, description, offer,status } = req.body;
 
   try {
     console.log(req.body);
@@ -61,17 +61,15 @@ const addCategory = async (req, res) => {
       name,
       description,
       offer,
-      offerPrice,
       status
     });
-
-    await newCategory.save();
-
-    return res.status(200).json({ success: true, message: "Category added successfully" });
+    
+    await newCategory.save()
+    return res.status(200).json({ success: true, message: "Category added successfully" })
 
   } catch (error) {
-    console.error("Error adding category:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error adding category:", error)
+    return res.status(500).json({ error: "Internal Server Error" })
   }
 };
 
@@ -128,7 +126,7 @@ const loadEditCategory = async (req, res) => {
 const editCategory = async (req, res) => {
     try {
         const id = req.params.id
-        const { name, description, offer, offerPrice, status } = req.body
+        const { name, description, offer, status } = req.body
         const existingCategory = await category.findById( id )
 
         if (!existingCategory) {
@@ -137,14 +135,12 @@ const editCategory = async (req, res) => {
         const updateCategory = await category.findByIdAndUpdate(id, {
             name: name,
             description:description,
-            offerPrice:offerPrice,
             offer:offer,
             status:status
         },{new:true})
 
         if(updateCategory){
             return res.status(200).json({ success: true, message: "Category updated successfully" });
-
         }else{
             res.status(404).json({error:"Category Not Found"})
         }
@@ -152,6 +148,93 @@ const editCategory = async (req, res) => {
 res.status(500).json({error:"Internal Server Error"})
     }
 }
+
+const addCategoryOffer = async (req, res) => {
+    try {
+      const { id, offer } = req.body;
+  
+      const updatedCategory = await category.findByIdAndUpdate(id, { offer }, { new: true });
+      if (!updatedCategory) return res.status(404).json({ success: false, message: 'Category not found' });
+  
+      const products = await Product.find({ category: id });
+  
+      for (const product of products) {
+        const effectiveOffer = Math.max(product.offer || 0, offer);
+        const salePrice = Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100);
+        product.salePrice = salePrice;
+        await product.save();
+      }
+  
+      res.json({ success: true, message: "Category offer applied and products updated" });
+    } catch (err) {
+      console.error('Error in addCategoryOffer:', err);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  };
+  
+
+  const removeCategoryOffer = async (req, res) => {
+    try {
+      const { id } = req.body;
+  
+      const Category = await category.findById(id);
+      if (!Category) return res.status(404).json({ success: false, message: 'Category not found' });
+  
+      Category.offer = 0;
+      await Category.save();
+  
+      const products = await Product.find({ category: id });
+  
+      for (const product of products) {
+        const productOffer = product.offer || 0;
+        const salePrice = productOffer > 0
+          ? Math.round(product.regularPrice - (product.regularPrice * productOffer) / 100)
+          : product.regularPrice;
+        product.salePrice = salePrice;
+        await product.save();
+      }
+  
+      res.json({ success: true, message: "Category offer removed and products updated" });
+    } catch (error) {
+      console.error('Error removing category offer:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  };
+  
+
+const editCategoryOffer = async (req, res) => {
+    try {
+      const { id, offer } = req.body;
+  
+      const updatedCategory = await category.findByIdAndUpdate(id, { offer }, { new: true });
+      if (!updatedCategory) return res.status(404).json({ success: false, message: 'Category not found' });
+  
+      const products = await Product.find({ category: id });
+  
+      for (const product of products) {
+        const effectiveOffer = Math.max(product.offer || 0, offer);
+        const salePrice = Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100);
+        product.salePrice = salePrice;
+        await product.save();
+      }
+  
+      res.json({ success: true, message: "Category offer updated and products refreshed" });
+    } catch (err) {
+      console.error('Error in editCategoryOffer:', err);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  };
+  
+
+const getCategoryEdit  =  async (req, res) => {
+    try {
+      const Category = await category.findById(req.params.id);
+      res.json({ offer: Category.offer });
+    } catch (err) {
+        console.log(err)
+      res.status(500).json({ error: 'Server error' });
+    }
+  }
 
 
 
@@ -162,5 +245,9 @@ module.exports = {
     unlistCategory,
     listCategory,
     loadEditCategory,
-    editCategory
+    editCategory,
+    addCategoryOffer,
+    removeCategoryOffer,
+    editCategoryOffer,
+    getCategoryEdit
 }

@@ -227,29 +227,17 @@ const viewOrderDetails = async (req, res) => {
 
   const returnOrder = async (req, res) => {
     try {
-      const { orderId, productId, reason } = req.body;
+      const { orderId,reason } = req.body;
   
       const order = await Order.findById(orderId);
       if (!order) {
         return res.status(404).json({ success: false, message: 'Order not found' });
       }
-  
-      const id = new mongoose.Types.ObjectId(productId);
-      const productItem = order.orderedItems.find(item => item.product.equals(id));
-  
-      if (!productItem) {
-        return res.status(404).json({ success: false, message: 'Product not found in order' });
-      }
-  
-      productItem.returnReason = reason
-
-      if(order.orderedItems.length>1){
-        productItem.status = 'Return Request'
-        await order.save();
-        return  res.status(200).json({ success: true, message: 'Return request submitted successfully' });
-      }
-      productItem.status = 'Return Request'
       order.status = 'Return Request'
+      order.returnReason = reason
+      order.orderedItems.forEach((item)=>{
+        item.status = 'Return Request'
+      })
       await order.save();
       res.status(200).json({ success: true, message: 'Return request submitted successfully' });
   
