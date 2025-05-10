@@ -4,7 +4,7 @@ const Product = require("../../models/productSchema")
 const Category = require("../../models/cartSchema")
 const Cart = require("../../models/cartSchema")
 const Address = require("../../models/addressSchema")
-const env = require("dotenv")
+const env = require("dotenv").config()
 
 const loadcart = async (req, res) => {
     try {
@@ -159,7 +159,7 @@ const loadCheckOut = async (req, res) => {
         const cart = await Cart.findOne({ userId: userId }).populate("items.productId")
         let cartItems = [];
         let subtotal = 0;
-
+        let razorpayKey = process.env.RAZORPAY_KEY_ID
         if (cart && cart.items.length > 0) {
             cartItems = cart.items.map(item => {
                 const totalPrice = item.productId.salePrice * item.quantity;
@@ -188,7 +188,8 @@ const loadCheckOut = async (req, res) => {
                 subtotal,
                 delivery,
                 discount,
-                finalTotal
+                finalTotal,
+                razorpayKey
             });
         }else{
             const delivery = subtotal > 1000 ? 0 : 50

@@ -123,10 +123,11 @@
         <div class="balance">₹<%= wallet.balance.toFixed(2) %></div>
       </div>
 
-      <form action="/wallet/add" method="POST" class="add-amount">
-        <input type="number" name="amount" placeholder="Enter amount" required>
+      <form id="walletForm" class="add-amount">
+        <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" required>
         <button type="submit">Add</button>
       </form>
+      
 
       <!-- Transactions Table -->
       <div class="table-responsive">
@@ -136,6 +137,7 @@
               <th>#</th>
               <th>Amount</th>
               <th>Type</th>
+              <th>Action</th>
               <th>Date</th>
             </tr>
           </thead>
@@ -146,6 +148,7 @@
                   <td><%= index + 1 %></td>
                   <td>₹<%= txn.amount %></td>
                   <td><%= txn.type %></td>
+                  <td><%= txn.description %></td>
                   <td><%= new Date(txn.date).toISOString().split('T')[0] %></td>
                 </tr>
               <% }) %>
@@ -154,4 +157,67 @@
         </table>
       </div>
       <%}%>
+      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const walletForm = document.getElementById('walletForm');
+
+  walletForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const amount = document.getElementById('walletAmount').value;
+
+    try {
+      const response = await fetch('/wallet/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ amount })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const order = data.order;
+
+        const options = {
+          key: "<%= process.env.RAZORPAY_KEY_ID %>",
+          amount: order.amount,
+          currency: "INR",
+          name: "LuxeLook Wallet",
+          description: "Add Money to Wallet",
+          order_id: order.id,
+          handler: async function (response) {
+            const res = await fetch('/wallet/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                amount: order.amount
+              })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+              window.location.reload();
+            } else {
+              alert("Payment verification failed.");
+            }
+          },
+          theme: {
+            color: "#57c9d5"
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      }
+    } catch (err) {
+      console.error("Payment initiation failed:", err);
+      alert("Something went wrong. Please try again.");
+    }
+  });
+</script>
+
 <%- include("../../views/partials/userPartial/footer") %>

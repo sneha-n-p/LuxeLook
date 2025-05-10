@@ -93,8 +93,10 @@ router.get('/order/details/:id',userAuth, orderController.viewOrderDetails);
 router.post('/orders/details',orderController.cancelSingleProduct)
 router.post('/orders/cancel',orderController.cancelOrders)
 router.patch('/orders/return',orderController.returnOrder)
+router.post('/create-razorpay-order',orderController.razorpay)
 
 router.get('/wallet',userAuth,walletController.loadWallet)
+router.post('/wallet/add',walletController.addAmountToWallet)
 
 router.get('/logout',userAuth,userController.logout)
 

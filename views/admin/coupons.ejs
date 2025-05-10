@@ -1,0 +1,396 @@
+
+<%- include("../../views/partials/adminPartial/header") %>
+
+<style>
+.content-main {
+  background-color: #1c1c24;
+  padding: 30px;
+  min-height: 100vh;
+  color: #ffffff;
+}
+
+.main-wrap {
+  display: flex;
+  min-height: 100vh;
+  background-color: #1e1e2f;
+  padding-left: 220px; 
+  position: relative;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background-color: #111827;
+  color: #ffffff;
+  z-index: 1000;
+  padding-top: 1rem;
+}
+
+.content-main {
+  flex: 1;
+  padding: 2rem;
+  z-index: 1;
+  position: relative;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  z-index: 10;
+  position: relative;
+  min-height: 400px;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.content-title {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 25px;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #333333;
+}
+
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 15px;
+  color: #333333;
+  width: 100%;
+}
+
+.form-control:focus {
+  border-color: #6c63ff;
+  box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+  outline: none;
+}
+
+.error-message {
+  font-size: 13px;
+  color: #ff4d4f;
+  margin-top: 4px;
+}
+
+.btn-primary {
+  background-color: #6c63ff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #574fd6;
+}
+
+.btn-light {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+  background-color: #e0e0e0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead.table-dark {
+  background-color: #343a40;
+  color: #ffffff;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.table td,
+.table th {
+  padding: 12px 15px;
+  vertical-align: middle;
+  font-size: 15px;
+  color: #333;
+  text-align: center;
+}
+
+.table .btn {
+  margin: 0 5px; 
+}
+
+.btn-outline-primary,
+.btn-outline-danger {
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.material-icons {
+  vertical-align: middle;
+  font-size: 18px;
+}
+
+.row {
+  display: flex;
+  align-items: stretch; /
+}
+
+.col-lg-4,
+.col-lg-8 {
+  display: flex;
+  flex-direction: column;
+}
+
+.col-lg-4 .card,
+.col-lg-8 .card {
+  flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+  .content-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .content-title {
+    margin-bottom: 15px;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+
+  .col-lg-4,
+  .col-lg-8 {
+    width: 100%;
+  }
+}
+</style>
+
+<div class="main-wrap">
+  <section class="content-main">
+    <div class="content-header">
+      <h2 class="content-title">Coupon Management</h2>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="card" id="coupon-form">
+          <div class="card-body">
+            <form method="post" action="/admin/createCoupon" onsubmit="return Validateform(event)">
+              <body onload="setDefaultStartDate()"></body>
+              <div class="mb-4">
+                <label class="form-label">Coupon Name</label>
+                <input type="text" name="couponName" class="form-control" />
+                <div id="error-coupon-name" class="error-message"></div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">Start Date</label>
+                <input type="date" name="startDate" id="startingDate" class="form-control" />
+                <div id="error-start-date" class="error-message"></div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">End Date</label>
+                <input type="date" name="endDate" id="expiringDate" class="form-control" />
+                <div id="error-end-date" class="error-message"></div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">Offer Price</label>
+                <input type="text" name="offerPrice" class="form-control" />
+                <div id="error-offer-price" class="error-message"></div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">Minimum Price</label>
+                <input type="text" name="minimumPrice" class="form-control minimumPrice" />
+                <div id="error-minimum-price" class="error-message"></div>
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Add Coupon</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card">
+          <div class "card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th style="color: #fff;">Name</th>
+                    <th style="color: #fff;">Created On</th>
+                    <th style="color: #fff;">Expire On</th>
+                    <th style="color: #fff;">Offer</th>
+                    <th style="color: #fff;">Min</th>
+                    <th style="color: #fff;">Status</th>
+                    <th style="color: #fff;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for (let i = 0; i < coupons.length; i++) { %>
+                  <tr>
+                    <td><%= coupons[i].name %></td>
+                    <td><%= new Date(coupons[i].createdOn).toLocaleDateString('en-US') %></td>
+                    <td><%= new Date(coupons[i].expireOn).toLocaleDateString('en-US') %></td>
+                    <td>₹<%= coupons[i].offerPrice %></td>
+                    <td>₹<%= coupons[i].minimumPrice %></td>
+                    <td>
+                      <% if (!coupons[i].islist) { %>
+                        <button class="btn btn-unlist btn-sm" style="background-color: green; color: #fff;"
+                          onClick="Listed('<%=coupons[i]._id%>','<%=coupons[i].name%>')">List</button>
+                      <% } else { %>
+                        <button class="btn btn-list btn-sm" style="background-color: rgb(255, 0, 0); color: #fff;"
+                          onClick="Unlisted('<%=coupons[i]._id%>','<%=coupons[i].name%>')">Unlist</button>
+                      <% } %>
+                    </td>
+                    <td>
+                      <a href="/admin/editCoupon/<%= coupons[i]._id %>" class="btn btn-sm btn-warning me-1">
+                        <i class="material-icons">edit</i>
+                      </a>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- JavaScript -->
+<script>
+  function Validateform() {
+    document.querySelectorAll(".error-message").forEach((element) => (element.innerHTML = ""));
+    const sDate = document.getElementById("startingDate").value;
+    const eDate = document.getElementById("expiringDate").value;
+    const sDateObj = new Date(sDate);
+    const eDateObj = new Date(eDate);
+    const todayDateObj = new Date();
+    todayDateObj.setHours(0, 0, 0, 0);
+
+    if (sDateObj > eDateObj) {
+      document.getElementById("error-end-date").innerHTML = "End Date Should Be After The Start Date";
+      return false;
+    }
+
+    if (sDateObj < todayDateObj) {
+      document.getElementById("error-start-date").innerHTML = "Start Date Should Be Today or Later";
+      return false;
+    }
+
+    const name = document.getElementsByName("couponName")[0].value;
+    const nameRegex = /^[A-Za-z0-9 ]{1,50}$/;
+    if (!nameRegex.test(name)) {
+      document.getElementById("error-coupon-name").innerHTML = "Coupon name must be alphanumeric (max 50 characters)";
+      return false;
+    }
+
+    const offerPriceInput = document.getElementsByName("offerPrice")[0];
+    const minimumPriceInput = document.getElementsByClassName("minimumPrice")[0];
+    const offerPrice = parseInt(offerPriceInput.value.trim());
+    const minimumPrice = parseInt(minimumPriceInput.value.trim());
+
+    if (isNaN(offerPrice) || isNaN(minimumPrice)) {
+      document.getElementById("error-offer-price").innerHTML = "Enter valid numbers for prices";
+      return false;
+    }
+
+    if (offerPrice >= minimumPrice) {
+      document.getElementById("error-offer-price").innerHTML = "Offer price must be less than minimum price";
+      return false;
+    }
+
+    return true;
+  }
+
+  function setDefaultStartDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    document.getElementById("startingDate").value = `${year}-${month}-${day}`;
+  }
+
+    function Unlisted(id, name) {
+          Swal.fire({
+            title: 'Unlisted',
+            text: "do you want Unlist this Coupon?",
+            icon: "warning",
+            showConfirmButton: true,
+            showCancelButton: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.patch("/admin/Unlist-Coupon", { id })
+                .then(function (responce) {
+                  if (responce.data.success) {
+                    Swal.fire({
+                      title: `${name} unlisted`,
+                      icon: 'success',
+                      showConfirmButton: false,
+                      timer: 1500
+                    }).then(() => {
+                      window.location.reload()
+                    })
+                  }
+                })
+            }
+          })
+        }
+
+        function Listed(id, name) {
+          Swal.fire({
+            tittle: "List the Coupon",
+            text: "do you want list the Coupon",
+            icon: "warning",
+            showConfirmButton: true,
+            showCancelButton: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.patch("/admin/list-Coupon", { id })
+                .then(function (responce) {
+                  if (responce.data.success) {
+                    Swal.fire({
+                      title: `${name} listed`,
+                      icon: 'success',
+                      showConfirmButton: false,
+                      timer: 1500
+                    }).then(() => {
+                      window.location.reload()
+                    })
+                  }
+                })
+            }
+          })
+        }
+
+</script>

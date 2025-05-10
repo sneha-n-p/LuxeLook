@@ -109,12 +109,12 @@
 
     <section class="hero text-center bg-light p-0 mb-4">
       <!-- <div class="banner position-relative"> -->
-          <img src="wallpaper\luxelook-wall8.jpg" alt="Shop Banner" class="img-fluid w-100"
-              style="height: 400px; object-fit: cover;">
-          <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">CHECKOUT
-          </h1>
+      <img src="wallpaper\luxelook-wall8.jpg" alt="Shop Banner" class="img-fluid w-100"
+        style="height: 400px; object-fit: cover;">
+      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">CHECKOUT
+      </h1>
       <!-- </div> -->
-  </section>
+    </section>
 
     <div class="container py-5">
       <div class="row">
@@ -122,7 +122,7 @@
           <h5 class="fw-bold mb-3">SELECT ADDRESS</h5>
 
           <form action="/placeOrder" method="POST">
-            <%if(addresses){%>
+            <%if(addresses.length>0){%>
               <div class="mb-3">
                 <select class="form-select" name="addressId" required>
                   <% addresses.forEach((address, index)=> { %>
@@ -144,9 +144,11 @@
                 <h5 class="fw-bold mb-3 mt-4">SELECT PAYMENT METHOD</h5>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="COD" checked>
-                  <label class="form-check-label" for="cod">
-                    Cash on Delivery
-                  </label>
+                  <label class="form-check-label" for="cod">Cash on Delivery</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="RAZORPAY">
+                  <label class="form-check-label" for="razorpay">Razorpay</label>
                 </div>
                 <input type="number" name="Total" value="<%= finalTotal %>" hidden>
 
@@ -197,4 +199,68 @@
         </div>
       </div>
     </div>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      const form = document.querySelector('form');
+      const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+      const razorpayKey = '<%= razorpayKey %>';
+    
+      form.addEventListener('submit', async function (e) {
+        const selectedMethod = [...paymentRadios].find(radio => radio.checked).value;
+    
+        if (selectedMethod === 'RAZORPAY') {
+          e.preventDefault();
+    
+          try {
+            const res = await fetch('/create-razorpay-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount: Number(<%= finalTotal %>) * 100 })
+            });
+    
+            const result = await res.json();
+            const order = result.order;
+    
+            const options = {
+              key: razorpayKey,
+              amount: order.amount,
+              currency: "INR",
+              name: "LuxeLook",
+              description: "Order Payment",
+              order_id: order.id,
+              handler: function (response) {
+                const razorpayResponse = {
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                  paymentMethod: 'RAZORPAY'
+                };
+    
+                Object.entries(razorpayResponse).forEach(([key, value]) => {
+                  const input = document.createElement('input');
+                  input.type = 'hidden';
+                  input.name = key;
+                  input.value = value;
+                  form.appendChild(input);
+                });
+    
+                form.submit();
+              },
+              theme: {
+                color: "#57c9d5"
+              }
+            };
+    
+            const rzp = new Razorpay(options);
+            rzp.open();
+          } catch (err) {
+            console.error('Razorpay error', err);
+            alert("Something went wrong. Please try again.");
+          }
+        }
+      });
+    </script>
+    
+
+
     <%-include("../../views/partials/userPartial/footer")%>

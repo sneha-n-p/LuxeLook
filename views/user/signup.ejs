@@ -144,6 +144,9 @@
           <div id="signupError5" class="Error-message"></div>
           <input id="Cpassword" type="password" class="form-control" name="Cpassword" placeholder="Confirm Password" required />
 
+          <div id="signupError6" class="Error-message"></div>
+          <input id="referalCode" type="text" class="form-control" name="referalCode" placeholder="referalCode(optional)" />
+
           <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" id="terms" required />
             <label class="form-check-label" for="terms">
@@ -180,127 +183,136 @@
     </div>
   </div>
 
-  <script>
-    const nameID = document.getElementById("name")
-    const emailID = document.getElementById("email")
-    const phoneNum = document.getElementById("phone")
-    const passwordID = document.getElementById("password")
-    const CpasswordID = document.getElementById("Cpassword")
-    const signupError1 = document.getElementById("signupError1")
-    const signupError2 = document.getElementById("signupError2")
-    const signupError3 = document.getElementById("signupError3")
-    const signupError4 = document.getElementById("signupError4")
-    const signupError5 = document.getElementById("signupError5")
-    const signform = document.getElementById("signform")
+<script>
+  const nameID = document.getElementById("name");
+  const emailID = document.getElementById("email");
+  const phoneNum = document.getElementById("phone");
+  const passwordID = document.getElementById("password");
+  const CpasswordID = document.getElementById("Cpassword");
+  const referalCode = document.getElementById("referalCode");
+  const signupError1 = document.getElementById("signupError1");
+  const signupError2 = document.getElementById("signupError2");
+  const signupError3 = document.getElementById("signupError3");
+  const signupError4 = document.getElementById("signupError4");
+  const signupError5 = document.getElementById("signupError5");
+  const signupError6 = document.getElementById("signupError6");
+  const signform = document.getElementById("signform");
 
-    
-    function nameValidateChecking(e) {
-      const nameValue = nameID.value
-      const namePattern = /^[A-Za-z\s]+$/
+  function nameValidateChecking() {
+    const nameValue = nameID.value;
+    const namePattern = /^[A-Za-z\s]+$/;
 
-      if (nameValue.trim() === '') {
-        signupError1.style.display = 'block'
-        signupError1.innerHTML = "Please enter a valid name"
-      } else if (!namePattern.test(nameValue)) {
-        signupError1.style.display = "block"
-        signupError1.innerHTML = "Name can only contain alphabates and Spaces"
-      } else {
-        signupError1.style.display = "none"
-        signupError1.innerHTML = ""
-      }
+    if (nameValue.trim() === "") {
+      signupError1.style.display = "block";
+      signupError1.innerHTML = "Please enter a valid name";
+      return false;
+    } else if (!namePattern.test(nameValue)) {
+      signupError1.style.display = "block";
+      signupError1.innerHTML = "Name can only contain alphabets and spaces";
+      return false;
+    } else {
+      signupError1.style.display = "none";
+      signupError1.innerHTML = "";
+      return true;
     }
-
-
-    function emailValidateChecking(e) {
-      const emailValue = emailID.value
-      const emailPattern = /^([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/
-
-      if (!emailPattern.test(emailValue)) {
-        signupError2.style.display = "block"
-        signupError2.innerHTML = "email should be valied format"
-      } else {
-        signupError2.style.display = "none"
-        signupError2.innerHTML = ""
-      }
-    }
-
-    function phonevalidateCheking(e) {
-  const phoneValue = phoneNum.value.trim()
-
-  const phoneRegex = /^(?!0{10})\d{10}$/
-
-  if (phoneValue === "") {
-    signupError3.style.display = "block"
-    signupError3.innerHTML = "Enter a valid number"
-  } else if (!phoneRegex.test(phoneValue)) {
-    signupError3.style.display = "block"
-    signupError3.innerHTML = "Enter a valid 10-digit number (not all zeros)"
-  } else {
-    signupError3.style.display = "none"
-    signupError3.innerHTML = ""
   }
-}
 
-    function passwordValidateChecking(e) {
-      const PasswordVlaue = passwordID.value
-      const CpasswordValue = CpasswordID.value
-      const alpha = /[a-zA-Z]/
-      const digit = /\d/
+  function emailValidateChecking() {
+    const emailValue = emailID.value;
+    const emailPattern = /^([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/;
 
-      if (PasswordVlaue.length < 8) {
-        signupError4.style.display = "block"
-        signupError4.innerHTML = "password should contain atleast 8 charecters"
-      } else if (!alpha.test(PasswordVlaue) || !digit.test(PasswordVlaue)) {
-        signupError4.style.display = "block"
-        signupError4.innerHTML = "password should contain alphabats and digits"
-      } else {
-        signupError4.style.display = "none"
-        signupError4.innerHTML = ""
-      }
+    if (!emailPattern.test(emailValue)) {
+      signupError2.style.display = "block";
+      signupError2.innerHTML = "Email should be in a valid format";
+      return false;
+    } else {
+      signupError2.style.display = "none";
+      signupError2.innerHTML = "";
+      return true;
+    }
+  }
 
-      if (PasswordVlaue !== CpasswordValue) {
-        signupError5.style.display = "block"
-        signupError5.innerHTML = "password do not match"
-      } else {
-        signupError5.style.display = "none"
-        signupError5.innerHTML = ""
-      }
+  function phoneValidateChecking() {
+    const phoneValue = phoneNum.value.trim();
+    const phoneRegex = /^(?!0{10})\d{10}$/;
+
+    if (phoneValue === "") {
+      signupError3.style.display = "block";
+      signupError3.innerHTML = "Enter a valid number";
+      return false;
+    } else if (!phoneRegex.test(phoneValue)) {
+      signupError3.style.display = "block";
+      signupError3.innerHTML = "Enter a valid 10-digit number (not all zeros)";
+      return false;
+    } else {
+      signupError3.style.display = "none";
+      signupError3.innerHTML = "";
+      return true;
+    }
+  }
+
+  function passwordValidateChecking() {
+    const passwordValue = passwordID.value;
+    const cPasswordValue = CpasswordID.value;
+    const alpha = /[a-zA-Z]/;
+    const digit = /\d/;
+
+    if (passwordValue.length < 8) {
+      signupError4.style.display = "block";
+      signupError4.innerHTML = "Password should contain at least 8 characters";
+      return false;
+    } else if (!alpha.test(passwordValue) || !digit.test(passwordValue)) {
+      signupError4.style.display = "block";
+      signupError4.innerHTML = "Password should contain alphabets and digits";
+      return false;
+    } else {
+      signupError4.style.display = "none";
+      signupError4.innerHTML = "";
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      signform.addEventListener('submit', function (e) {
+    if (passwordValue !== cPasswordValue) {
+      signupError5.style.display = "block";
+      signupError5.innerHTML = "Passwords do not match";
+      return false;
+    } else {
+      signupError5.style.display = "none";
+      signupError5.innerHTML = "";
+      return true;
+    }
+    return true;
+  }
 
-        nameValidateChecking()
-        emailValidateChecking()
-        phonevalidateCheking()
-        passwordValidateChecking()
+  function referralCodeValidateChecking() {
+    const referralValue = referalCode.value.trim();
+    const uuidPattern =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
-        if (!nameID ||
-          !emailID ||
-          !phoneNum ||
-          !passwordID ||
-          !signupError1 ||
-          !signupError2 ||
-          !signupError3 ||
-          !signupError4 ||
-          !signupError5 ||
-          !signform
-        ) {
-          console.error('One or more element not found')
-        }
+    if (referralValue === "") {
+      signupError6.style.display = "none";
+      signupError6.innerHTML = "";
+      return true; // Referral code is optional
+    } else if (!uuidPattern.test(referralValue)) {
+      signupError6.style.display = "block";
+      signupError6.innerHTML = "Invalid referral code format";
+      return false;
+    } else {
+      signupError6.style.display = "none";
+      signupError6.innerHTML = "";
+      return true;
+    }
+  }
 
-        if (
-          signupError1.innerHTML ||
-          signupError2.innerHTML ||
-          signupError3.innerHTML ||
-          signupError4.innerHTML ||
-          signupError5.innerHTML
-        ) {
-          e.preventDefault()
-        }
-      })
-    })
-  </script>
-</body>
+  document.addEventListener("DOMContentLoaded", function () {
+    signform.addEventListener("submit", function (e) {
+      const isNameValid = nameValidateChecking();
+      const isEmailValid = emailValidateChecking();
+      const isPhoneValid = phoneValidateChecking();
+      const isPasswordValid = passwordValidateChecking();
+      const isReferralValid = referralCodeValidateChecking();
 
-</html>
+      if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid || !isReferralValid) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>

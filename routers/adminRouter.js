@@ -5,6 +5,7 @@ const customerController = require("../controllers/adminController/costomerContr
 const categoryController =require("../controllers/adminController/categoryController")
 const productController = require("../controllers/adminController/productController")
 const orderController = require('../controllers/adminController/orderController')
+const couponController = require('../controllers/adminController/couponController')
 const upload = require("../helpers/multer")
 const {adminAuth,adminAuthCheck} = require('../middlewares/auth')
 
@@ -52,6 +53,13 @@ router.get('/orders',adminAuth,orderController.loadOrder)
 router.get("/orderDetails/:id",adminAuth,orderController.loadViewDetails)
 router.post('/update-order-status', orderController.updateOrderStatus)
 router.patch('/verify-return',orderController.verifyRequest)
+
+router.get("/Coupons",adminAuth,couponController.loadCoupon)
+router.post("/createCoupon",adminAuth,couponController.createCoupon)
+router.get('/editCoupon/:id',adminAuth,couponController.loadEditCoupon)
+router.patch("/updateCoupon",adminAuth,couponController.updateCoupon)
+router.patch("/list-Coupon",adminAuth,couponController.listCategory)
+router.patch("/Unlist-Coupon",adminAuth,couponController.unlistCategory)
 
 
 module.exports = router

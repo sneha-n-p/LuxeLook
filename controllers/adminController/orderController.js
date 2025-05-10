@@ -65,7 +65,9 @@ const updateOrderStatus = async (req, res) => {
                 return res.status(500).json({ success: false, message: 'Invalid order items' });
             }
             order.orderedItems.forEach((item) => {
-                item.status = 'Delivered';
+                if(item.status!=='Cancelled'){
+                    item.status = 'Delivered';
+                }
             });
             order.markModified('orderedItems'); 
         }
@@ -112,6 +114,11 @@ const verifyRequest = async (req, res) => {
         }
 
         if (action === 'Returned') {
+            const product = await Product.findById(id)
+            console.log("productItem:",productItem)
+            let total = product.quatity+productItem.quantity
+            product.quatity = total
+            await product.save()
             const userId = order.userId;
             let wallet = await Wallet.findOne({ userId });
 
@@ -120,7 +127,8 @@ const verifyRequest = async (req, res) => {
                 type: 'credit',
                 amount: refundAmount,
                 description: `Refund of ${orderId}`,
-                date: new Date()
+                date: new Date(),
+                reason:'Return'
             };
 
             if (!wallet) {

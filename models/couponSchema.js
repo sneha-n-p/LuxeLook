@@ -22,7 +22,11 @@ const couponSchema = new Schema({
     },
     minimumPrice:{
         type:Number,
-        reuired:true
+        required:true
+    },
+    restricted:{
+        type:Boolean,
+        default:false
     },
     islist:{
         type:Boolean,

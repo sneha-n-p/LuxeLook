@@ -373,11 +373,6 @@ const removeProductOffer = async(req,res)=>{
     let appliedOffer = 0;
     let salePrice = product.regularPrice;
 
-    // if (category && category.offer > 0) {
-    //   appliedOffer = category.offer;
-    //   salePrice = Math.round(product.regularPrice - (product.regularPrice * appliedOffer) / 100);
-    // }
-
     await Product.findByIdAndUpdate(productId, {
       offer: appliedOffer,
       salePrice: appliedOffer > 0 ? salePrice : product.regularPrice,

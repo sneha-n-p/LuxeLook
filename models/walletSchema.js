@@ -28,6 +28,11 @@ const WalletSchema = new mongoose.Schema({
       description : { 
         type:String, 
         required:true 
+      },
+      reason:{
+        type:String,
+        required:true,
+        enum:['Return','Razorpay','Order Cancel']
       }
     }
   ]

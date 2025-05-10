@@ -113,6 +113,9 @@ const orderSchema = new Schema({
         type: Boolean,
         default: false
     },
+    paymentMethod: {
+        type: String,
+    },
     returnReason :{
         type:String,
         required:false

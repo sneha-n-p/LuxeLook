@@ -1,5 +1,7 @@
 const mongoose = require("mongoose")
 const {Schema} = mongoose
+const { v4: uuidv4 } = require("uuid")
+
 
 
 const userSchema = new Schema({
@@ -31,10 +33,6 @@ const userSchema = new Schema({
         type:String,
         unique:false
     },
-    googleId:{
-        type:String,
-        unique:true
-    },
     password:{
         type:String,
         required:false
@@ -46,7 +44,13 @@ const userSchema = new Schema({
     isAdmin:{
         type:Boolean,
         default:false
-    },
+    },availableCoupons: [{
+    type: Schema.Types.ObjectId,
+    ref: "Coupon"
+}],referredBy: {
+  type: String, // or Schema.Types.ObjectId if you want to reference actual User
+  default: null
+},
     cart:[{
         type:Schema.Types.ObjectId,
         ref:"Cart",       
@@ -68,12 +72,10 @@ const userSchema = new Schema({
         default:Date.now
     },
     referalCode:{
-        type:String,
-        // required:true
-    },
-    redeemed:{
-        type:Boolean,
-        // default:false
+        type: String,
+        default: () => uuidv4(),
+        unique: true,
+        required:true
     },
     image:{
         type:[String],

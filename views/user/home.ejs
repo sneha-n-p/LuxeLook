@@ -104,9 +104,8 @@
                   <p class="card-text">₹ <%= products[i].salePrice %>
                   </p>
                   
-                      <a href="/product-details/<%=products[i]._id%>">
-                        <button class="btn btn-outline-dark btn-sm">View Details</button>
-                      </a>
+                  <a href="/product-details/<%=products[i]._id%>"><button class="btn btn-outline-dark btn-sm">View
+                    Details</button></a>
                       
                       <% if (products[i].quatity > 0) { %>
                         <button class="wishlist-symbol" onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
