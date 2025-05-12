@@ -136,63 +136,55 @@ const verifyOtp = async (req, res) => {
       const user = req.session.userData;
       let availableCoupons = [];
 
-      // Hash the password
       const passwordHash = await securePassword(user.password);
 
-      // Create the new user
       const saveUserData = new User({
         name: user.name,
         email: user.email,
         phone: user.phone,
         password: passwordHash,
-        referredBy: user.referalCode || null, // Store the referral code used (if any)
-        availableCoupons: [], // Will be updated below if referral exists
+        referredBy: user.referalCode || null,
+        availableCoupons: [],
       });
 
       await saveUserData.save();
 
-      // Check if the new user signed up with a referral code
       if (user.referalCode) {
         const referrer = await User.findOne({ referalCode: user.referalCode });
         if (referrer) {
-          // Create a coupon for the referrer (not publicly listed)
           const referrerCoupon = new Coupon({
             name: "REF" + Math.random().toString(36).substr(2, 8).toUpperCase(),
             offerPrice: 100,
             minimumPrice: 500,
             restricted : true,
-            expiredOn: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days expiry
-            isList: false, // Not visible to all users
+            expiredOn: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 
+            isList: false, 
           });
           await referrerCoupon.save();
 
-          // Update referrer's availableCoupons and redeemedUsers
           if (!referrer.availableCoupons) referrer.availableCoupons = [];
           if (!referrer.redeemedUsers) referrer.redeemedUsers = [];
           referrer.availableCoupons.push(referrerCoupon._id);
-          referrer.redeemedUsers.push(saveUserData._id); // Add the new user's ID directly
+          referrer.redeemedUsers.push(saveUserData._id); 
           await referrer.save();
 
-          // Create a coupon for the referee (not publicly listed)
           const refereeCoupon = new Coupon({
             name: "NEW" + Math.random().toString(36).substr(2, 8).toUpperCase(),
             offerPrice: 50,
             minimumPrice: 300,
-            expiredOn: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days expiry
-            isList: false, // Not visible to all users
+            expiredOn: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), 
+            isList: false,
           });
           await refereeCoupon.save();
 
-          // Update the new user's availableCoupons
           saveUserData.availableCoupons = [refereeCoupon._id];
           await saveUserData.save();
         }
       }
 
-      // Set session and redirect
       req.session.user = saveUserData._id;
-      req.session.userData = null; // Clear userData from session
-      req.session.userOtp = null; // Clear OTP from session
+      req.session.userData = null;
+      req.session.userOtp = null; 
       res.json({ success: true, redirectUrl: "/" });
     } else {
       res.json({

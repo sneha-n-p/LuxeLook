@@ -192,11 +192,9 @@
   </section>
 </div>
 
-<!-- JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  // Set default dates
   function setDefaultStartDate() {
     const today = new Date();
     const year = today.getFullYear();
@@ -215,7 +213,6 @@
     document.getElementById('expiringDate').value = `${year}-${month}-${day}`;
   }
 
-  // Form validation
   function validateForm() {
     document.querySelectorAll(".error-message").forEach((element) => (element.innerHTML = ""));
     const sDate = document.getElementById("startingDate").value;

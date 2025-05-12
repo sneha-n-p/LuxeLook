@@ -1,223 +1,308 @@
 <%- include("../../views/partials/userPartial/header") %>
 
-<style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #fff;
-  }
-
-  .wallet-banner {
-    background: url('/images/banner-wallet.jpg') center/cover no-repeat;
-    height: 300px;
-    position: relative;
-  }
-
-  .wallet-title {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 42px;
-    font-weight: 600;
-    color: #000;
-  }
-
-  .wallet-card {
-    background: #0b3b4a;
-    color: white;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    position: relative;
-  }
-
-  .wallet-card .balance {
-    font-size: 28px;
-    font-weight: 600;
-  }
-
-  .wallet-card .card-number {
-    font-size: 18px;
-    margin-bottom: 5px;
-  }
-
-  .wallet-card .valid-thru {
-    position: absolute;
-    bottom: 20px;
-    right: 25px;
-    font-size: 14px;
-  }
-
-  .add-amount {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .add-amount input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  .add-amount button {
-    background-color: #57c9d5;
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 6px;
-  }
-
-  .add-amount button:hover {
-    background-color: #44b0bb;
-  }
-
-  .table thead th {
-    background-color: #f7f7f7;
-  }
-
-  .pagination {
-    margin-top: 10px;
-  }
-
-  .pagination .page-item .page-link {
-    color: #000;
-  }
-
-  .pagination .active .page-link {
-    background-color: #57c9d5;
-    color: white;
-    border: none;
-  }
-</style>
-
-<section class="hero text-center bg-light p-0 mb-4">
-  <!-- <div class="banner position-relative"> -->
-      <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
-          style="height: 400px; object-fit: cover;">
-      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">WALLET
-      </h1>
-  <!-- </div> -->
-</section>
-
-<div class="container py-5">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-3 mb-4">
-      <div class="bg-light p-3 rounded">
-        <h6 class="fw-bold">SETTINGS</h6>
-        <ul class="list-unstyled mt-3">
-          <li><a href="/orders" class="text-dark d-block mb-2">Orders</a></li>
-          <li><a href="/profile" class="text-dark d-block mb-2">Personal Info</a></li>
-          <li><a href="/addresses" class="text-dark d-block mb-2">Addresses</a></li>
-          <li><a href="/wallet" class="fw-bold text-dark d-block">Wallet</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Wallet Section -->
-     <%if(wallet){%>
-    <div class="col-md-9">
-      <div class="wallet-card">
-        <div class="balance">₹<%= wallet.balance.toFixed(2) %></div>
-      </div>
-
-      <form id="walletForm" class="add-amount">
-        <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" required>
-        <button type="submit">Add</button>
-      </form>
-      
-
-      <!-- Transactions Table -->
-      <div class="table-responsive">
-        <table class="table align-middle text-center">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Amount</th>
-              <th>Type</th>
-              <th>Action</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <%if(transactions){%>
-              <% transactions.forEach((txn, index) => { %>
-                <tr>
-                  <td><%= index + 1 %></td>
-                  <td>₹<%= txn.amount %></td>
-                  <td><%= txn.type %></td>
-                  <td><%= txn.description %></td>
-                  <td><%= new Date(txn.date).toISOString().split('T')[0] %></td>
-                </tr>
-              <% }) %>
-            <%}%>
-          </tbody>
-        </table>
-      </div>
-      <%}%>
-      <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-  const walletForm = document.getElementById('walletForm');
-
-  walletForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const amount = document.getElementById('walletAmount').value;
-
-    try {
-      const response = await fetch('/wallet/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ amount })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        const order = data.order;
-
-        const options = {
-          key: "<%= process.env.RAZORPAY_KEY_ID %>",
-          amount: order.amount,
-          currency: "INR",
-          name: "LuxeLook Wallet",
-          description: "Add Money to Wallet",
-          order_id: order.id,
-          handler: async function (response) {
-            const res = await fetch('/wallet/verify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                amount: order.amount
-              })
-            });
-
-            const result = await res.json();
-            if (result.success) {
-              window.location.reload();
-            } else {
-              alert("Payment verification failed.");
-            }
-          },
-          theme: {
-            color: "#57c9d5"
-          }
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.open();
-      }
-    } catch (err) {
-      console.error("Payment initiation failed:", err);
-      alert("Something went wrong. Please try again.");
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #fff;
     }
-  });
-</script>
 
-<%- include("../../views/partials/userPartial/footer") %>
+    .wallet-banner {
+      background: url('/images/banner-wallet.jpg') center/cover no-repeat;
+      height: 300px;
+      position: relative;
+    }
+
+    .wallet-title {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 42px;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .wallet-card {
+      background: #0b3b4a;
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .wallet-card .balance {
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .wallet-card .card-number {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .wallet-card .valid-thru {
+      position: absolute;
+      bottom: 20px;
+      right: 25px;
+      font-size: 14px;
+    }
+
+    .add-amount {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .add-amount input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .add-amount button {
+      background-color: #57c9d5;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 6px;
+    }
+
+    .add-amount button:hover {
+      background-color: #44b0bb;
+    }
+
+    .table thead th {
+      background-color: #f7f7f7;
+    }
+
+    .pagination {
+      margin-top: 10px;
+    }
+
+    .pagination .page-item .page-link {
+      color: #000;
+    }
+
+    .pagination .active .page-link {
+      background-color: #57c9d5;
+      color: white;
+      border: none;
+    }
+  </style>
+
+  <section class="hero text-center bg-light p-0 mb-4">
+    <!-- <div class="banner position-relative"> -->
+    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100" style="height: 400px; object-fit: cover;">
+    <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">WALLET
+    </h1>
+    <!-- </div> -->
+  </section>
+
+  <div class="container py-5">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 mb-4">
+        <div class="bg-light p-3 rounded">
+          <h6 class="fw-bold">SETTINGS</h6>
+          <ul class="list-unstyled mt-3">
+            <li><a href="/orders" class="text-dark d-block mb-2">Orders</a></li>
+            <li><a href="/profile" class="text-dark d-block mb-2">Personal Info</a></li>
+            <li><a href="/addresses" class="text-dark d-block mb-2">Addresses</a></li>
+            <li><a href="/wallet" class="fw-bold text-dark d-block">Wallet</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Wallet Section -->
+      <%if(wallet){%>
+        <div class="col-md-9">
+          <div class="wallet-card">
+            <div class="balance"><span id="walletBalance">₹<%= wallet.balance.toFixed(2) %></span>
+            </div>
+          </div>
+
+          <form id="walletForm" class="add-amount">
+            <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" required>
+            <button type="button" onclick="addMoney()">Add</button>
+          </form>
+
+
+          <!-- Transactions Table -->
+          <div class="table-responsive">
+            <table class="table align-middle text-center">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Action</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%if(transactions){%>
+                  <% transactions.forEach((txn, index)=> { %>
+                    <tr>
+                      <td>
+                        <%= index + 1 %>
+                      </td>
+                      <td>₹<%= txn.amount %>
+                      </td>
+                      <td>
+                        <%= txn.type %>
+                      </td>
+                      <td>
+                        <%= txn.description %>
+                      </td>
+                      <td>
+                        <%= new Date(txn.date).toISOString().split('T')[0] %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                      <%}%>
+              </tbody>
+            </table>
+          </div>
+          <%}else{%>
+            <div class="col-md-9">
+              <div class="wallet-card">
+                <div class="balance">₹0.00</div>
+              </div>
+
+              <form id="walletForm" class="add-amount">
+                <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" required>
+                <button type="submit">Add</button>
+              </form>
+              <%}%>
+                <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                <script>
+
+                  function addMoney() {
+                    console.log('hiii')
+                    const amount = parseFloat(document.getElementById("walletAmount").value);
+                    if (!amount || amount <= 0) {
+                      Swal.fire('Error', 'Please enter a valid amount', 'error');
+                      return;
+                    }
+
+                    fetch('/wallet/create-order', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ amount }),
+                    })
+                      .then(response => response.json())
+                      .then(data => {
+                        if (!data.success) {
+                          Swal.fire('Error', data.message || 'Failed to create order', 'error');
+                          return;
+                        }
+
+                        const options = {
+                          key: 'rzp_test_xRDXSqtLkjJ1Gf',
+                          amount: data.amount,
+                          currency: data.currency,
+                          order_id: data.orderId,
+                          name: 'LUXE LOOK',
+                          description: 'Add Money to Wallet',
+                          handler: function (response) {
+                            fetch('/wallet/payment-success', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                amount,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                              }),
+                            })
+                              // .then(res => res.json())
+                              .then(data => {
+                                console.log('data:', data)
+                                if (data.ok) {
+                                  document.getElementById('walletBalance').innerText = data.newBalance;
+                                  Swal.fire('Success', 'Money added successfully!', 'success')
+                                    .then(() => window.location.reload())
+                                } else {
+                                  Swal.fire('Error', data.message || 'Payment failed', 'error');
+                                }
+                              })
+                              .catch(err => Swal.fire('Error', 'Server error during payment', 'error'));
+                          },
+                          prefill: {
+                            name: '<%= user.username %>',
+                            email: '<%= user.email %>',
+                            contact: '<%= user.phone %>',
+                          },
+                          theme: { color: '#C4A277' },
+                        };
+
+                        const rzp = new Razorpay(options);
+                        rzp.open();
+                      })
+                      .catch(err => Swal.fire('Error', 'Failed to initiate payment', 'error'));
+                  }
+
+                  const walletForm = document.getElementById('walletForm');
+
+                  walletForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const amount = document.getElementById('walletAmount').value;
+
+                    try {
+                      const response = await fetch('/wallet/add', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ amount })
+                      });
+
+                      const data = await response.json();
+
+                      if (data.success) {
+                        const order = data.order;
+
+                        const options = {
+                          key: "<%= process.env.RAZORPAY_KEY_ID %>",
+                          amount: order.amount,
+                          currency: "INR",
+                          name: "LuxeLook Wallet",
+                          description: "Add Money to Wallet",
+                          order_id: order.id,
+                          handler: async function (response) {
+                            const res = await fetch('/wallet/verify-payment', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                amount: order.amount
+                              })
+                            });
+
+                            const result = await res.json();
+                            if (result.success) {
+                              window.location.reload();
+                            } else {
+                              alert("Payment verification failed.");
+                            }
+                          },
+                          theme: {
+                            color: "#57c9d5"
+                          }
+                        };
+
+                        const rzp = new Razorpay(options);
+                        rzp.open();
+                      }
+                    } catch (err) {
+                      console.error("Payment initiation failed:", err);
+                      alert("Something went wrong. Please try again.");
+                    }
+                  });
+                </script>
+
+                <%- include("../../views/partials/userPartial/footer") %>

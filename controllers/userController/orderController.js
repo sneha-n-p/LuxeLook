@@ -242,13 +242,14 @@ const cancelOrders = async (req, res) => {
     if (order.paymentMethod === 'RAZORPAY') {
       const refundAmount = order.finalAmount
       const transaction = {
-        type: 'credit',
         amount: refundAmount,
-        description: `Refund of ${orderId}`,
+        type: 'credit',
         date: new Date(),
+        description: `Refund of ${orderId}`,
         reason:"Order Cancel"
       };
       const wallet = await Wallet.findOne({ userId: order.userId });
+      console.log(wallet)
       if (!wallet) {
         return res.status(404).json({ message: 'Wallet not found for user' });
       }

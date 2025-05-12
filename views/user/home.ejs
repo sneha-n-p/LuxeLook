@@ -37,35 +37,61 @@
       margin: 0 auto;
     }
 
-  .wishlist-symbol {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  color: red;
-  font-size: 20px;
-  cursor: pointer;
+    .wishlist-symbol {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      color: red;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .wishlist-symbol:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .text-danger {
+      color: red;
+      font-size: 14px;
+    }
+
+    .card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.wishlist-symbol:focus {
-  outline: none;
-  box-shadow: none;
+
+.card-img-top {
+  height: 320px;
+  object-fit: cover;
 }
-.text-danger {
-  color: red;
-  font-size: 14px;
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.card-title {
+  min-height: 50px;
+  font-size: 1rem;
 }
 
   </style>
 
   <section class="hero text-center py-5 bg-light position-relative">
     <!-- <div class="container position-relative"> -->
-      <img class="banner-image1" src="\images\banner_image1.webp.jpg" alt="banner-image1">
+    <img class="banner-image1" src="\images\banner_image1.webp.jpg" alt="banner-image1">
 
-      <div class="banner-overlay-text">
-        <h1 class="display-4">Elevate Your Style, Embrace the Elegance</h1>
-        <p class="lead">Luxury fashion at your fingertips.</p>
-        <input class="form-control w-50 mx-auto" type="text" placeholder="Search...">
-      </div>
+    <div class="banner-overlay-text">
+      <h1 class="display-4">Elevate Your Style, Embrace the Elegance</h1>
+      <p class="lead">Luxury fashion at your fingertips.</p>
+      <input class="form-control w-50 mx-auto" type="text" placeholder="Search...">
+    </div>
 
     <!-- </div> -->
   </section>
@@ -94,30 +120,29 @@
       <div class="row">
         <% for (let i=0; i < 4; i++) { %>
           <% if (products[i]) { %>
-            <div class="col-md-3 mb-4">
-              <div class="card">
-                <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
-                <div class="card-body text-center">
-                  <h5 class="card-title">
-                    <%= products[i].productName %>
-                  </h5>
-                  <p class="card-text">₹ <%= products[i].salePrice %>
-                  </p>
-                  
-                  <a href="/product-details/<%=products[i]._id%>"><button class="btn btn-outline-dark btn-sm">View
-                    Details</button></a>
-                      
-                      <% if (products[i].quatity > 0) { %>
-                        <button class="wishlist-symbol" onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
-                        <button class="wishlist-symbol" onclick="addToCart('<%=products[i]._id%>')">&#128722;</button>
-                      <% } else { %>
-                        <div class="text-danger mt-2"><strong>Out of Stock</strong></div>
-                      <% } %>
-                      
+            <div class="col-md-3 mb-4 d-flex">
+  <div class="card w-100">
+    <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
+    <div class="card-body text-center">
+      <h5 class="card-title"><%= products[i].productName %></h5>
+      <p class="card-text">₹ <%= products[i].salePrice %></p>
+      <div>
+        <a href="/product-details/<%=products[i]._id%>">
+          <button class="btn btn-outline-dark btn-sm">View Details</button>
+        </a>
+      </div>
 
-                </div>
-              </div>
-            </div>
+      <% if (products[i].quatity > 0) { %>
+        <div class="mt-2">
+          <button class="wishlist-symbol" onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
+          <button class="wishlist-symbol" onclick="addToCart('<%=products[i]._id%>')">&#128722;</button>
+        </div>
+      <% } else { %>
+        <div class="text-danger mt-2"><strong>Out of Stock</strong></div>
+      <% } %>
+    </div>
+  </div>
+</div>
             <% } %>
               <% } %>
 
@@ -158,34 +183,34 @@
     }
     function addToCart(productId) {
 
-axios.post("/addToCart", { productId })
-  .then(function (responce) {
-    if (responce.data.success) {
-      Swal.fire({
-        title: `Add To Cart`,
-        icon: 'success',
-        showConfirmButton:false,
-        timer: 1500
-      })
-    } else {
-      Swal.fire({
-        title: "Error Occured",
-        icon: "error",
-        showConfirmButton:false,
-        text: responce.data.message,
-        timer: 1500
-      })
+      axios.post("/addToCart", { productId })
+        .then(function (responce) {
+          if (responce.data.success) {
+            Swal.fire({
+              title: `Add To Cart`,
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 1500
+            })
+          } else {
+            Swal.fire({
+              title: "Error Occured",
+              icon: "error",
+              showConfirmButton: false,
+              text: responce.data.message,
+              timer: 1500
+            })
+          }
+        }).catch((error) => {
+          Swal.fire({
+            title: "Error Occured",
+            icon: "error",
+            showConfirmButton: false,
+            text: "Internal Server Error",
+            timer: 1500
+          })
+        })
     }
-  }).catch((error)=>{
-    Swal.fire({
-        title: "Error Occured",
-        icon: "error",
-        showConfirmButton:false,
-        text:"Internal Server Error",
-        timer: 1500
-      })
-  })
-}
 
 
   </script>

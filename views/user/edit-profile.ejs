@@ -121,10 +121,6 @@
 
               <form id="profilePicForm" enctype="multipart/form-data" class="text-center">
                 <input type="file" id="profileImage" accept="image/*" class="hidden" onchange="handleImageUpload()">
-                <button type="button" onclick="document.getElementById('profileImage').click()" 
-                        class="btn-upload">
-                  <i class="fas fa-camera mr-2"></i>Change Photo
-                </button>
               </form>
             </div>
 
@@ -216,13 +212,11 @@ async function editProfile() {
   const Error4 = document.getElementById("Error4");
   const Error5 = document.getElementById("Error5");
 
-  // Reset error messages
   Error2.style.display = 'none';
   Error3.style.display = 'none';
   Error4.style.display = 'none';
   Error5.style.display = 'none';
 
-  // Validation
   if (!/^[A-Za-z\s]+$/.test(firstName) || firstName.length < 3) {
     Error2.style.display = 'block';
     Error2.innerHTML = 'FirstName should contain only alphabets and be at least 3 characters long.';

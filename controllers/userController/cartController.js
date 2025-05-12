@@ -198,12 +198,13 @@ const loadCheckOut = async (req, res) => {
     
             res.render('checkout', {
                 user,
-                addresses:null,
+                addresses:[],
                 cartItems,
                 subtotal,
                 delivery,
                 discount,
-                finalTotal
+                finalTotal,
+                razorpayKey
             });
         }
 

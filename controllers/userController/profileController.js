@@ -163,7 +163,7 @@ const confirmPassword = async (req, res) => {
 const loadProfile = async (req, res) => {
   try {
     const userId = req.session.user
-    const userData = await User.findById(userId)
+    const userData = await User.findById(userId).populate('availableCoupons')
     const orderData = await Order.find({ userId: userId }).sort({createdOn:-1}).limit(3)
     console.log('orderData:', orderData)
     const addressData = await Address.findById(userId)
@@ -178,6 +178,7 @@ const loadProfile = async (req, res) => {
     res.redirect("/pageNotFound")
   }
 }
+
 
 const loadEditProfile = async (req, res) => {
   try {

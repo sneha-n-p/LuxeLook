@@ -1,0 +1,254 @@
+<%- include("../../views/partials/adminPartial/header") %>
+<style>
+    body {
+  background-color: #0e1629;
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.sales-container {
+  margin-left: 220px; /* adjust to your sidebar width */
+  padding: 40px;
+  max-width: 1000px;
+}
+
+.sales-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.sales-form label,
+.sales-form select,
+.sales-form input {
+  color: #fff;
+  font-size: 14px;
+}
+
+.sales-form select,
+.sales-form input[type="date"],
+.sales-form button {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: none;
+  background-color: #fff;
+  color: #000;
+}
+
+.sales-form button {
+  background-color: #28a745;
+  color: #fff;
+  cursor: pointer;
+}
+
+.date-range {
+  display: none;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.report-summary {
+  margin-bottom: 20px;
+  background-color: #1c2b45;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #1c2b45;
+  color: #fff;
+}
+
+.sales-table th, .sales-table td {
+  padding: 10px;
+  border: 1px solid #2d3e5e;
+  text-align: left;
+}
+
+.download-links {
+  margin-top: 20px;
+}
+
+.download-links a {
+  margin-right: 15px;
+  color: #00d1ff;
+  text-decoration: none;
+}
+</style>
+<div class="sales-container">
+  <h1>Sales Report</h1>
+
+  <form action="/admin/sales" method="GET" id="sales-filter-form" class="sales-form">
+    <label for="report-type">Report Type:</label>
+    <select name="reportType" id="report-type">
+      <option value="daily" <%= (reportType || 'daily') === 'daily' ? 'selected' : '' %>>Daily</option>
+      <option value="weekly" <%= reportType === 'weekly' ? 'selected' : '' %>>Weekly</option>
+      <option value="monthly" <%= reportType === 'monthly' ? 'selected' : '' %>>Monthly</option>
+      <option value="yearly" <%= reportType === 'yearly' ? 'selected' : '' %>>Yearly</option>
+      <option value="custom" <%= reportType === 'custom' ? 'selected' : '' %>>Custom</option>
+    </select>
+
+    <div id="custom-date-range" class="date-range">
+      <label for="start-date">Start Date:</label>
+      <input type="date" name="startDate" id="start-date">
+      <label for="end-date">End Date:</label>
+      <input type="date" name="endDate" id="end-date">
+    </div>
+
+    <button type="submit">Generate Report</button>
+  </form>
+
+  <% if (salesData) { %>
+    <div class="report-summary">
+      <p><strong>Overall Sales Count:</strong> <%= salesData.totalSales %></p>
+      <p><strong>Overall Order Amount:</strong> ₹<%= salesData.totalAmount %></p>
+      <p><strong>Overall Discount:</strong> ₹<%= salesData.totalDiscount.toFixed(2) %></p>
+    </div>
+
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Order ID</th>
+          <th>Amount</th>
+          <th>Discount</th>
+          <th>Coupon Used</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% salesData.orders.forEach(order => { %>
+          <tr>
+            <td><%= order.createdOn.toDateString() %></td>
+            <td><%= order.orderId %></td>
+            <td>₹<%= order.finalAmount.toFixed(2) %></td>
+            <td>₹<%= order.discount.toFixed(2) %></td>
+            <td><%= order.couponApplied || 'N/A' %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+
+    <div class="download-links">
+      <a href="javascript:void(0)" onclick="downloadPDF()">Download PDF</a>
+      <a href="javascript:void(0)" onclick="downloadExcel()">Download Excel</a>
+    </div>
+  <% } %>
+</div>
+
+<!-- Add CDN libraries for frontend downloads -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+  const reportType = document.getElementById('report-type');
+  const customDateRange = document.getElementById('custom-date-range');
+
+  reportType.addEventListener('change', function () {
+    if (this.value === 'custom') {
+      customDateRange.style.display = 'flex';
+    } else {
+      customDateRange.style.display = 'none';
+    }
+  });
+
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text('Sales Report', 14, 20);
+
+    // Add summary
+    const summary = document.querySelector('.report-summary');
+    if (summary) {
+      doc.setFontSize(12);
+      doc.text(`Overall Sales Count: ${summary.children[0].textContent.split(': ')[1]}`, 14, 30);
+      doc.text(`Overall Order Amount: ${summary.children[1].textContent.split(': ')[1]}`, 14, 40);
+      doc.text(`Overall Discount: ${summary.children[2].textContent.split(': ')[1]}`, 14, 50);
+    }
+
+    // Add table
+    const table = document.querySelector('.sales-table');
+    const rows = [];
+    const headers = ['Date', 'Order ID', 'Amount', 'Discount', 'Coupon Used'];
+
+    // Extract table data
+    table.querySelectorAll('tbody tr').forEach(row => {
+      const rowData = [];
+      row.querySelectorAll('td').forEach(cell => {
+        rowData.push(cell.textContent);
+      });
+      rows.push(rowData);
+    });
+
+    // Generate table in PDF
+    doc.autoTable({
+      head: [headers],
+      body: rows,
+      startY: 60,
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 2 },
+      headStyles: { fillColor: [28, 43, 69], textColor: [255, 255, 255] },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+    });
+
+    // Save the PDF
+    doc.save('sales-report.pdf');
+  }
+
+  function downloadExcel() {
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet([]);
+
+    // Add summary
+    const summary = document.querySelector('.report-summary');
+    if (summary) {
+      XLSX.utils.sheet_add_aoa(ws, [
+        ['Summary'],
+        ['Overall Sales Count', summary.children[0].textContent.split(': ')[1]],
+        ['Overall Order Amount', summary.children[1].textContent.split(': ')[1]],
+        ['Overall Discount', summary.children[2].textContent.split(': ')[1]],
+        [], // Empty row for spacing
+      ], { origin: 'A1' });
+    }
+
+    // Add table data
+    const table = document.querySelector('.sales-table');
+    const headers = ['Date', 'Order ID', 'Amount', 'Discount', 'Coupon Used'];
+    const rows = [];
+
+    // Extract table data
+    table.querySelectorAll('tbody tr').forEach(row => {
+      const rowData = [];
+      row.querySelectorAll('td').forEach(cell => {
+        rowData.push(cell.textContent);
+      });
+      rows.push(rowData);
+    });
+
+    // Add headers and rows to worksheet
+    XLSX.utils.sheet_add_aoa(ws, [headers], { origin: -1 });
+    XLSX.utils.sheet_add_json(ws, rows.map(row => ({
+      Date: row[0],
+      'Order ID': row[1],
+      Amount: row[2],
+      Discount: row[3],
+      'Coupon Used': row[4],
+    })), { skipHeader: true, origin: -1 });
+
+    // Append worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
+
+    // Save the Excel file
+    XLSX.write(wb, 'sales-report.xlsx');
+  }
+</script>

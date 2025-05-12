@@ -107,27 +107,22 @@
 <body>
   <%-include("../../views/partials/userPartial/header")%>
 
-  <!-- Profile Header -->
   <section class="hero text-center bg-light p-0 mb-4">
     <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
          style="height: 400px; object-fit: cover;">
     <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">PROFILE</h1>
   </section>
 
-  <!-- Main Content -->
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar -->
       <div class="col-md-2 sidebar" style="height: auto;">
         <h5>SETTINGS</h5>
         <a href="/orders" style="text-decoration: none;">Orders</a>
         <a href="/profile" style="text-decoration: none;">Personal Info</a>
         <a href="/addresses" style="text-decoration: none;">Addresses</a>
         <a href="/wallet" style="text-decoration: none;">Wallet</a>
-        <a href="/referals" style="text-decoration: none;">Referrals</a>
       </div>
 
-      <!-- Profile Content -->
       <div class="col-md-10 profile-container">
         <img src="<%= user.image[0] %>" 
              alt="User Image" 
@@ -144,17 +139,39 @@
         </div>
 
         <!-- Referral Code Section -->
-       <div class="referral-container">
-  <span>Your Referral Code:</span>
-  <span class="referral-code" id="referralCode"><%= user.referalCode %></span>
-  <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
-</div>
-
+        
         <div class="text-center mb-4">
           <a href="/profile/edit" class="btn btn-custom">Edit Profile</a>
           <a href="/profile/change-email" class="btn btn-custom">Change Email</a>
           <a href="/profile/change-password" class="btn btn-custom">Change Password</a>
+          <a href="/add-address" class="btn btn-custom">Add Address</a>
         </div>
+        
+        <div class="referral-container">
+   <span>Your Referral Code:</span>
+   <span class="referral-code" id="referralCode"><%= user.referalCode %></span>
+   <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
+ </div>
+
+ <!-- Referral Coupons Section -->
+<% if (user.availableCoupons && user.availableCoupons.length > 0) { %>
+  <h5 class="mt-4">Your Referral Coupons</h5>
+  <div class="row">
+    <% user.availableCoupons.forEach(coupon => { %>
+      <div class="col-md-4 mb-3">
+        <div class="referral-container">
+          <div>
+            <strong>Code:</strong> <span class="referral-code" id="coupon-<%= coupon._id %>"><%= coupon.name %></span><br>
+            <small>Offer: ₹<%= coupon.offerPrice %> off</small><br>
+            <small>Min Order: ₹<%= coupon.minimumPrice %></small><br>
+            <small>Expires on: <%= new Date(coupon.expiredOn).toLocaleDateString('en-IN') %></small>
+          </div>
+          <button class="btn-copy" onclick="copyCoupon('<%= coupon._id %>')">Copy</button>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
 
         <!-- Recent Orders -->
         <h5 class="text-center mb-3">Recent Orders</h5>
@@ -170,29 +187,44 @@
         </div>
 
 
-        <a href="/add-address" class="btn btn-custom">Add Address</a>
       </div>
     </div>
   </div>
 
   <script>
+
+function copyCoupon(couponId) {
+    const couponCode = document.getElementById(`coupon-${couponId}`).innerText;
+    navigator.clipboard.writeText(couponCode).then(() => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Copied!',
+        text: 'Coupon code copied to clipboard.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }).catch(err => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to copy coupon code.',
+      });
+    });
+  }
+
     function copyReferralCode() {
       console.log("hiiii")
-  // Get the referral code element
   const referralCode = document.getElementById('referralCode').innerText;
 
-  // Copy the referral code to clipboard
   navigator.clipboard.writeText(referralCode).then(() => {
-    // Show SweetAlert popup
     Swal.fire({
       icon: 'success',
       title: 'Copied!',
       text: 'Referral code copied to clipboard.',
-      timer: 2000, // Auto-close after 2 seconds
+      timer: 2000,
       showConfirmButton: false
     });
   }).catch(err => {
-    // Handle errors (optional)
     Swal.fire({
       icon: 'error',
       title: 'Error',
@@ -200,7 +232,6 @@
     });
   });
 }
-    // Date formatting
     document.querySelectorAll('.order-date').forEach(el => {
       const rawDate = el.getAttribute('data-date');
       const dateObj = new Date(rawDate);

@@ -14,7 +14,7 @@ const upload = require("../helpers/multer")
 
 
 
-router.get("/pageNotFound",userAuth,userController.pageNotFound)
+router.get("/pageNotFound",userController.pageNotFound)
 router.get("/",userAuth,userController.loadHomePage)
 router.get("/signup",userAuthCheck,userController.loadSignup)
 router.post("/signup",userController.postSignup)
@@ -47,20 +47,20 @@ router.post("/reset-password",profileController.confirmPassword)
 router.get("/shop",userAuth,productController.loadShop)
 router.get("/product-details/:id",userAuth,productController.loadProductDetails)
 
-router.get ("/profile",profileController.loadProfile)
-router.get ("/profile/edit",profileController.loadEditProfile)
+router.get ("/profile",userAuth,profileController.loadProfile)
+router.get ("/profile/edit",userAuth,profileController.loadEditProfile)
 router.post ("/profile/edit",upload.single('profileImage'),profileController.updateProfile)
 
 router.get("/profile/change-email",userAuth,profileController.loadChangeEmail)
 router.post("/profile/change-email",userAuth,profileController.changeEmailValidation)
-router.get("/change-email-otp",profileController.loadEmailVerifyOtp)
+router.get("/change-email-otp",userAuth,profileController.loadEmailVerifyOtp)
 router.post("/verifying-changeEmail-otp",profileController.EmailVerifyOtp)
-router.get("/reset-email",profileController.loadResetEmail)
+router.get("/reset-email",userAuth,profileController.loadResetEmail)
 router.post("/reset-email",profileController.resetEmail)
 
 router.get("/profile/change-password",userAuth,profileController.changePassword)
 router.post("/profile/change-password",userAuth,profileController.changePasswordValid)
-router.get("/verifying-changePassword-otp",profileController.loadPasswordVerifyingOtp)
+router.get("/verifying-changePassword-otp",userAuth,profileController.loadPasswordVerifyingOtp)
 router.post("/changePassword-otp",profileController.PasswordVerifyingOtp)
 router.get("/profile/reset-password",userAuth,profileController.loadresetPassword)
 router.post("/profile/reset-password",userAuth,profileController.resetPassword)
@@ -97,6 +97,8 @@ router.post('/create-razorpay-order',orderController.razorpay)
 
 router.get('/wallet',userAuth,walletController.loadWallet)
 router.post('/wallet/add',walletController.addAmountToWallet)
+router.post("/wallet/create-order",userAuth,walletController.createRazorpayOrder)
+router.post("/wallet/payment-success",userAuth,walletController.razorpayPaymentSuccess)
 
 router.get('/logout',userAuth,userController.logout)
 

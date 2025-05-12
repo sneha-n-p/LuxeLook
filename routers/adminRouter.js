@@ -6,6 +6,7 @@ const categoryController =require("../controllers/adminController/categoryContro
 const productController = require("../controllers/adminController/productController")
 const orderController = require('../controllers/adminController/orderController')
 const couponController = require('../controllers/adminController/couponController')
+const salesRepoartController = require("../controllers/adminController/salesReportController")
 const upload = require("../helpers/multer")
 const {adminAuth,adminAuthCheck} = require('../middlewares/auth')
 
@@ -31,7 +32,7 @@ router.get("/edit-category/:id",adminAuth,categoryController.loadEditCategory)
 router.post("/edit-category/:id",categoryController.editCategory)
 router.post('/add-category-offer',categoryController.addCategoryOffer)
 router.post('/remove-category-offer',categoryController.removeCategoryOffer)
-router.get('/get-category-offer/:id',categoryController.getCategoryEdit);
+router.get('/get-category-offer/:id',adminAuth,categoryController.getCategoryEdit);
 router.patch('/edit-category-offer',categoryController.editCategoryOffer)
 
 router.get("/Products",adminAuth,productController.productInfo)
@@ -46,7 +47,7 @@ router.post('/unblockProduct',productController.unblockProduct)
 router.post("/deleteImage",productController.deleteSingleImage)
 router.post('/add-product-offer',productController.addProductOffer)
 router.post('/remove-product-offer',productController.removeProductOffer)
-router.get('/get-product-offer/:id',productController.getProductEdit);
+router.get('/get-product-offer/:id',adminAuth,productController.getProductEdit);
 router.patch('/edit-product-offer',productController.editProductOffer)
 
 router.get('/orders',adminAuth,orderController.loadOrder)
@@ -60,6 +61,10 @@ router.get('/editCoupon/:id',adminAuth,couponController.loadEditCoupon)
 router.patch("/updateCoupon",adminAuth,couponController.updateCoupon)
 router.patch("/list-Coupon",adminAuth,couponController.listCategory)
 router.patch("/Unlist-Coupon",adminAuth,couponController.unlistCategory)
+
+router.get("/sales",adminAuth,salesRepoartController.loadSalesPage)
+router.get('/sales/download/pdf',adminAuth, salesRepoartController.downloadPDF);
+router.get('/sales/download/excel',adminAuth, salesRepoartController.downloadExcel);
 
 
 module.exports = router
