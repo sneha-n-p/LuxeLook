@@ -39,7 +39,7 @@ const loadShop = async (req, res) => {
             const user = await User.findById(id)
             const products = await Product.find({ isBlocked: false })
             const categories = await Category.find({isBlocked:false})
-            res.render("shop", { products:productData, user,totalPages,categories ,currentPage: page,search})
+            res.render("shop", { products:productData, user,totalPages,categories ,currentPage: page,search, activePage: 'shop'  })
         } else {
             const products = await Product.find({ isBlocked: false })
             const categories = await Category.find({isBlocked:false})
@@ -60,7 +60,7 @@ const loadProductDetails = async (req, res) => {
             const user = await User.findById(id)
             const product = await Product.findById(req.params.id)
             const recommendedProducts = await Product.find({ _id: { $ne: product._id } }).limit(4);
-            res.render('productDetails', { product, recommendedProducts ,user});
+            res.render('productDetails', { product, recommendedProducts ,user, activePage: 'productDetails' });
         } else {
             const product = await Product.findById(req.params.id);
             const recommendedProducts = await Product.find({ _id: { $ne: product._id } }).limit(4);

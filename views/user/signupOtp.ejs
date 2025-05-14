@@ -89,12 +89,13 @@
       <button type="submit" class="btn btn-submit">Submit</button>
     </form>
 
-    <div id="timer" style="text-align: center;">OTP valid for: <span id="countdown">30</span> seconds</div>
+    <div id="timer" style="text-align: center;">OTP valid for: <span id="countdown">60</span> seconds</div>
     <div class="expired-msg" id="expiredMsg" style="display: none;">OTP expired</div>
 
     <div class="text-small">
-      Wrong Email? <button id="resend-btn" onclick="resendOTP() ">Resend
+      Wrong Email? <button id="resend-btn" onclick="resendOTP()" disabled>Resend</button>
     </div>
+
   </div>
 
   <script>
@@ -105,7 +106,7 @@
     const expiredMsg = document.getElementById('expiredMsg');
     const otpForm = document.getElementById('otpForm');
 
-      
+
     let timer = setInterval(() => {
       countdown--;
       countdownEl.innerText = countdown;
@@ -115,7 +116,9 @@
         otpInput.disabled = true;
         submitBtn.disabled = true;
         expiredMsg.style.display = 'block';
+        document.getElementById("resend-btn").disabled = false;  // ENABLE resend button
       }
+
     }, 1000);
 
     function validateOTPform() {
@@ -162,12 +165,12 @@
 
     function resendOTP() {
       document.getElementById("resend-btn").disabled = true
-      countdown = 30;
+      countdown = 60;
       otpInput.disabled = false
       submitBtn.disabled = false;
       expiredMsg.style.display = "none"
       countdownEl.innerText = countdown;
-      if(timer)clearInterval(timer);
+      if (timer) clearInterval(timer);
 
       timer = setInterval(() => {
         countdown--;
@@ -175,7 +178,7 @@
         countdownEl.innerText = countdown;
 
         if (countdown <= 0) {
-          clearInterval(timer); 
+          clearInterval(timer);
           otpInput.disabled = true;
           submitBtn.disabled = true;
           expiredMsg.style.display = 'block';
@@ -184,7 +187,7 @@
       // clearInterval(timer)
       axios.post("/resend-otp")
         .then(function (response) {
-          
+
           console.log("resend otp response:", response);
           if (response.data.success) {
             Swal.fire({

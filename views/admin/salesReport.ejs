@@ -162,11 +162,9 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Add title
     doc.setFontSize(18);
     doc.text('Sales Report', 14, 20);
 
-    // Add summary
     const summary = document.querySelector('.report-summary');
     if (summary) {
       doc.setFontSize(12);
@@ -175,12 +173,10 @@
       doc.text(`Overall Discount: ${summary.children[2].textContent.split(': ')[1]}`, 14, 50);
     }
 
-    // Add table
     const table = document.querySelector('.sales-table');
     const rows = [];
     const headers = ['Date', 'Order ID', 'Amount', 'Discount', 'Coupon Used'];
 
-    // Extract table data
     table.querySelectorAll('tbody tr').forEach(row => {
       const rowData = [];
       row.querySelectorAll('td').forEach(cell => {
@@ -189,7 +185,6 @@
       rows.push(rowData);
     });
 
-    // Generate table in PDF
     doc.autoTable({
       head: [headers],
       body: rows,
@@ -200,16 +195,13 @@
       alternateRowStyles: { fillColor: [240, 240, 240] },
     });
 
-    // Save the PDF
     doc.save('sales-report.pdf');
   }
 
   function downloadExcel() {
-    // Create workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet([]);
 
-    // Add summary
     const summary = document.querySelector('.report-summary');
     if (summary) {
       XLSX.utils.sheet_add_aoa(ws, [
@@ -217,16 +209,14 @@
         ['Overall Sales Count', summary.children[0].textContent.split(': ')[1]],
         ['Overall Order Amount', summary.children[1].textContent.split(': ')[1]],
         ['Overall Discount', summary.children[2].textContent.split(': ')[1]],
-        [], // Empty row for spacing
+        [], 
       ], { origin: 'A1' });
     }
 
-    // Add table data
     const table = document.querySelector('.sales-table');
     const headers = ['Date', 'Order ID', 'Amount', 'Discount', 'Coupon Used'];
     const rows = [];
 
-    // Extract table data
     table.querySelectorAll('tbody tr').forEach(row => {
       const rowData = [];
       row.querySelectorAll('td').forEach(cell => {
@@ -235,7 +225,6 @@
       rows.push(rowData);
     });
 
-    // Add headers and rows to worksheet
     XLSX.utils.sheet_add_aoa(ws, [headers], { origin: -1 });
     XLSX.utils.sheet_add_json(ws, rows.map(row => ({
       Date: row[0],
@@ -245,10 +234,8 @@
       'Coupon Used': row[4],
     })), { skipHeader: true, origin: -1 });
 
-    // Append worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Sales Report');
 
-    // Save the Excel file
     XLSX.write(wb, 'sales-report.xlsx');
   }
 </script>

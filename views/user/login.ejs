@@ -35,6 +35,7 @@
             background: url('/images/login-image.png') no-repeat center center;
             background-size: cover;
             position: relative;
+            z-index: 10;
         }
 
         .login-form {
@@ -140,6 +141,30 @@
         .logo img {
             width: 120px;
         }
+           .left-section {
+  flex: 1;
+  background-color: #fce9e4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Make it a positioning context */
+  overflow: hidden;
+}
+
+.left-section > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.img-logo {
+  position: absolute;
+  top: -11px;
+  right: 502px;
+  width: 161px; /* Adjust based on your logo size */
+  height: auto;
+  z-index: 5;
+}
     </style>
 </head>
 
@@ -151,15 +176,15 @@
                 <h2>Welcome back!</h2>
                 <p>Enter your Credentials to access your account</p>
 
-                <form action="/login" method="POST">
+                <form id="loginForm" action="/login" method="POST">
                     <div class="mb-3">
                         <label>Email address</label>
-                        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                        <input type="email" name="email" class="form-control" placeholder="Enter your email">
                     </div>
 
                     <div class="mb-3">
                         <label>Password</label> <a href="/forgot-password" class="forgot-link">forgot password</a>
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" name="password" class="form-control" placeholder="Password">
                     </div>
                     <%if(message){%>
                         <div class="alert alert-danger text-center">
@@ -181,13 +206,45 @@
                 </div>
             </div>
         </div>
-
-        <div class="right-side">
-            <div class="logo">
-                <img src="images\logo_forWhite.png" alt="LuxeLook Logo">
-            </div>
+         <div class="left-section">
+                <div class="top-nav-top">
+            <img  class="img-logo" src="images\logo_forWhite.png" alt="luxelook-logo">
+        </div  class="top-nav-bottom">
+          <img src="\wallpaper\signup_image.jpeg" alt="LuxeLook Logo">
         </div>
     </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    const email = this.email.value.trim();
+    const password = this.password.value.trim();
+
+    if (!email || !password) {
+      e.preventDefault();
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Missing Fields',
+        text: 'Please enter both email and password.'
+      });
+    } else if (!validateEmail(email)) {
+      e.preventDefault();
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Email',
+        text: 'Please enter a valid email address.'
+      });
+    }
+  });
+
+  function validateEmail(email) {
+    // Basic email regex pattern
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email.toLowerCase());
+  }
+</script>
 
 </body>
 

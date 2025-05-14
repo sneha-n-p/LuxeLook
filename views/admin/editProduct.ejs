@@ -1,67 +1,66 @@
 <%-include("../../views/partials/adminPartial/header")%>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
-    <style>
-        body {
-            background-color: #0f172a;
-            color: #f1f5f9;
-            font-family: 'Segoe UI', sans-serif;
-        }
+<style>
+    body {
+        background-color: #0f172a;
+        color: #f1f5f9;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-        .form-control {
-            background-color: #f8fafc;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 12px;
-        }
+    .form-control {
+        background-color: #f8fafc;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 12px;
+    }
 
-        .form-control:focus {
-            background-color: #f8fafc;
-            box-shadow: none;
-            border-color: #38bdf8;
-        }
+    .form-control:focus {
+        background-color: #f8fafc;
+        box-shadow: none;
+        border-color: #38bdf8;
+    }
 
-        .form-label {
-            color: #f1f5f9;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
+    .form-label {
+        color: #f1f5f9;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
 
-        .btn-submit {
-            background-color: #2dd4bf;
-            color: #0f172a;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 6px;
-        }
+    .btn-submit {
+        background-color: #2dd4bf;
+        color: #0f172a;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 6px;
+    }
 
-        .btn-submit:hover {
-            background-color: #14b8a6;
-        }
+    .btn-submit:hover {
+        background-color: #14b8a6;
+    }
 
-        .category-image-box {
-            width: 160px;
-            height: 160px;
-            background-color: #cbd5e1;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #475569;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    .category-image-box {
+        width: 160px;
+        height: 160px;
+        background-color: #cbd5e1;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #475569;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
 
-        .category-image-box:hover {
-            background-color: #94a3b8;
-        }
+    .category-image-box:hover {
+        background-color: #94a3b8;
+    }
 
-        .product-form {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-    </style>
-
+    .product-form {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+</style>
 
 <div class="product-form">
     <form name="productForm" action="/admin/edit-product/<%=product._id%>" method="POST" enctype="multipart/form-data">
@@ -137,7 +136,7 @@
                                 <div class="card-body">
                                     <div class="image-upload-container">
                                         <p id="image<%= i+1 %>-error"></p>
-                                        <input type="file" name="image<%= i+1 %>" accept="image/*" class="form-control image-input" data-index="<%= i %>" onchange="previewImage(event, <%= i %>)">
+                                        <input type="file" name="image<%= i+1 %>" class="form-control image-input" data-index="<%= i %>" onchange="previewImage(event, <%= i %>)" accept=".jpg, .jpeg, .png">
                                         <div class="preview-container" style="margin-top: 10px; display: none;">
                                             <img id="preview<%= i %>" src="#" alt="Image preview" style="max-width: 100%; height: auto;">
                                         </div>
@@ -155,14 +154,40 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 let croppers = [];
 
 function previewImage(event, index) {
     const input = event.target;
     const file = input.files[0];
+
+    // Define allowed file types
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
     if (file) {
         console.log(`File selected for image${index + 1}:`, file.name);
+
+        // Check if the file type is allowed
+        if (!allowedTypes.includes(file.type)) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Only JPG, JPEG, and PNG images are allowed.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+
+            // Clear the input
+            input.value = '';
+            const previewContainer = input.parentElement.querySelector('.preview-container');
+            previewContainer.style.display = 'none';
+            if (croppers[index]) {
+                croppers[index].destroy();
+                croppers[index] = null;
+            }
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = function (e) {
             const previewContainer = input.parentElement.querySelector('.preview-container');
@@ -228,7 +253,7 @@ async function deleteSingleImage(imageName, productId, index) {
                         <div class="card-body">
                             <div class="image-upload-container">
                                 <p id="image${index + 1}-error"></p>
-                                <input type="file" name="image${index + 1}" accept="image/*" class="form-control image-input" data-index="${index}" onchange="previewImage(event, ${index})">
+                                <input type="file" name="image${index + 1}" accept=".jpg, .jpeg, .png" class="form-control image-input" data-index="${index}" onchange="previewImage(event, ${index})">
                                 <div class="preview-container" style="margin-top: 10px; display: none;">
                                     <img id="preview${index}" src="#" alt="Image preview" style="max-width: 100%; height: auto;">
                                 </div>
@@ -273,6 +298,7 @@ form.addEventListener('submit', async function (event) {
     event.preventDefault();
     let isValid = true;
 
+    // Validate other form inputs (name, description, etc.)
     document.querySelectorAll('input:not([type="file"]), textarea, select').forEach((input) => {
         if (!validateInput(input)) {
             isValid = false;
@@ -291,12 +317,13 @@ form.addEventListener('submit', async function (event) {
         console.log(`${pair[0]}:`, pair[1]);
     }
 
+    // Process cropped images
     for (let i = 0; i < 4; i++) {
         if (croppers[i] && croppers[i].getCroppedCanvas()) {
             try {
                 console.log(`Processing image ${i + 1}`);
                 const blob = await new Promise((resolve) => {
-                    croppers[i].getCroppedCanvas({ width: 500, height: 500 }).toBlob(resolve, 'image/jpeg', 0.9);
+                    croppers[i].getCroppedCanvas({ width: 800, height: 800 }).toBlob(resolve, 'image/jpeg', 0.9);
                 });
                 console.log(`Blob for image${i + 1}:`, blob);
                 formData.set(`image${i + 1}`, blob, `image-${Date.now()}-${i}.jpg`);

@@ -120,7 +120,7 @@
      style="width: 80px; height: 80px; object-fit: cover; border-radius: 50%;">
 
               <form id="profilePicForm" enctype="multipart/form-data" class="text-center">
-                <input type="file" id="profileImage" accept="image/*" class="hidden" onchange="handleImageUpload()">
+                <input type="file" id="profileImage"  class="hidden" onchange="handleImageUpload()" accept=".jpg, .jpeg, .png">
               </form>
             </div>
 
@@ -178,8 +178,16 @@
 
 <script>
 async function handleImageUpload() {
-  const file = document.getElementById('profileImage').files[0];
+  const input = document.getElementById('profileImage');
+  const file = input.files[0];
   if (!file) return;
+
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  if (!allowedTypes.includes(file.type)) {
+    Swal.fire('Invalid File!', 'Please upload an image (jpg, jpeg, png only).', 'warning');
+    input.value = ''; // Clear the input
+    return;
+  }
 
   const formData = new FormData();
   formData.append('profileImage', file);
@@ -201,6 +209,7 @@ async function handleImageUpload() {
     Swal.fire('Error!', 'Something went wrong.', 'error');
   }
 }
+
 
 async function editProfile() {
   const firstName = document.getElementById('firstName').value.trim();

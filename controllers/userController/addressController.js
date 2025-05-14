@@ -28,7 +28,8 @@ const loadAddress = async (req, res) => {
             user: userData,
             addresses,
             currentPage: page,
-            totalPages
+            totalPages,
+              activePage: 'address'
         });
 
     } catch (error) {
@@ -42,7 +43,7 @@ const loadAddress = async (req, res) => {
 const loadAddAddress = async (req, res) => {
     try {
         const user = req.session.user
-        res.render("add-address", { user: user })
+        res.render("add-address", { user: user,activePage: 'add-address' })
     } catch (error) {
         console.error(error)
         res.redirect("/pageNotFound")
@@ -155,7 +156,7 @@ const deleteAddress = async (req, res) => {
 const loadcartAddAddress = async(req,res)=>{
     try {
         const user = req.session.user
-        res.render("cartAdd-address", { user: user })
+        res.render("cartAdd-address", { user: user,activePage: 'cartAdd-address'})
     } catch (error) {
         console.error(error)
         res.redirect("/pageNotFound")

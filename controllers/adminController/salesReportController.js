@@ -97,7 +97,6 @@ const loadSalesPage = async (req, res) => {
         };
         break;
       default:
-        // Default to all delivered orders if no reportType
         query.createdOn = { $exists: true };
     }
 

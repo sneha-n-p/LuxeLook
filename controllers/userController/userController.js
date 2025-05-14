@@ -24,10 +24,10 @@ const loadHomePage = async (req, res) => {
         if (user) {
             const products = await Product.find({ isBlocked: false })
             const userData = await User.findOne({ _id: user })
-            res.render('home', { user: userData, products })
+            res.render('home', { user: userData, products , activePage: 'home'  })
         } else {
             const products = await Product.find()
-            return res.render('home', { user: null, products })
+            return res.render('home', { user: null, products})
         }
     } catch (error) {
         console.log("homePage not found", error)
@@ -48,6 +48,7 @@ const loadSignup = async (req, res) => {
 
     }
 }
+
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString()
 }
@@ -112,7 +113,7 @@ const postSignup = async (req, res) => {
 
 const loadShopping = async (req, res) => {
     try {
-        return res.render("shop")
+        return res.render("shop",{user: req.session.user, activePage: 'shop' })
     } catch (error) {
         console.log('Shopping page not loading', error)
         res.status(500).send('Server Error')
@@ -287,5 +288,6 @@ module.exports = {
     resendOtp,
     loadLogin,
     postLogin,
-    logout, sample
+    logout, 
+    sample
 } 

@@ -23,6 +23,9 @@ const placeOrder = async (req, res) => {
 
     const addressData = addresss && addresss.address.length > 0 ? addresss.address[0] : null;
     console.log('addressData:', addressData);
+    if(addressData==null){
+      return res.status(400).json({message:'address not added,please add you address' })
+    }
 
     const cart = await Cart.findOne({ userId }).populate('items.productId');
 
@@ -130,7 +133,7 @@ const loadOrders = async (req, res) => {
     const user = await User.findById(userId)
     const order = await Order.find({ userId: userId }).populate("orderedItems.product").sort({ createdOn: -1 })
     console.log(order)
-    res.render("orderDetails", { user, orders: order, totalPages, currentPage: page, search })
+    res.render("orderDetails", { user, orders: order, totalPages, currentPage: page, search, activePage: 'orderDetails'   })
   } catch (error) {
     console.error(error)
     res.redirect("/pageNotFound")
@@ -312,8 +315,15 @@ const razorpay = async (req, res) => {
   }
 }
 
-
-
+const loadFailure = async (req, res) => {
+  try {
+    const { orderId, error } = req.query
+    res.render('razorpayfailer', { orderId: orderId || '', error: error || '' })
+  } catch (error) {
+    console.error("Error occur while loadFailure:", error)
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).redirect('/pageNotFound')
+  }
+}
 
 module.exports = {
   placeOrder,
@@ -323,5 +333,6 @@ module.exports = {
   cancelSingleProduct,
   cancelOrders,
   returnOrder,
-  razorpay
+  razorpay,
+  loadFailure
 }

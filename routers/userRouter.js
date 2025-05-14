@@ -94,6 +94,7 @@ router.post('/orders/details',orderController.cancelSingleProduct)
 router.post('/orders/cancel',orderController.cancelOrders)
 router.patch('/orders/return',orderController.returnOrder)
 router.post('/create-razorpay-order',orderController.razorpay)
+router.get('/orderFailure',orderController.loadFailure)
 
 router.get('/wallet',userAuth,walletController.loadWallet)
 router.post('/wallet/add',walletController.addAmountToWallet)

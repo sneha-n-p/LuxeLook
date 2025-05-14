@@ -56,7 +56,7 @@
     <div class="row">
 
       <!-- Filter Sidebar -->
-      <div class="col-md-3">
+      <!-- <div class="col-md-3">
         <div class="filter-section">
           <h5>Categories</h5>
           <ul class="list-unstyled">
@@ -80,13 +80,13 @@
           <input type="range" class="form-range">
           <p>₹500 - ₹3000</p>
         </div>
-      </div>
+      </div> -->
 
-      <div class="col-md-9">
+      <div class="col-md-12">
         <div class="d-flex mb-3">
-          <input type="text" class="form-control me-2" placeholder="Search products...">
-          <button class="btn btn-dark">Search</button>
-        </div>
+  <input id="searchInput" type="text" class="form-control me-2" value="<%= search %>" placeholder="Search products...">
+  <button class="btn btn-dark" onclick="searchProducts()">Search</button>
+</div>
 
         <div class="row">
           <% for(let i=0;i<products.length;i++) { %>
@@ -212,6 +212,14 @@
           })
         })
     }
+    
+    function searchProducts() {
+    const query = document.getElementById("searchInput").value.trim();
+    const url = new URL(window.location.href);
+    url.searchParams.set("search", query);
+    url.searchParams.set("page", 1); // reset to first page
+    window.location.href = url.toString();
+  }
 
   </script>
   <%-include("../../views/partials/userPartial/footer")%>

@@ -63,7 +63,7 @@
   </style>
 
   <div class="product-form">
-    <form name="productForm" id ="productForm" action="/admin/add-product" method="POST" enctype="multipart/form-data">
+    <form name="productForm" id="productForm" action="/admin/add-product" method="POST" enctype="multipart/form-data">
       <div class="row mb-4">
 
 
@@ -120,8 +120,7 @@
           <div class="mb-3">
             <label class="form-label">Stock</label>
             <p id="Stock-error"></p>
-            <input type="number" class="form-control" id="stock" name="Stock" min="0"
-              placeholder="Enter the Stock" />
+            <input type="number" class="form-control" id="stock" name="Stock" min="0" placeholder="Enter the Stock" />
           </div>
         </div>
       </div>
@@ -139,8 +138,8 @@
         <% for (let i=1; i <=4; i++) { %>
           <div class="image-upload-group" id="images">
             <label for="image<%= i %>">Image <%= i %></label>
-            <input type="file" name="image<%= i %>" id="image<%= i %>" class="form-control" accept="image/*"
-              onchange="previewImage(event, <%= i %>)">
+            <input type="file" name="image<%= i %>" id="image<%= i %>" class="form-control" accept=".jpg, .jpeg, .png"
+              onchange="previewImage(event, <%= i %>)" >
             <img id="preview<%= i %>" src="#" alt="Image preview" class="image-preview" style="display: none;">
             <button type="button" class="btn btn-primary mt-2" onclick="cropImage(<%= i %>)">Save Image <%= i %>
             </button>
@@ -178,7 +177,7 @@
       const category = document.getElementById("category").value;
       const size = document.getElementById("size").value.trim()
       const stock = document.getElementById("stock").value.trim()
-      const form  = document.getElementById("productForm")
+      const form = document.getElementById("productForm")
 
       const namePattern = /^[A-Za-z ]+$/;
       const numberPattern = /^\d+(\.\d{1,2})?$/;
@@ -228,12 +227,12 @@
         displayErrorMessage("category-error", "Please select a category");
         isValid = false;
       }
-      if(!size){
-        displayErrorMessage("size-error","please enter proper Size")
+      if (!size) {
+        displayErrorMessage("size-error", "please enter proper Size")
         isValid = false
       }
-      if(!stock){
-        displayErrorMessage("stock-error","please enter the number")
+      if (!stock) {
+        displayErrorMessage("stock-error", "please enter the number")
       }
 
 
@@ -282,6 +281,10 @@
       //     }
       //   });
       // }
+      for (let i = 1; i <= 4; i++) {
+        const imageInput = document.getElementById(`image${i}`);
+        imageInput.disabled = true; // Disable original image inputs
+      }
 
       let imageUploaded = false;
       for (let i = 1; i <= 4; i++) {
@@ -332,7 +335,7 @@
           try {
             const resp = await axios.post("/admin/add-product", formData, {
               headers: {
-                "Content-Type": "multipart/form-data",  // important if formData includes files
+                "Content-Type": "multipart/form-data",
               },
             });
 
@@ -343,7 +346,7 @@
                 text: data.message,
                 icon: "success",
                 confirmButtonText: "OK",
-              }).then((result)=>{
+              }).then((result) => {
                 window.location.href = data.url;
               })
             } else {
@@ -509,8 +512,8 @@
 
       try {
         const canvas = croppers[index].getCroppedCanvas({
-          width: 150,
-          height: 150,
+          width: 800,
+          height: 800,
           imageSmoothingEnabled: true,
           imageSmoothingQuality: "high",
         });

@@ -48,11 +48,48 @@
         .nav-link{
             font-size: 13px;
             padding-bottom: 13px;
+            color: black;
+            font-style: normal;
+            
         }
+      
+.top-nav{
+   height: 78px;
+   margin: 0;
+   background-color: #fff;
+   font-family:  Arial;
+   font-size: 20px;
+   font-style: initial;
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   position: fixed;
+   top: 0;
+   width: 100%;
+   z-index: 10;
+   border-bottom-width: 1px;
+   border-bottom-style: solid;
+   border-bottom-color: #fff;
+}
+
+.img-logo{
+   width:135px;
+   height:114px ;
+   padding-left: 14px;
+   padding-top: 1px;
+
+}
+.top-nav-left{
+   flex: 1;
+}
+.top-nav-right{
+   flex: 1;
+   
+}
+
     </style>
 </head>
 
-<body>
     <body class="goto-here">
         <div class="py-1 bg-black">
             <div class="container">
@@ -77,133 +114,48 @@
                 </div>
             </div>
         </div>
-    <header class="header ">
-        <nav class="container d-flex justify-content-between align-items-center">
-            <div class="logo h2">LUXE</div>
-            <ul class="nav">
-                <li class="nav-item"><a class="nav-link" style="color:#000" href="/">Home</a></li>
-                <li class="nav-item"><a class="nav-link"  style="color:#000" href="/shop">Shop</a></li>
-                <li class="nav-item"><a class="nav-link" style="color:#000"  href="/about">About</a></li>
-                <li class="nav-item"><a class="nav-link"  style="color:#000" href="/contact">Contact</a></li>
-                <li class="nav-item"><a class="nav-link"  style="color:#000" href="/cart">Cart</a></li>
-                <li class="nav-item"><a class="nav-link"  style="color:#000" href="/wishlist">wishlist</a></li>
-                <%if(user){%>
-                    <div class="dropdown">
-                        <li class="nav-item">
-                            <a class="nav-link"  style="color:#000" href="#"><%=user.name%></a>
-                        </li>
-                        <div class="dropdown-content">
-                            <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
-                        </div>
-                    </div>
-                    <%}else{%>
-                        <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/signup">SignUp</a></li>
-                        <%}%>
-            </ul>
-        </nav>
-    </header>
+    <header class="header">
+        <nav class="top-nav d-flex align-items-center justify-content-between">
+        <div class="top-nav-left">
+            <img  class="img-logo" src="images\logo_forWhite.png" alt="luxelook-logo">
+        </div>
+        <div class="top-nav-left">
+                <ul class="nav d-flex align-items-center justify-content-end">
+    <li class="nav-item">
+        <a class="nav-link <%= activePage === 'home' ? 'fw-bold text-dark' : '' %>" href="/">Home</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link <%= activePage === 'shop' ? 'fw-bold text-dark' : '' %>" href="/shop">Shop</a>
+    </li>
+   
+    <li class="nav-item">
+        
+        <a class="nav-link <%= activePage === 'cart' ? 'fw-bold text-dark' : '' %>" href="/cart">Cart</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link <%= activePage === 'wishlist' ? 'fw-bold text-dark' : '' %>" href="/wishlist">Wishlist</a>
+    </li>
+    <% if (user) { %>
+        <div class="dropdown">
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'profile' ? 'fw-bold text-dark' : '' %>" href="#"><%= user.name %></a>
+            </li>
+            <div class="dropdown-content">
+                <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+            </div>
+        </div>
+    <% } else { %>
+        <li class="nav-item"><a class="nav-link <%= activePage === 'login' ? 'fw-bold text-dark' : '' %>" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link <%= activePage === 'signup' ? 'fw-bold text-dark' : '' %>" href="/signup">SignUp</a></li>
+    <% } %>
+</ul>
+
+</div>
+</nav>
+</header>
+
 </body>
 
 
 
-<!-- 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>LuxeLook</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
-
-    <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css">
-    <link rel="stylesheet" href="css/animate.css">
-
-    <link rel="stylesheet" href="css/owl.carousel.min.css">
-    <link rel="stylesheet" href="css/owl.theme.default.min.css">
-    <link rel="stylesheet" href="css/magnific-popup.css">
-
-    <link rel="stylesheet" href="css/aos.css">
-
-    <link rel="stylesheet" href="css/ionicons.min.css">
-
-    <link rel="stylesheet" href="css/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="css/jquery.timepicker.css">
-
-
-    <link rel="stylesheet" href="css/flaticon.css">
-    <link rel="stylesheet" href="css/icomoon.css">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-
-<body class="goto-here">
-    <div class="py-1 bg-black">
-        <div class="container">
-            <div class="row no-gutters d-flex align-items-start align-items-center px-md-0">
-                <div class="col-lg-12 d-block">
-                    <div class="row d-flex">
-                        <div class="col-md pr-4 d-flex topper align-items-center">
-                            <div class="icon mr-2 d-flex justify-content-center align-items-center"><span
-                                    class="icon-phone2"></span></div>
-                            <span class="text">+ 1235 2355 98</span>
-                        </div>
-                        <div class="col-md pr-4 d-flex topper align-items-center">
-                            <div class="icon mr-2 d-flex justify-content-center align-items-center"><span
-                                    class="icon-paper-plane"></span></div>
-                            <span class="text">Luxelook@email.com</span>
-                        </div>
-                        <div class="col-md-5 pr-4 d-flex topper align-items-center text-lg-right">
-                            <span class="text">3-5 Business days delivery &amp; Free Returns</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> class="navbar navbar-expand-lg navbar-light ftco_navbar bg-light ftco-navbar-light" id="ftco-navbar"
-    <nav>
-        <div class="container">
-            <a class="navbar-brand" href="index.html">LuxeLook</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
-                aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="oi oi-menu"></span> Menu
-            </button>
-
-            <div class="collapse navbar-collapse" id="ftco-nav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
-                    
-                    
-                    <li class="nav-item"><a href="/shop" class="nav-link">shop</a></li>
-                    <li class="nav-item"><a href="/wishlist" class="nav-link">wishlist</a></li>
-                    
-                    <% if(user){ %>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false" style="color: rgb(0, 0, 0);">
-                                <%= user.name %>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right bg-dark" aria-labelledby="dropdown04">
-                                <a class="dropdown-item text-white" href="/profile/<%= user._id %>">Profile</a>
-                                <a class="dropdown-item text-white" href="/logout">Logout</a>
-                            </div>
-                        </li>
-                    <% } else { %>
-                        <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/signup">SignUp</a></li>
-                    <% } %>
-                    
-
-                        <li class="nav-item cta cta-colored"><a href=/cart class="nav-link"><span
-                            class="icon-shopping_cart"></span>[0]</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script> -->
-
-    <!-- END nav -->

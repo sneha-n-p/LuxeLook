@@ -17,7 +17,7 @@ router.post('/login',adminControllar.postLogin)
 
 router.get('/',adminAuth,adminControllar.loadDashboard)
 router.get('/pageError',adminControllar.pageError)
-router.get("/logout",adminControllar.logout)
+router.post("/logout",adminControllar.logout)
 
 router.get("/users",adminAuth,customerController.customerInfo)
 router.patch("/blockUser",adminAuth,customerController.userBlocked)

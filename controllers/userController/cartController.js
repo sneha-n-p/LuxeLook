@@ -48,7 +48,8 @@ const loadcart = async (req, res) => {
                 totalPages,
                 currentPage: page,
                 search,
-                subTotal
+                subTotal,
+                activePage: 'cart'  
             })
         }
     } catch (error) {
@@ -75,7 +76,7 @@ const procedToCheckOut = async (req, res) => {
                 }
             );
         }
-            return res.json({ success: true });
+            return res.json({ success: true});
 
     } catch (error) {
         console.error("Error updating cart quantities:", error);
@@ -189,7 +190,8 @@ const loadCheckOut = async (req, res) => {
                 delivery,
                 discount,
                 finalTotal,
-                razorpayKey
+                razorpayKey,
+             activePage: 'checkout'  
             });
         }else{
             const delivery = subtotal > 1000 ? 0 : 50
@@ -204,7 +206,8 @@ const loadCheckOut = async (req, res) => {
                 delivery,
                 discount,
                 finalTotal,
-                razorpayKey
+                razorpayKey,
+                activePage: 'checkout'
             });
         }
 

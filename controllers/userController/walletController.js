@@ -13,9 +13,9 @@ const loadWallet = async (req, res) => {
     if (wallet) {
       const transactions = wallet.transactions
       console.log(Wallet)
-      res.render('wallet', { user, wallet, transactions })
+      res.render('wallet', { user, wallet, transactions,  activePage: 'wallet' })
     } else {
-      res.render('wallet', { user, wallet: null, transactions: null })
+      res.render('wallet', { user, wallet: null, transactions: null,  activePage: 'wallet' })
     }
   } catch (error) {
     console.error(error)

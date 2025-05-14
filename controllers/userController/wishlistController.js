@@ -41,7 +41,7 @@ const loadwishlist = async (req, res) => {
             const user = await User.findById(id)
             const products = await Product.find({ _id: { $in: user.wishlist } }).populate('category')
             const categories = await Category.find({ isBlocked: false })
-            res.render("wishlist", { wishlist: products, user, totalPages, categories, currentPage: page, search, productData })
+            res.render("wishlist", { wishlist: products, user, totalPages, categories, currentPage: page, search, productData, activePage: 'wishlist'  })
         } else {
             res.redirect("/login", { products, productData, user: null, totalPages, currentPage: page, search, categories })
             console.log(products)

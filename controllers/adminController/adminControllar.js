@@ -13,7 +13,9 @@ const loadLogin = async (req, res) => {
         if (req.session.admin) {
             return res.redirect('/admin/dashboard')
         }
-        res.render('admin-login', { message: null })
+        message = req.session.message || null
+        req.session.message = null
+        res.render('admin-login', { message })
     } catch (error) {
         console.error(error)
     }
@@ -22,15 +24,16 @@ const loadLogin = async (req, res) => {
 const postLogin = async (req, res) => {
     try {
         const { email, password } = req.body
-        const admin = await User.findOne({ email, isAdmin: true })
+        const admin = await User.findOne({ email:email, isAdmin: true })
         if (admin) {
-            const passwordMatch = bcrypt.compare(password, admin.password)
-            if (passwordMatch) {
+            const passwordMatch = await bcrypt.compare(password,admin.password)
+            if (!passwordMatch) {
+                console.log('done')
+                req.session.message = 'invalid credentials'
+                return res.redirect('/admin/login')
+            } else {
                 req.session.admin = true
                 return res.redirect("/admin")
-            } else {
-                console.log('done')
-                return res.redirect('/admin/login')
             }
         } else {
             return res.redirect('/admin/login')

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -118,9 +117,33 @@
       font-size: 0.75rem;
       display: none;
     }
+
+     .left-section {
+  flex: 1;
+  background-color: #fce9e4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Make it a positioning context */
+  overflow: hidden;
+}
+
+.left-section > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+   .img-logo {
+  position: absolute;
+  top: -11px;
+  right: 502px;
+  width: 161px; /* Adjust based on your logo size */
+  height: auto;
+  z-index: 5;
+}
   </style>
 </head>
-
 <body>
   <div class="container-fluid">
     <div class="row signup-wrapper">
@@ -129,26 +152,19 @@
         <h2>Get Started Now</h2>
         <form id="signform" action="/signup" method="POST">
           <div id="signupError1" class="Error-message"></div>
-          <input id="name" type="text" class="form-control" name="name" placeholder="Enter your name" required />
-
+          <input id="name" type="text" class="form-control" name="name" placeholder="Enter your name"  />
           <div id="signupError2" class="Error-message"></div>
-          <input id="email" type="email" class="form-control" name="email" placeholder="Enter your email" required />
-
+          <input id="email" type="email" class="form-control" name="email" placeholder="Enter your email"  />
           <div id="signupError3" class="Error-message"></div>
-          <input id="phone" type="tel" class="form-control" name="phone" placeholder="Enter your Phone Number"
-            required />
-
-            <div id="signupError4" class="Error-message"></div>
-          <input id="password" type="password" class="form-control" name="password" placeholder="Password" required />
-
+          <input id="phone" type="tel" class="form-control" name="phone" placeholder="Enter your Phone Number"  />
+          <div id="signupError4" class="Error-message"></div>
+          <input id="password" type="password" class="form-control" name="password" placeholder="Password"  />
           <div id="signupError5" class="Error-message"></div>
-          <input id="Cpassword" type="password" class="form-control" name="Cpassword" placeholder="Confirm Password" required />
-
+          <input id="Cpassword" type="password" class="form-control" name="Cpassword" placeholder="Confirm Password"  />
           <div id="signupError6" class="Error-message"></div>
           <input id="referalCode" type="text" class="form-control" name="referalCode" placeholder="referalCode(optional)" />
-
           <div class="form-check mb-3">
-            <input class="form-check-input" type="checkbox" id="terms" required />
+            <input class="form-check-input" type="checkbox" id="terms"  />
             <label class="form-check-label" for="terms">
               I agree to the <a href="#">terms & policy</a>
             </label>
@@ -156,99 +172,93 @@
               <div class="alert alert-danger text-center">
                   <%=message%>
               </div>
-              <% } %>
+            <% } %>
           </div>
           <button type="submit" class="btn btn-signup w-100">Signup</button>
         </form>
-
         <div class="divider"><span>or</span></div>
-
         <a href="/auth/google" class="google-btn">
           <img src="https://img.icons8.com/color/16/000000/google-logo.png" />
           Sign up with Google
         </a>
-
         <p class="mt-4 text-center">
           Have an account? <a href="/login" class="text-info">Login</a>
         </p>
       </div>
-
       <!-- Image Side -->
-      <div class="col-md-6 d-none d-md-block right-img-section">
-        <div class="logo text-end">
-          <h1>LUXE</h1>
-          <h6>LOOK</h6>
+      <div class="left-section">
+                <div class="top-nav-top">
+            <img  class="img-logo" src="images\logo_forWhite.png" alt="luxelook-logo">
+        </div  class="top-nav-bottom">
+          <img src="\wallpaper\signup_image.jpeg" alt="LuxeLook Logo">
         </div>
-      </div>
+    </div>
     </div>
   </div>
-
-<script>
+  <script>
   const nameID = document.getElementById("name");
   const emailID = document.getElementById("email");
   const phoneNum = document.getElementById("phone");
   const passwordID = document.getElementById("password");
   const CpasswordID = document.getElementById("Cpassword");
   const referalCode = document.getElementById("referalCode");
+  const termsCheckbox = document.getElementById("terms");
+
   const signupError1 = document.getElementById("signupError1");
   const signupError2 = document.getElementById("signupError2");
   const signupError3 = document.getElementById("signupError3");
   const signupError4 = document.getElementById("signupError4");
   const signupError5 = document.getElementById("signupError5");
   const signupError6 = document.getElementById("signupError6");
+
   const signform = document.getElementById("signform");
 
   function nameValidateChecking() {
-    const nameValue = nameID.value;
+    const nameValue = nameID.value.trim();
     const namePattern = /^[A-Za-z\s]+$/;
-
-    if (nameValue.trim() === "") {
+    if (!nameValue) {
+      signupError1.textContent = "Name is required";
       signupError1.style.display = "block";
-      signupError1.innerHTML = "Please enter a valid name";
       return false;
     } else if (!namePattern.test(nameValue)) {
+      signupError1.textContent = "Only alphabets and spaces allowed";
       signupError1.style.display = "block";
-      signupError1.innerHTML = "Name can only contain alphabets and spaces";
       return false;
-    } else {
-      signupError1.style.display = "none";
-      signupError1.innerHTML = "";
-      return true;
     }
+    signupError1.style.display = "none";
+    return true;
   }
 
   function emailValidateChecking() {
-    const emailValue = emailID.value;
-    const emailPattern = /^([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/;
-
-    if (!emailPattern.test(emailValue)) {
+    const emailValue = emailID.value.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailValue) {
+      signupError2.textContent = "Email is required";
       signupError2.style.display = "block";
-      signupError2.innerHTML = "Email should be in a valid format";
       return false;
-    } else {
-      signupError2.style.display = "none";
-      signupError2.innerHTML = "";
-      return true;
+    } else if (!emailPattern.test(emailValue)) {
+      signupError2.textContent = "Invalid email format";
+      signupError2.style.display = "block";
+      return false;
     }
+    signupError2.style.display = "none";
+    return true;
   }
 
   function phoneValidateChecking() {
     const phoneValue = phoneNum.value.trim();
     const phoneRegex = /^(?!0{10})\d{10}$/;
-
-    if (phoneValue === "") {
+    if (!phoneValue) {
+      signupError3.textContent = "Phone number is required";
       signupError3.style.display = "block";
-      signupError3.innerHTML = "Enter a valid number";
       return false;
     } else if (!phoneRegex.test(phoneValue)) {
+      signupError3.textContent = "Enter a valid 10-digit number";
       signupError3.style.display = "block";
-      signupError3.innerHTML = "Enter a valid 10-digit number (not all zeros)";
       return false;
-    } else {
-      signupError3.style.display = "none";
-      signupError3.innerHTML = "";
-      return true;
     }
+    signupError3.style.display = "none";
+    return true;
   }
 
   function passwordValidateChecking() {
@@ -257,62 +267,83 @@
     const alpha = /[a-zA-Z]/;
     const digit = /\d/;
 
-    if (passwordValue.length < 8) {
+    if (!passwordValue) {
+      signupError4.textContent = "Password is required";
       signupError4.style.display = "block";
-      signupError4.innerHTML = "Password should contain at least 8 characters";
+      return false;
+    } else if (passwordValue.length < 8) {
+      signupError4.textContent = "At least 8 characters required";
+      signupError4.style.display = "block";
       return false;
     } else if (!alpha.test(passwordValue) || !digit.test(passwordValue)) {
+      signupError4.textContent = "Use alphabets and digits";
       signupError4.style.display = "block";
-      signupError4.innerHTML = "Password should contain alphabets and digits";
       return false;
     } else {
       signupError4.style.display = "none";
-      signupError4.innerHTML = "";
     }
 
-    if (passwordValue !== cPasswordValue) {
+    if (!cPasswordValue) {
+      signupError5.textContent = "Confirm your password";
       signupError5.style.display = "block";
-      signupError5.innerHTML = "Passwords do not match";
+      return false;
+    } else if (passwordValue !== cPasswordValue) {
+      signupError5.textContent = "Passwords do not match";
+      signupError5.style.display = "block";
       return false;
     } else {
       signupError5.style.display = "none";
-      signupError5.innerHTML = "";
       return true;
     }
-    return true;
   }
 
   function referralCodeValidateChecking() {
     const referralValue = referalCode.value.trim();
-    const uuidPattern =
-      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    const uuidPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
-    if (referralValue === "") {
+    if (!referralValue) {
       signupError6.style.display = "none";
-      signupError6.innerHTML = "";
-      return true; // Referral code is optional
+      return true;
     } else if (!uuidPattern.test(referralValue)) {
+      signupError6.textContent = "Invalid referral code format";
       signupError6.style.display = "block";
-      signupError6.innerHTML = "Invalid referral code format";
       return false;
     } else {
       signupError6.style.display = "none";
-      signupError6.innerHTML = "";
       return true;
     }
   }
 
+  function termsValidation() {
+    if (!termsCheckbox.checked) {
+      alert("Please accept the terms & policy");
+      return false;
+    }
+    return true;
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    nameID.addEventListener("blur", nameValidateChecking);
+    emailID.addEventListener("blur", emailValidateChecking);
+    phoneNum.addEventListener("blur", phoneValidateChecking);
+    passwordID.addEventListener("blur", passwordValidateChecking);
+    CpasswordID.addEventListener("blur", passwordValidateChecking);
+    referalCode.addEventListener("blur", referralCodeValidateChecking);
+
     signform.addEventListener("submit", function (e) {
       const isNameValid = nameValidateChecking();
       const isEmailValid = emailValidateChecking();
       const isPhoneValid = phoneValidateChecking();
       const isPasswordValid = passwordValidateChecking();
       const isReferralValid = referralCodeValidateChecking();
+      const isTermsChecked = termsValidation();
 
-      if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid || !isReferralValid) {
+      if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid || !isReferralValid || !isTermsChecked) {
         e.preventDefault();
       }
     });
   });
 </script>
+
+</body>
+</html>

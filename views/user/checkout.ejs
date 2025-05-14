@@ -122,7 +122,7 @@
           <h5 class="fw-bold mb-3">SELECT ADDRESS</h5>
 
           <form action="/placeOrder" method="POST">
-<% if (addresses && addresses.length > 0) { %>
+            <% if (addresses && addresses.length> 0) { %>
               <div class="mb-3">
                 <select class="form-select" name="addressId" required>
                   <% addresses.forEach((address, index)=> { %>
@@ -200,106 +200,124 @@
       </div>
     </div>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
- <script>
-  const form = document.querySelector('form');
-  const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
-  const razorpayKey = '<%= razorpayKey %>';
+    <script>
+      const form = document.querySelector('form');
+      const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
+      const razorpayKey = '<%= razorpayKey %>';
 
-  form.addEventListener('submit', async function (e) {
-    const selectedMethod = [...paymentRadios].find(radio => radio.checked).value;
+      form.addEventListener('submit', async function (e) {
+        const addressSelect = form.querySelector('select[name="addressId"]');
+        const selectedMethod = [...paymentRadios].find(radio => radio.checked).value;
 
-    if (selectedMethod === 'RAZORPAY') {
-      e.preventDefault();
-
-      try {
-        const res = await fetch('/create-razorpay-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: Number("<%= finalTotal %>") * 100 })  // FIXED: added quotes
-        });
-
-        const result = await res.json();
-        if (!result.success || !result.order) {
-          throw new Error("Failed to create Razorpay order"); // This triggers catch()
+        if (!addressSelect || addressSelect.options.length === 0) {
+          e.preventDefault();
+          Swal.fire({
+            icon: 'warning',
+            title: 'No Address Found',
+            text: 'Please add a delivery address before placing the order.',
+            confirmButtonText: 'Add Address',
+          }).then(() => {
+            window.location.href = '/cart-add-address';
+          });
+          return;
         }
 
-        const order = result.order;
+        // Razorpay flow continues here...
 
-        const options = {
-          key: razorpayKey,
-          amount: order.amount,
-          currency: "INR",
-          name: "LuxeLook",
-          description: "Order Payment",
-          order_id: order.id,
-          handler: function (response) {
-            const razorpayResponse = {
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-              paymentMethod: 'RAZORPAY'
-            };
 
-            Object.entries(razorpayResponse).forEach(([key, value]) => {
-              const input = document.createElement('input');
-              input.type = 'hidden';
-              input.name = key;
-              input.value = value;
-              form.appendChild(input);
+        if (selectedMethod === 'RAZORPAY') {
+          e.preventDefault();
+
+          try {
+            const res = await fetch('/create-razorpay-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount: Number("<%= finalTotal %>") * 100 })
             });
 
-            form.submit();
-          },
-          modal: {
-            ondismiss: function () {
+            const result = await res.json();
+            if (!result.success || !result.order) {
+              throw new Error("Failed to create Razorpay order");
+            }
+
+            const order = result.order;
+
+            const options = {
+              key: razorpayKey,
+              amount: order.amount,
+              currency: "INR",
+              name: "LuxeLook",
+              description: "Order Payment",
+              order_id: order.id,
+              handler: function (response) {
+                const razorpayResponse = {
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_signature: response.razorpay_signature,
+                  paymentMethod: 'RAZORPAY'
+                };
+
+                Object.entries(razorpayResponse).forEach(([key, value]) => {
+                  const input = document.createElement('input');
+                  input.type = 'hidden';
+                  input.name = key;
+                  input.value = value;
+                  form.appendChild(input);
+                });
+
+                form.submit();
+              },
+              modal: {
+                ondismiss: function () {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Cancelled',
+                    text: 'You cancelled the payment. Please try again.',
+                    timer: 2000,
+                    showConfirmButton: false
+                  }).then(() => {
+                    window.location.href = '/checkout';
+                  });
+                }
+              },
+              theme: {
+                color: "#57c9d5"
+              }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
               Swal.fire({
                 icon: 'error',
-                title: 'Payment Cancelled',
-                text: 'You cancelled the payment. Please try again.',
+                title: 'Payment Failed',
+                text: response.error.description || 'Payment failed. Please try again.',
                 timer: 2000,
                 showConfirmButton: false
               }).then(() => {
-                window.location.href = '/checkout';
+                // Redirect after alert
+                window.location.href = `/orderFailure?error=${encodeURIComponent(response.error.description)}`;
               });
-            }
-          },
-          theme: {
-            color: "#57c9d5"
+            });
+
+            rzp.open();
+          } catch (err) {
+            console.error('Razorpay error:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Payment Failed',
+              text: 'Something went wrong while initiating the payment. Please try again.',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = '/checkout';
+            });
           }
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.on('payment.failed', function (response) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Payment Failed',
-            text: response.error.description || 'Payment failed. Please try again.',
-            timer: 2000,
-            showConfirmButton: false
-          }).then(() => {
-            window.location.href = '/checkout';
-          });
-        });
-
-        rzp.open();
-      } catch (err) {
-        console.error('Razorpay error:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Payment Failed',
-          text: 'Something went wrong while initiating the payment. Please try again.',
-          timer: 2000,
-          showConfirmButton: false
-        }).then(() => {
-          window.location.href = '/checkout';
-        });
-      }
-    }
-  });
-</script>
+        }
+      });
+    </script>
 
 
-    
+
 
 
     <%-include("../../views/partials/userPartial/footer")%>

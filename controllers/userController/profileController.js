@@ -171,7 +171,8 @@ const loadProfile = async (req, res) => {
     res.render('profile', {
       user: userData,
       userAddress: addressData,
-      latestOrders: orderData
+      latestOrders: orderData,
+       activePage: 'profile'
     })
   } catch (error) {
     console.log('error:occur', error)
@@ -186,7 +187,7 @@ const loadEditProfile = async (req, res) => {
     const userData = await User.findById(userId)
     console.log('userId:', userId)
 
-    res.render("edit-profile", { user: userData })
+    res.render("edit-profile", { user: userData,activePage:'edit-profile' })
   } catch (error) {
     console.log(error)
     res.redirect("/pageNotFound")
