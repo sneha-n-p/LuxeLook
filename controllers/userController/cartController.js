@@ -4,7 +4,9 @@ const Product = require("../../models/productSchema")
 const Category = require("../../models/cartSchema")
 const Cart = require("../../models/cartSchema")
 const Address = require("../../models/addressSchema")
+const Coupon = require("../../models/couponSchema")
 const env = require("dotenv").config()
+const mongoose = require('mongoose')
 
 const loadcart = async (req, res) => {
     try {
@@ -30,6 +32,7 @@ const loadcart = async (req, res) => {
         }).countDocuments()
 
         const totalPages = Math.ceil(count / limit);
+        
 
         if (req.session.user) {
             const id = req.session.user
@@ -49,7 +52,7 @@ const loadcart = async (req, res) => {
                 currentPage: page,
                 search,
                 subTotal,
-                activePage: 'cart'  
+                activePage: 'cart'
             })
         }
     } catch (error) {
@@ -62,8 +65,13 @@ const procedToCheckOut = async (req, res) => {
     try {
         const userId = req.session.user;
         const cartItems = req.body.cartItems;
-        console.log('cartItems:',cartItems)
-
+        console.log('cartItems:', cartItems)
+        cartItems.map((item) => {
+            if (item.quantity === 0) {
+                console.log('hhooiii')
+                return res.json({ success: false, message: 'The product Out of stock' })
+            }
+        })
         for (let item of cartItems) {
             const totalPrice = item.price * item.quantity;
             const updateResult = await Cart.updateOne(
@@ -76,7 +84,7 @@ const procedToCheckOut = async (req, res) => {
                 }
             );
         }
-            return res.json({ success: true});
+        return res.json({ success: true });
 
     } catch (error) {
         console.error("Error updating cart quantities:", error);
@@ -175,15 +183,26 @@ const loadCheckOut = async (req, res) => {
                 };
             });
         }
-        if(address){
+        if (address) {
             const addresses = address.address
             console.log('cartItems:', cartItems)
             const delivery = subtotal > 1000 ? 0 : 50
             const discount = 0
-            const finalTotal = subtotal  + delivery - discount;
-    
+            const finalTotal = subtotal + delivery - discount;
+
+const coupons = await Coupon.find({
+  minimumPrice: { $lte: finalTotal },
+  $or: [
+    { restricted: false },
+    { restricted: true, userId: new mongoose.Types.ObjectId(userId) }
+  ]
+});
+console.log('coupons:',coupons)
+
+
             res.render('checkout', {
                 user,
+                coupons,
                 addresses,
                 cartItems,
                 subtotal,
@@ -191,16 +210,17 @@ const loadCheckOut = async (req, res) => {
                 discount,
                 finalTotal,
                 razorpayKey,
-             activePage: 'checkout'  
+                activePage: 'checkout'
             });
-        }else{
+        } else {
             const delivery = subtotal > 1000 ? 0 : 50
             const discount = 0
-            const finalTotal = subtotal  + delivery - discount;
-    
+            const finalTotal = subtotal + delivery - discount;
+
             res.render('checkout', {
                 user,
-                addresses:[],
+                coupons,
+                addresses: [],
                 cartItems,
                 subtotal,
                 delivery,

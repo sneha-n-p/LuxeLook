@@ -136,9 +136,15 @@
                 <a href="/cart-add-address" class="btn add-address-btn my-3">Add Address</a>
 
                 <div class="input-group mb-3">
-                  <input type="text" class="form-control" name="coupon" placeholder="Coupon Code">
-                  <button class="btn btn-dark" type="button">Available Coupon</button>
+                  <input type="text" class="form-control" name="coupon" id="couponInput" placeholder="Coupon Code">
+                  <button class="btn btn-dark" type="button" id="applyCouponBtn">Apply Coupon</button>
+                  <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal"
+                    data-bs-target="#couponModal">
+                    Available Coupons
+                  </button>
                 </div>
+                <div id="couponMessage" class="text-success fw-bold mb-3" style="display: none;"></div>
+
 
                 <!-- Payment Method Section -->
                 <h5 class="fw-bold mb-3 mt-4">SELECT PAYMENT METHOD</h5>
@@ -180,25 +186,62 @@
                 <h6 class="fw-bold mb-2">CART TOTAL</h6>
                 <div class="d-flex justify-content-between">
                   <span>Subtotal</span>
-                  <span>₹<%= subtotal %></span>
+                  <span id="subtotal">₹<%= subtotal %></span>
                 </div>
                 <div class="d-flex justify-content-between">
                   <span>Delivery</span>
-                  <span>₹<%= delivery %></span>
+                  <span id="delivery">₹<%= delivery %></span>
                 </div>
                 <div class="d-flex justify-content-between">
                   <span>Discount</span>
-                  <span>₹<%= discount %></span>
+                  <span id="discount">₹<%= discount %></span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between fw-bold">
                   <span>Total</span>
-                  <span>₹<%= finalTotal %></span>
+                  <span id="finalTotal">₹<%= finalTotal %></span>
                 </div>
+
+                <!-- Update hidden finalTotal input for order placing -->
+                <input type="hidden" name="Total" id="hiddenFinalTotal" value="<%= finalTotal %>">
+
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Coupon Modal -->
+    <div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="couponModalLabel">Available Coupons</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <% if (coupons && coupons.length> 0) { %>
+              <% coupons.forEach(coupon=> { %>
+                <div class="d-flex justify-content-between align-items-center border p-2 rounded mb-2">
+                  <div>
+                    <strong>
+                      <%= coupon.name %>
+                    </strong><br>
+                    <small>
+                      <%= coupon.description || '' %>
+                    </small>
+                  </div>
+                  <button class="btn btn-outline-primary btn-sm copy-coupon"
+                    data-code="<%= coupon.name %>">Copy</button>
+                </div>
+                <% }) %>
+                  <% } else { %>
+                    <p>No available coupons.</p>
+                    <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
       const form = document.querySelector('form');
@@ -314,10 +357,63 @@
           }
         }
       });
+
+      // Copy coupon code to input box
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".copy-coupon").forEach(btn => {
+          btn.addEventListener("click", function () {
+            const code = this.getAttribute("data-code");
+            const couponInput = document.querySelector('input[name="coupon"]');
+            if (couponInput) {
+              couponInput.value = code;
+              Swal.fire({
+                icon: 'success',
+                title: 'Coupon Copied!',
+                text: `Coupon "${code}" applied.`,
+                timer: 1500,
+                showConfirmButton: false
+              });
+              const modal = bootstrap.Modal.getInstance(document.getElementById('couponModal'));
+              modal.hide();
+            }
+          });
+        });
+      });
+
+      document.getElementById('applyCouponBtn').addEventListener('click', async () => {
+        const couponCode = document.getElementById('couponInput').value;
+        if (!couponCode) {
+          Swal.fire({ icon: 'warning', title: 'Please enter a coupon code' });
+          return;
+        }
+
+        try {
+          const response = await axios.post('/apply-coupon', {
+            coupon: couponCode,
+            subtotal: <%= subtotal %>
+      });
+
+      const data = response.data;
+
+      if (data.success) {
+        document.getElementById('discount').textContent = `₹${data.discount}`;
+        document.getElementById('finalTotal').textContent = `₹${data.finalTotal}`;
+        document.getElementById('hiddenFinalTotal').value = data.finalTotal;
+        document.getElementById('couponMessage').textContent = `Coupon "${couponCode}" applied! ₹${data.discount} discount`;
+        document.getElementById('couponMessage').style.display = 'block';
+      } else {
+        Swal.fire({ 
+          icon: 'error', 
+          title: 'Invalid Coupon', 
+          text: data.message || 'Please try another one.' 
+        });
+      }
+    } catch (error) {
+        console.error('Coupon Error:', error);
+        Swal.fire({ icon: 'error', title: 'Something went wrong', text: 'Try again later.' });
+      }
+  });
+
     </script>
 
-
-
-
-
-    <%-include("../../views/partials/userPartial/footer")%>
+<%-include("../../views/partials/userPartial/footer")%>

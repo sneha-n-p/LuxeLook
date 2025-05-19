@@ -21,7 +21,7 @@ const productInfo = async (req, res) => {
     const Data = await Product.find({})
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit)
+      .limit(limit).populate('category')
 
     const totalProducts = await Product.countDocuments()
     const totalPage = Math.ceil(totalProducts / limit)
@@ -106,7 +106,7 @@ const addproduct = async (req, res) => {
       quatity: Stock,
       size: Size,
       category: categoryDoc._id,
-      offer: 0,
+      offer: offer,
       regularPrice: parseFloat(price),
       salePrice: parseFloat(salesPrice),
       productImage: imagesPaths

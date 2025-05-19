@@ -106,15 +106,15 @@
 
   <section class="features py-5 text-center">
     <div class="container row mx-auto">
-      <div class="col-md-4">
+      <div class="col-md-4" style="background-color: hsl(32, 50%, 87%);border-radius:77px;">
         <h3>🚚 Free Shipping</h3>
         <p>Enjoy hassle-free shopping with free worldwide delivery.</p>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4"  style="background-color: hsl(32, 50%, 87%);border-radius:77px;">
         <h3>📞 Support 24/7</h3>
         <p>Dedicated customer service for support and assistance.</p>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4"  style="background-color: hsl(32, 50%, 87%);border-radius:77px;">
         <h3>💰 Secure Payments</h3>
         <p>Shop without worries, your data is safe with us.</p>
       </div>
@@ -132,10 +132,10 @@
     <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
     <div class="card-body text-center">
       <h5 class="card-title"><%= products[i].productName %></h5>
-      <p class="card-text">₹ <%= products[i].salePrice %></p>
+      <p class="card-text"><strong>₹ <%= products[i].salePrice %></strong></p>
       <div>
         <a href="/product-details/<%=products[i]._id%>">
-          <button class="btn btn-outline-dark btn-sm">View Details</button>
+          <button class="btn btn-outline-dark btn-sm" style="background-color: black; color: #fff;">View Details</button>
         </a>
       </div>
 

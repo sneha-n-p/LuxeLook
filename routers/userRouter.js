@@ -9,6 +9,7 @@ const cartController = require("../controllers/userController/cartController")
 const addressController  = require("../controllers/userController/addressController")
 const orderController = require("../controllers/userController/orderController")
 const walletController = require("../controllers/userController/walletController")
+const couponController = require("../controllers/userController/couponController")
 const {userAuth,userAuthCheck} = require('../middlewares/auth')
 const upload = require("../helpers/multer")
 
@@ -85,6 +86,8 @@ router.post("/cart",cartController.procedToCheckOut)
 router.post("/addToCart",cartController.addToCart)
 router.post("/removeFromCart",cartController.removeProductCart)
 router.get("/checkout",userAuth,cartController.loadCheckOut)
+
+router.post("/apply-coupon",couponController.applyCoupon)
 
 router.post('/placeOrder',orderController.placeOrder)
 router.get("/orderSuccess",userAuth,orderController.loadOrderSuccess)

@@ -4,19 +4,14 @@ const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
 const Product = require("../../models/productSchema")
 const Coupon = require('../../models/couponSchema')
+
 const pageNotFound = async (req, res) => {
     try {
-
         res.render("pageNotFound")
-
     } catch (error) {
-
         res.redirect("/pageNotFound")
-
     }
 }
-
-
 
 const loadHomePage = async (req, res) => {
     try {
@@ -38,11 +33,8 @@ const loadHomePage = async (req, res) => {
 
 const loadSignup = async (req, res) => {
     try {
-
         return res.render("signup", { message: null })
-
     } catch (error) {
-
         console.log('signup page is not loading', error)
         req.status(500).send('Server Error')
 
@@ -64,14 +56,12 @@ async function sendVerificationEmail(email, otp) {
                 pass: process.env.NODEMAILER_PASSWORD
             }
         })
-
         const info = await transporter.sendMail({
             from: process.env.NODEMAIL_EMAIL,
             to: email,
             subject: "verify your account",
             text: `your OTP is ${otp}`,
             html: `<b>Your OTP:${otp}</b>`
-
         })
         return info.accepted.length > 0
     } catch (error) {

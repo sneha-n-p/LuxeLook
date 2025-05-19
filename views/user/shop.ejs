@@ -42,14 +42,10 @@
   </style>
   <!-- Header Banner -->
  
-  <section class="hero text-center bg-light p-0 mb-4">
-      <!-- <div class="banner position-relative"> -->
-      <img src="wallpaper\luxelook-wall8.jpg" alt="Shop Banner" class="img-fluid w-100"
-        style="height: 400px; object-fit: cover;">
-      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">SHOP
-      </h1>
-      <!-- </div> -->
-    </section>
+ <section class="relative mb-10">
+  <img src="wallpaper\luxelook-wall8.jpg" alt="Wallet Banner" class="w-full h-[400px] object-cover">
+  <h1 class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-5xl">SHOP</h1>
+</section>
 
 
   <div class="container mt-5">
@@ -95,10 +91,10 @@
     <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
     <div class="card-body text-center">
       <h5 class="card-title"><%= products[i].productName %></h5>
-      <p class="card-text">₹ <%= products[i].salePrice %></p>
+      <p class="card-text"><strong>₹ <%= products[i].salePrice %></strong></p>
       <div>
         <a href="/product-details/<%=products[i]._id%>">
-          <button class="btn btn-outline-dark btn-sm">View Details</button>
+          <button class="btn btn-outline-dark btn-sm" style="background-color: black;color: #fff;">View Details</button>
         </a>
       </div>
 

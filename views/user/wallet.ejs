@@ -173,7 +173,7 @@
 
               <form id="walletForm" class="add-amount">
                 <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" required>
-                <button type="submit">Add</button>
+            <button type="button" onclick="addMoney()">Add</button>
               </form>
               <%}%>
                 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -217,10 +217,10 @@
                                 razorpay_signature: response.razorpay_signature,
                               }),
                             })
-                              // .then(res => res.json())
+                              .then(res => res.json())
                               .then(data => {
                                 console.log('data:', data)
-                                if (data.ok) {
+                                if (data.success) {
                                   document.getElementById('walletBalance').innerText = data.newBalance;
                                   Swal.fire('Success', 'Money added successfully!', 'success')
                                     .then(() => window.location.reload())

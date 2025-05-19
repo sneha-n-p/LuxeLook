@@ -223,10 +223,9 @@ const updateProfile = async (req, res) => {
 
       user.image = '/uploads/profile/' + fileName;
     }
-
-
     await user.save()
     res.status(200).json({ success: true })
+
 
   } catch (error) {
     console.log(error)
@@ -250,7 +249,7 @@ const loadChangeEmail = async (req, res) => {
       return res.redirect("/pageNotFound");
     }
 
-    res.render("change-email", { user: userData, message: null });
+    res.render("change-email", { user: userData, message: null,activePage:"change-email" });
   } catch (error) {
     console.error("Error loading change email page:", error);
     res.redirect("/pageNotFound");
@@ -373,7 +372,7 @@ const changePassword = async (req, res) => {
       return res.redirect("/pageNotFound");
     }
 
-    res.render("change-password", { user: userData, message: null });
+    res.render("change-password", { user: userData, message: null ,activePage:"change-password"});
   } catch (error) {
     console.error("Error loading change email page:", error);
     res.redirect("/pageNotFound");

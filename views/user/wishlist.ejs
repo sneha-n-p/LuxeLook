@@ -147,12 +147,18 @@
                   </p>
                   <small>
                     <%= product.description %>
-                  </small>
+                  </small><br>
+                  <% if (product.quatity === 0) { %>
+                    <p class="text-danger fw-bold">Out of Stock</p>
+                  <% } %>
                 </td>
                 <td>₹<%= product.salePrice %>
                 </td>
                 <td>
-                  <button class="add-cart-btn" onclick="addToCart('<%=product._id%>')">Add to Cart</button>
+<button class="add-cart-btn" onclick="addToCart('<%=product._id%>')" <%= product.quatity === 0 ? 'disabled' : '' %>>
+  Add to Cart
+</button>
+
                   <button class="delet-cart-btn" herf="#" onclick="confirmRemove('<%=product._id%>')">&#128465;</button>
                 </td>
 
@@ -213,32 +219,65 @@
 
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.post(`/removeFromWishlist`,{productId})
-          .then(function (response){
-            if (response.data.success) {
-              Swal.fire({
-                icon: "success",
-                title: "Removed!",
-                text: "Product removed from wishlist.",
-                showConfirmButton: false,
-                timer: 1200
-              }).then(() => {
-                if (data.wishlistCount === 0) {
-                  window.location.href = "/wishlist"
-                } else {
-                  location.reload()
-                }
-              });
-            }
-          })
-          .catch(error => {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong while removing the product!"
-            });
-            console.error("Remove Wishlist Error:", error);
-          });
+        // axios.post(`/removeFromWishlist`,{productId})
+        //   .then(function (response){
+        //     if (response.data.success) {
+        //       Swal.fire({
+        //         icon: "success",
+        //         title: "Removed!",
+        //         text: "Product removed from wishlist.",
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //       }).then(() => {
+        //         if (data.wishlistCount === 0) {
+        //           window.location.href = "/wishlist"
+        //         } else {
+        //           location.reload()
+        //         }
+        //       });
+        //     }
+        //   })
+        //   .catch(error => {
+        //     Swal.fire({
+        //       icon: "error",
+        //       title: "Oops...",
+        //       text: "Something went wrong while removing the product!"
+        //     });
+        //     console.error("Remove Wishlist Error:", error);
+        //   });
+
+        axios.post('/removeFromWishlist', { productId })
+    .then(response => {
+      if (response.data.success) {
+        Swal.fire({
+          title: "Removed",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500
+        });
+
+        setTimeout(() => {
+          location.reload();
+        }, 1600); 
+      } else {
+        Swal.fire({
+          title: "Error",
+          icon: "error",
+          text: response.data.message,
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    })
+    .catch(() => {
+      Swal.fire({
+        title: "Error",
+        icon: "error",
+        text: "Internal Server Error",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    });
       }
     });
   }

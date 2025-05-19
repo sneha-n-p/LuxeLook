@@ -153,7 +153,7 @@ const viewOrderDetails = async (req, res) => {
       return res.redirect("/pageNotFound");
     }
 
-    res.render("orderDetailsView", { order, user });
+    res.render("orderDetailsView", { order, user,activePage:"orderDetailsView" });
   } catch (error) {
     console.log(error);
     res.redirect("/pageNotFound");
