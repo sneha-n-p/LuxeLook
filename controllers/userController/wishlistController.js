@@ -4,6 +4,7 @@ const Wishlist = require("../../models/wishlistSchema")
 const Category = require("../../models/categorySchema")
 const { connect } = require("mongoose")
 const env = require("dotenv").config()
+const StatusCode = require('../../statusCode')
 
 
 
@@ -41,14 +42,14 @@ const loadwishlist = async (req, res) => {
             const user = await User.findById(id)
             const products = await Product.find({ _id: { $in: user.wishlist } }).populate('category')
             const categories = await Category.find({ isBlocked: false })
-            res.render("wishlist", { wishlist: products, user, totalPages, categories, currentPage: page, search, productData, activePage: 'wishlist'  })
+            res.render("wishlist", { wishlist: products, user, totalPages, categories, currentPage: page, search, productData, activePage: 'wishlist' })
         } else {
             res.redirect("/login", { products, productData, user: null, totalPages, currentPage: page, search, categories })
             console.log(products)
         }
     } catch (error) {
         console.error(error)
-        res.redirect("/pageNotFound")
+        res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
     }
 }
 
@@ -59,15 +60,15 @@ const addToWishlist = async (req, res) => {
 
         const user = await User.findById(userId)
         if (user.wishlist.includes(productId)) {
-            return res.status(200).json({ success: false, message: "Product Already In Wishlist" })
+            return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Product Already In Wishlist" })
         }
         user.wishlist.push(productId)
         await user.save()
-        return res.status(200).json({ success: true, message: "Product Added To Wishlist" })
+        return res.status(StatusCode.OK).json({ success: true, message: "Product Added To Wishlist" })
 
     } catch (error) {
         console.error(error)
-        return res.status(500).json({ success: false, message: "Server Error" })
+        return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" })
     }
 }
 const removeProduct = async (req, res) => {
@@ -76,13 +77,13 @@ const removeProduct = async (req, res) => {
         const userId = req.session.user
         const user = await User.findById(userId)
         const index = user.wishlist.indexOf(productId)
-        user.wishlist.splice(index,1)
+        user.wishlist.splice(index, 1)
         await user.save()
-        return res.status(200).json({ success: true, wishlistCount: user.wishlist.length });
+        return res.status(StatusCode.OK).json({ success: true, wishlistCount: user.wishlist.length });
 
     } catch (error) {
         console.error(error)
-        return res.status(500).json({success:false,message:"Server Error"})
+        return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" })
     }
 }
 
@@ -92,5 +93,4 @@ module.exports = {
     loadwishlist,
     addToWishlist,
     removeProduct
-
 }

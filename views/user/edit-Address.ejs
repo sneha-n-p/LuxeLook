@@ -1,356 +1,345 @@
-<%-include("../../views/partials/userPartial/header")%>
+<%- include("../../views/partials/userPartial/header") %>
 
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #fff;
-        }
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #FFF8F3;
+  }
 
-        .account-banner {
-            background: url('/images/banner-add-address.jpg') center/cover no-repeat;
-            height: 300px;
-            position: relative;
-        }
+  .sidebar {
+    background-color: #F2E8DC;
+    padding: 30px 20px;
+    height: auto;
+    color: #6B4C3B;
+  }
 
-        .account-title {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 42px;
-            font-weight: 600;
-            color: #000;
-        }
+  .sidebar h5 {
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
 
-        .account-wrapper {
-            display: flex;
-            margin-top: 40px;
-        }
+  .sidebar a {
+    display: block;
+    color: #333;
+    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: 500;
+  }
 
-        .sidebar {
-            width: 220px;
-            background: #f3f3f3;
-            padding: 30px 20px;
-        }
+  .form-section {
+    background-color: #FCF4ED;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
 
-        .sidebar h6 {
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
+  .form-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
 
-        .sidebar ul {
-            padding-left: 0;
-            list-style: none;
-        }
+  .form-control, .form-select {
+    border-radius: 8px;
+    height: 45px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 14px;
+    background-color: #fff;
+  }
 
-        .sidebar ul li {
-            padding: 8px 0;
-            font-size: 14px;
-            font-weight: 500;
-        }
+  .submit-btn {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
+    color: white;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    transition: 0.3s;
+    width: 100%;
+  }
 
-        .sidebar ul li.active {
-            font-weight: bold;
-        }
+  .submit-btn:hover {
+    opacity: 0.9;
+  }
 
-        .content-area {
-            flex: 1;
-            padding: 30px 40px;
-        }
+  .banner {
+    position: relative;
+  }
 
-        .form-label {
-            font-weight: 500;
-            font-size: 14px;
-        }
+  .banner img {
+    height: 414px;
+    object-fit: cover;
+    width: 100%;
+  }
 
-        .form-control,
-        .form-select {
-            border-radius: 0;
-            border: 1px solid #ccc;
-            padding: 10px;
-            font-size: 14px;
-        }
+  .banner h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 42px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px black;
+  }
 
-        .submit-btn {
-            background-color: #57c9d5;
-            border: none;
-            color: white;
-            padding: 10px 30px;
-            border-radius: 25px;
-            font-size: 15px;
-            transition: 0.3s;
-        }
+  .error-message {
+    color: darkred;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: none;
+  }
 
-        .submit-btn:hover {
-            background-color: #44b0bb;
-        }
+  footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+  }
+</style>
 
-        .Error-message {
-            color: red;
-            font-size: 0.75rem;
-            display: none;
-        }
-    </style>
-    </head>
+<!-- Banner -->
+<section class="hero text-center bg-light p-0 mb-4">
+  <div class="banner">
+    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <h1>EDIT ADDRESS</h1>
+  </div>
+</section>
 
-    <body>
+<!-- Wrapper -->
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-2 sidebar">
+      <h5>SETTINGS</h5>
+      <a href="/orders">Orders</a>
+      <a href="/profile">Personal Info</a>
+      <a href="/addresses">Addresses</a>
+      <a href="/wallet">Wallet</a>
+    </div>
 
-        <section class="hero text-center bg-light p-0 mb-4">
-            <div class="banner position-relative">
-              <img src="/wallpaper/luxelook-wall9.jpg" alt="Shop Banner" class="img-fluid w-100"
-                  style="height: 400px; object-fit: cover;">
-              <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">EDIT-ADDRESS</h1>
-            </div>
-          </section>
-
-        <!-- Wrapper -->
-        <div class="container-fluid account-wrapper">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <h6>SETTINGS</h6>
-                <ul>
-                    <li><a href="/orders" style="text-decoration: none;">Orders</a></li>
-                    <li><a href="/profile" style="text-decoration: none;">Personal Info</a></li>
-                    <li><a href="/addresses" style="text-decoration: none;">Addresses</a></li>
-                    <li><a href="/wallet" style="text-decoration: none;">Wallet</a></li>
-                </ul>
-            </div>
-
-            <!-- Content Area -->
-            <div class="content-area">
-                <h5 class="mb-4 fw-bold">ADD ADDRESS</h5>
-
-                <form id="addAddressForm" class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Name</label>
-                        <input type="text" id="name" class="form-control" value="<%=address.name%>" name="name"
-                            required>
-                        <div id="Error1" class="Error-message"></div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">State</label>
-                            <select class="form-select" id="state" name="state" required>
-                                <option>
-                                    <%=address.state%>
-                                </option>
-                                <option value="Andhra Pradesh">Andhra Pradesh</option>
-                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                                <option value="Assam">Assam</option>
-                                <option value="Bihar">Bihar</option>
-                                <option value="Chhattisgarh">Chhattisgarh</option>
-                                <option value="Goa">Goa</option>
-                                <option value="Gujarat">Gujarat</option>
-                                <option value="Haryana">Haryana</option>
-                                <option value="Himachal Pradesh">Himachal Pradesh</option>
-                                <option value="Jharkhand">Jharkhand</option>
-                                <option value="Karnataka">Karnataka</option>
-                                <option value="Kerala">Kerala</option>
-                                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                                <option value="Maharashtra">Maharashtra</option>
-                                <option value="Manipur">Manipur</option>
-                                <option value="Meghalaya">Meghalaya</option>
-                                <option value="Mizoram">Mizoram</option>
-                                <option value="Nagaland">Nagaland</option>
-                                <option value="Odisha">Odisha</option>
-                                <option value="Punjab">Punjab</option>
-                                <option value="Rajasthan">Rajasthan</option>
-                                <option value="Sikkim">Sikkim</option>
-                                <option value="Tamil Nadu">Tamil Nadu</option>
-                                <option value="Telangana">Telangana</option>
-                                <option value="Tripura">Tripura</option>
-                                <option value="Uttar Pradesh">Uttar Pradesh</option>
-                                <option value="Uttarakhand">Uttarakhand</option>
-                                <option value="West Bengal">West Bengal</option>
-                                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                                <option value="Chandigarh">Chandigarh</option>
-                                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and
-                                    Daman and Diu</option>
-                                <option value="Delhi">Delhi</option>
-                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                                <option value="Ladakh">Ladakh</option>
-                                <option value="Lakshadweep">Lakshadweep</option>
-                                <option value="Puducherry">Puducherry</option>
-                            </select>
-
-                        </div>
-
-
-                        <div class="col-md-6">
-                            <label class="form-label">Street Address</label>
-                            <input type="text" id="streetAddress" class="form-control"
-                                value="<%=address.streetAddress%>" name="streetAddress" required>
-                            <div id="Error2" class="Error-message"></div>
-
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Apartment, suite, unit etc (optional)</label>
-                            <input type="text" id="apartment" class="form-control" value="<%=address.apartment%>"
-                                name="apartment">
-                            <div id="Error3" class="Error-message"></div>
-
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Town / City</label>
-                            <input type="text" id="city" class="form-control" value="<%=address.city%>" name="city"
-                                required>
-                            <div id="Error4" class="Error-message"></div>
-
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">pincode / ZIP</label>
-                            <input type="text" id="pincode" class="form-control" value="<%=address.pincode%>"
-                                name="pincode" required>
-                            <div id="Error5" class="Error-message"></div>
-
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Phone</label>
-                            <input type="text" id="phone" class="form-control" value="<%=address.phone%>" name="phone"
-                                required>
-                            <div id="Error6" class="Error-message"></div>
-
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Alternative Phone</label>
-                            <input type="text" id="altPhone" class="form-control" value="<%=address.altPhone%>"
-                                name="altPhone">
-                            <div id="Error7" class="Error-message"></div>
-
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="addressType">Select Address Type</label>
-                            <select id="addressType" name="addressType" class="form-control" required>
-                                <option value="<%=address.addressType%>" disabled selected>
-                                    <%=address.addressType%>
-                                </option>
-                                <option value="Home">Home</option>
-                                <option value="Work">Work</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <div id="Error8" class="Error-message"></div>
-                        </div>
-
-                        <div class="col-12 mt-3">
-                            <button type="submit" onclick="editAddress('<%=address._id%>')" class="submit">Edit
-                                Address</button>
-                        </div>
-                </form>
-            </div>
+    <!-- Content Area -->
+    <div class="col-md-10 form-section">
+      <h5 class="mb-4 fw-bold">Edit Address</h5>
+      <form id="editAddressForm" action="/edit-address/<%= address._id %>" method="POST" class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="name">Name</label>
+          <input type="text" id="name" class="form-control" name="name" value="<%= address.name %>" required>
+          <div id="Error1" class="error-message"></div>
         </div>
+        <div class="col-md-6">
+          <label class="form-label" for="state">State</label>
+          <select class="form-select" id="state" name="state" required>
+            <option value="" disabled>Choose a State...</option>
+            <% const states = [
+              "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
+              "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
+              "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+              "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
+              "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
+              "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh",
+              "Lakshadweep", "Puducherry"
+            ]; %>
+            <% states.forEach(state => { %>
+              <option value="<%= state %>" <%= address.state === state ? 'selected' : '' %>><%= state %></option>
+            <% }) %>
+          </select>
+          <div id="Error9" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="streetAddress">Street Address</label>
+          <input type="text" id="streetAddress" class="form-control" name="streetAddress" value="<%= address.streetAddress %>" required>
+          <div id="Error2" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="apartment">Apartment, suite, unit etc (optional)</label>
+          <input type="text" id="apartment" class="form-control" name="apartment" value="<%= address.apartment %>">
+          <div id="Error3" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="city">Town / City</label>
+          <input type="text" id="city" class="form-control" name="city" value="<%= address.city %>" required>
+          <div id="Error4" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="pincode">Pincode / ZIP</label>
+          <input type="text" id="pincode" class="form-control" name="pincode" value="<%= address.pincode %>" required>
+          <div id="Error5" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="phone">Phone</label>
+          <input type="text" id="phone" class="form-control" name="phone" value="<%= address.phone %>" required>
+          <div id="Error6" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="altPhone">Alternative Phone</label>
+          <input type="text" id="altPhone" class="form-control" name="altPhone" value="<%= address.altPhone %>">
+          <div id="Error7" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="addressType">Select Address Type</label>
+          <select id="addressType" name="addressType" class="form-select" required>
+            <option value="" disabled>Select Address Type</option>
+            <% const addressTypes = ["Home", "Work", "Other"]; %>
+            <% addressTypes.forEach(type => { %>
+              <option value="<%= type %>" <%= address.addressType === type ? 'selected' : '' %>><%= type %></option>
+            <% }) %>
+          </select>
+          <div id="Error8" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label d-block">Set as Default Address</label>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="isDefault" id="defaultYes" value="true" <%= address.isDefault ? 'checked' : '' %>>
+            <label class="form-check-label" for="defaultYes">Yes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="isDefault" id="defaultNo" value="false" <%= !address.isDefault ? 'checked' : '' %>>
+            <label class="form-check-label" for="defaultNo">No</label>
+          </div>
+        </div>
+        <div class="col-12 mt-3">
+          <button type="submit" class="submit-btn">Update Address</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
+<script>
+  const editAddressForm = document.getElementById('editAddressForm');
 
-        <script>
+  const showError = (elementId, message) => {
+    const errorElement = document.getElementById(elementId);
+    errorElement.innerHTML = message;
+    errorElement.style.display = 'block';
+  };
 
+  const hideError = (elementId) => {
+    const errorElement = document.getElementById(elementId);
+    errorElement.innerHTML = '';
+    errorElement.style.display = 'none';
+  };
 
+  editAddressForm.addEventListener('submit', function (e) {
+    e.preventDefault();
 
-            const addAddressForm = document.getElementById('addAddressForm');
+    let isValid = true;
 
-            addAddressForm.addEventListener('submit', function (e) {
-                e.preventDefault()
-                const name = document.getElementById('name').value.trim();
-                const phone = document.getElementById('phone').value.trim();
-                const altPhone = document.getElementById('altPhone').value.trim();
-                const streetAddress = document.getElementById('streetAddress').value.trim();
-                const apartment = document.getElementById('apartment').value.trim();
-                const city = document.getElementById('city').value.trim();
-                const state = document.getElementById('state').value.trim();
-                const pincode = document.getElementById('pincode').value.trim();
-                const addressType = document.getElementById('addressType').value;
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const altPhone = document.getElementById('altPhone').value.trim();
+    const streetAddress = document.getElementById('streetAddress').value.trim();
+    const apartment = document.getElementById('apartment').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const state = document.getElementById('state').value.trim();
+    const pincode = document.getElementById('pincode').value.trim();
+    const addressType = document.getElementById('addressType').value;
 
+    if (!/^[A-Za-z\s]{3,}$/.test(name)) {
+      showError('Error1', 'Name must be at least 3 characters and contain only alphabets.');
+      isValid = false;
+    } else {
+      hideError('Error1');
+    }
 
-                if (!/^[A-Za-z\s]+$/.test(name) || name.length < 3) {
-                    Error1.style.display = 'block'
-                    Error1.innerHTML = 'Name should contain only alphabets and be at least 3 characters long.';
-                    return;
-                }
+    if (streetAddress.length < 5) {
+      showError('Error2', 'Street address must be at least 5 characters.');
+      isValid = false;
+    } else {
+      hideError('Error2');
+    }
 
+    hideError('Error3');
 
-                if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
-                    Error6.style.display = 'block'
-                    Error6.innerHTML = 'Phone number must be 10 digits and not all same digits.';
-                    return;
-                }
+    if (!/^[A-Za-z\s]{3,}$/.test(city)) {
+      showError('Error4', 'City name must contain only letters and be at least 3 characters.');
+      isValid = false;
+    } else {
+      hideError('Error4');
+    }
 
-                if (altPhone && (!/^\d{10}$/.test(altPhone) || /^(\d)\1{9}$/.test(altPhone || altPhone !== phone))) {
-                    Error7.style.display = 'block'
-                    Error7.innerHTML = 'Alternate Phone number must be 10 digits and not all same digits.and Not same to phone.';
-                    return;
-                }
-                if (!streetAddress || !city || !state) {
-                    Error4.style.display = 'block'
-                    Error2.style.display = 'block'
-                    Error2.innerHTML = 'Please fill  the address fields.';
-                    Error4.innerHTML = 'Please fill  the City fields.';
-                    return;
-                }
+    if (!/^\d{6}$/.test(pincode) || /^(\d)\1{5}$/.test(pincode)) {
+      showError('Error5', 'Pincode must be 6 digits and not all same digits.');
+      isValid = false;
+    } else {
+      hideError('Error5');
+    }
 
-                if (!/^\d{6}$/.test(pincode) || /^(\d)\1{5}$/.test(pincode)) {
-                    Error5.style.display = 'block'
-                    Error5.innerHTML = 'Pincode must be 6 digits and not all same digits.';
-                    return;
-                }
+    if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
+      showError('Error6', 'Phone must be 10 digits and not all same digits.');
+      isValid = false;
+    } else {
+      hideError('Error6');
+    }
 
-                if (!addressType) {
-                    Error5.style.display = 'block'
-                    Error5.innerHTML = 'Please select an address type.';
-                    return;
-                }
-                addAddressForm.submit();
+    if (altPhone && (!/^\d{10}$/.test(altPhone) || /^(\d)\1{9}$/.test(altPhone) || altPhone === phone)) {
+      showError('Error7', 'Alternate phone must be 10 digits, not all same digits, and different from primary phone.');
+      isValid = false;
+    } else {
+      hideError('Error7');
+    }
+
+    if (!addressType) {
+      showError('Error8', 'Please select an address type.');
+      isValid = false;
+    } else {
+      hideError('Error8');
+    }
+
+    if (!state) {
+      showError('Error9', 'Please select a state.');
+      isValid = false;
+    } else {
+      hideError('Error9');
+    }
+
+    if (isValid) {
+      const addressId = '<%= address._id %>';
+      axios.post('/edit-address', {
+        addressId,
+        name,
+        phone,
+        altPhone,
+        streetAddress,
+        apartment,
+        city,
+        state,
+        pincode,
+        addressType,
+        isDefault: document.querySelector('input[name="isDefault"]:checked').value
+      })
+        .then(function (response) {
+          if (response.data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Updated!",
+              text: "Address updated successfully!",
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+              window.location.href = "/addresses";
             });
+          }
+        })
+        .catch(function (error) {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong while updating address!"
+          });
+          console.error("Update Address Error:", error);
+        });
+    }
+  });
+</script>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Axios for AJAX requests -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- SweetAlert2 for alerts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            function editAddress(addressId) {
-                const name = document.getElementById('name').value.trim();
-                const phone = document.getElementById('phone').value.trim();
-                const altPhone = document.getElementById('altPhone').value.trim();
-                const streetAddress = document.getElementById('streetAddress').value.trim();
-                const apartment = document.getElementById('apartment').value.trim();
-                const city = document.getElementById('city').value.trim();
-                const state = document.getElementById('state').value.trim();
-                const pincode = document.getElementById('pincode').value.trim();
-                const addressType = document.getElementById('addressType').value;
-
-                const addAddressForm = document.getElementById('addAddressForm');
-                axios.post('/edit-address', {
-                    addressId,
-                    name,
-                    phone,
-                    altPhone,
-                    streetAddress,
-                    apartment,
-                    city,
-                    state,
-                    pincode,
-                    addressType
-                })
-                    .then(function (response) {
-                        if (response.data.success) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Updated!",
-                                text: "Address updated successfully!",
-                                showConfirmButton: false,
-                                timer: 1500
-                            }).then(() => {
-                                window.location.href = "/addresses"
-                            });
-                        }
-                    })
-                    .catch(function (error) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Oops...",
-                            text: "Something went wrong while updating address!"
-                        });
-                        console.error("Update Address Error:", error);
-                    });
-            }
-
-
-
-        </script>
-        <%-include("../../views/partials/userPartial/footer")%>
+<%- include("../../views/partials/userPartial/footer") %>

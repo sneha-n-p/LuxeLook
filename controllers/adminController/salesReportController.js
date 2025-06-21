@@ -8,6 +8,7 @@ const Sale = require('../../models/saleSchema')
 const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 const moment = require('moment');
+const StatusCode = require("../../statusCode")
 
 
 const getFilteredSales = async (reportType, startDate, endDate) => {
@@ -89,7 +90,7 @@ const loadSalesPage = async (req, res) => {
         break;
       case 'custom':
         if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
-          return res.status(400).render('admin/pageerror', { message: 'Invalid date range' });
+          return res.status(StatusCode.NOT_FOUND).render('admin/pageerror', { message: 'Invalid date range' });
         }
         query.createdOn = {
           $gte: new Date(startDate),
@@ -117,7 +118,7 @@ const loadSalesPage = async (req, res) => {
     });
   } catch (error) {
     console.error('Error loading sales page:', error);
-    res.status(500).render('admin/pageerror', { message: 'Server Error' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).render('admin/pageerror', { message: 'Server Error' });
   }
 };
 

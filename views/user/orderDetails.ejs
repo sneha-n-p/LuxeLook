@@ -1,309 +1,388 @@
-<%- include('../partials/userPartial/header') %>
 
-  <style>
-    .account-banner {
-      background: url('/images/account-banner.jpg') center/cover no-repeat;
-      height: 250px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 48px;
-      font-weight: 600;
-      color: #111;
-    }
+<%- include("../partials/userPartial/header") %>
 
-    .account-container {
-      padding: 50px 0;
-    }
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #FFF8F3;
+  }
 
-    .sidebar {
-      background: #f1f1f1;
-      padding: 20px;
-      border-radius: 8px;
-      height: 100%;
-    }
+  .banner {
+    position: relative;
+  }
 
-    .sidebar a {
-      display: block;
-      margin-bottom: 10px;
-      color: #000;
-      font-weight: 500;
-    }
+  .banner img {
+    height: 414px;
+    object-fit: cover;
+    width: 100%;
+  }
 
-    .sidebar a:hover {
-      text-decoration: underline;
-    }
+  .banner h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 42px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px black;
+  }
 
-    .orders-table {
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      overflow: hidden;
-    }
+  .sidebar {
+    background-color: #F2E8DC;
+    padding: 30px 20px;
+    height: auto;
+    color: #6B4C3B;
+    border-radius: 8px;
+  }
 
-    .orders-table thead {
-      background: #3ccfcf;
-      color: #fff;
-    }
+  .sidebar h5 {
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
 
-    .orders-table th,
-    .orders-table td {
-      padding: 15px;
-      text-align: center;
-      vertical-align: middle;
-    }
+  .sidebar a {
+    display: block;
+    color: #333;
+    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: 500;
+  }
 
-    .status-delivered {
-      background: #28a745;
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 20px;
-    }
+  .sidebar a:hover {
+    color: #B5654B;
+  }
 
-    .status-pending {
-      background: #ffc107;
-      color: #000;
-      padding: 5px 10px;
-      border-radius: 20px;
-    }
+  .orders-section {
+    background-color: #FCF4ED;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
 
-    .action-btn {
-      padding: 5px 15px;
-      border: none;
-      border-radius: 20px;
-      font-weight: 500;
-      cursor: pointer;
-    }
+  .orders-table {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
 
-    .btn-return {
-      background-color: #dc3545;
-      color: #fff;
-    }
+  .orders-table thead {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
+    color: #fff;
+  }
 
-    .btn-cancel {
-     background-color: #661820;
-      color: #fff;
-    }
-  </style>
+  .orders-table th,
+  .orders-table td {
+    padding: 15px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 14px;
+  }
 
+  .status-delivered {
+    background: #28a745;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  .status-pending {
+    background: #ffc107;
+    color: #000;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  .status-other {
+    background: #6B4C3B;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  .action-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 2px 0;
+  }
+
+  .btn-return {
+    background: linear-gradient(90deg, #dc3545, #e4606d);
+    color: #fff;
+  }
+
+  .btn-cancel {
+    background: linear-gradient(90deg, #661820, #8a2c3b);
+    color: #fff;
+  }
+
+  .btn-view {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .action-btn:hover {
+    opacity: 0.9;
+  }
+
+  .pagination .page-link {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    color: #333;
+    transition: 0.3s;
+  }
+
+  .pagination .page-item.active .page-link {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
+    border-color: #B5654B;
+    color: #fff;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #F2E8DC;
+    color: #B5654B;
+  }
+
+  footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+  }
+</style>
+
+<!-- Banner -->
 <section class="hero text-center bg-light p-0 mb-4">
-  <!-- <div class="banner position-relative"> -->
-      <img src="wallpaper\wall3.jpg" alt="Shop Banner" class="img-fluid w-100"
-          style="height: 400px; object-fit: cover;">
-      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">ORDERS 
-      </h1>
-  <!-- </div> -->
+  <div class="banner">
+    <img src="/wallpaper/wall3.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <h1>ORDERS</h1>
+  </div>
 </section>
 
-  <div class="container-fluid account-container">
-    <div class="row">
-      <div class="col-md-3">
-        <div class="sidebar">
-                <h5>SETTINGS</h5>
-          <a href="/orders" style="text-decoration: none;">Orders</a>
-          <a href="/profile" style="text-decoration: none;">Personal Info</a>
-          <a href="/addresses" style="text-decoration: none;">Addresses</a>
-          <a href="/wallet" style="text-decoration: none;">Wallet</a>
-        </div>
-      </div>
-      <div class="col-md-9">
-        <h4 class="mb-4 fw-bold">MY ORDERS</h4>
-        <table class="table orders-table">
-          <thead>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-2 sidebar">
+      <h5>SETTINGS</h5>
+      <a href="/orders">Orders</a>
+      <a href="/profile">Personal Info</a>
+      <a href="/addresses">Addresses</a>
+      <a href="/wallet">Wallet</a>
+    </div>
+
+    <!-- Orders Content -->
+    <div class="col-md-10 orders-section">
+      <h5 class="mb-4 fw-bold">MY ORDERS</h5>
+      <table class="table orders-table">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Delivery Date</th>
+            <th>Status</th>
+            <th>Action</th>
+            <th>Image</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% orders.forEach(order => { %>
             <tr>
-              <th>Product Name</th>
-              <th>Price</th>
-              <th>Delivery Date</th>
-              <th>Status</th>
-              <th>Action</th>
-              <th>Image</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% orders.forEach(order=> { %>
-              <tr>
-                <td>
-                  <% order.orderedItems.forEach(item=> { %>
-                    <div>
-                      <%= item.product.productName %>
-                    </div>
-                    <% }) %>
-                </td>
-                <td>
-                  ₹<%= order.orderedItems.map(i=> i.price * i.quantity).reduce((a, b) => a + b, 0) %>
-                </td>
-                <td>
-                  <%= order.deliveryDate ? order.deliveryDate.toDateString() : "Not Assigned" %>
-                </td>
-                <td>
-                  <% if (order.status.trim()==='Delivered' ) { %>
-                    <span class="status-delivered">DELIVERED</span>
-                    <% } else if (order.status.trim()==='Pending' ) { %>
-                      <span class="status-pending">PENDING</span>
-                      <% } else { %>
-                        <span class="badge bg-secondary">
-                          <%= order.status.toUpperCase() %>
-                        </span>
-                        <% } %>
-                </td>
-                <td>
-                  <% if (order.status.trim()==='Delivered' ) { %>
-                      <div style="margin-bottom: 5px;">
-                        <button class="action-btn btn-return"
-                          onclick="returnOrder('<%= order._id %>')">
-                          RETURN
-                        </button>
-                      </div>
-                        <% } else if (['Pending', 'Shipped' , 'Out For Delivery' ].includes(order.status.trim())) { %>
-                          <button onclick="fullCancellation('<%= order._id %>')"
-                            class="action-btn btn-cancel">CANCEL</button>
-                          <% }else { %>
-                            <span></span>
-                            <% } %>
-
-                              <!-- View details button -->
-                              <a href="/order/details/<%= order._id %>" class="action-btn btn-primary"
-                                style="background:#007bff; color:white; text-decoration: none; ">VIEW</a>
-                </td>
-
-                <td style="display: flex; gap: 5px; justify-content: center;">
-                  <% order.orderedItems.slice(0, 2).forEach(item=> { %>
-                    <img src="<%= item.product.productImage[0] %>" alt="Product Image"
-                      style="width:50px; height:65px; object-fit:cover;">
-                    <% }) %>
-                </td>
-
-              </tr>
-              <% }) %>
-          </tbody>
-
-        </table>
-        <div class="d-flex justify-content-between align-items-center mt-4">
-          <p class="m-0">Showing 1 to <%= totalPages %>
-          </p>
-          <div class="d-flex gap-2">
-            <ul class="pagination mb-0">
-              <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-              </li>
-    
-              <% for (let i=1; i <=totalPages; i++) { %>
-                <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                  <a class="page-link" style="text-decoration: none;background-color:#30cfcf;"
-                    href="?page=<%= i %>&search=<%= search %>">
-                    <%= i %>
-                  </a>
-                </li>
+              <td>
+                <% order.orderedItems.forEach(item => { %>
+                  <div><%= item.productName %></div>
+                <% }) %>
+              </td>
+              <td>₹<%= order.finalAmount %></td>
+              <td>
+                <%= order.deliveryDate ? order.deliveryDate.toDateString() : "Not Assigned" %>
+              </td>
+              <td>
+                <% if (order.status.trim() === 'Delivered') { %>
+                  <span class="status-delivered">DELIVERED</span>
+                <% } else if (order.status.trim() === 'Pending') { %>
+                  <span class="status-pending">PENDING</span>
+                <% } else { %>
+                  <span class="status-other"><%= order.status.toUpperCase() %></span>
                 <% } %>
-    
-                  <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-                    <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-                  </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+              </td>
+              <td>
+                <% if (order.status.trim() === 'Delivered') { %>
+                  <div style="margin-bottom: 5px;">
+                    <button class="action-btn btn-return" onclick="returnOrder('<%= order._id %>')">
+                      RETURN
+                    </button>
+                  </div>
+                <% } else if (['Pending', 'Shipped', 'Out For Delivery'].includes(order.status.trim())) { %>
+                  <button class="action-btn btn-cancel" onclick="fullCancellation('<%= order._id %>')">
+                    CANCEL
+                  </button>
+                <% } %>
+                <a href="/order/details/<%= order._id %>" class="action-btn btn-view">VIEW</a>
+              </td>
+              <td style="display: flex; gap: 5px; justify-content: center;">
+               <% order.orderedItems.slice(0, 2).forEach(item => { %>
+  <% if (item.product && item.product.productImage && item.product.productImage.length > 0) { %>
+    <img src="<%= item.product.productImage[0] %>" alt="Product Image" style="width:50px; height:65px; object-fit:cover;">
+  <% } else { %>
+    <img src="/images/no-image.png" alt="No Image" style="width:50px; height:65px; object-fit:cover;">
+  <% } %>
+<% }) %>
+
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
+  <div>Showing 1 of <%= totalPages %></div>
+  <nav>
+    <ul class="pagination mb-0">
+      <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+        <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+      </li>
+
+      <% for (let i=1; i <=totalPages; i++) { %>
+        <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+            <%= i %>
+          </a>
+        </li>
+      <% } %>
+
+      <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+        <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+      </li>
+    </ul>
+  </nav>
+</div>
     </div>
   </div>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function fullCancellation(orderId) {
+  const reasons = [
+    "Found a better price elsewhere",
+    "Order placed by mistake",
+    "Item won't arrive on time",
+    "Changed my mind",
+    "Other"
+  ];
 
-  <script>
+  let optionsHtml = reasons.map(reason =>
+    `<option value="${reason}">${reason}</option>`
+  ).join("");
 
-    function fullCancellation(orderId) {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You wont cancel the order!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, Cancel it!"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.post('/orders/cancel', { orderId })
-            .then(response => {
-              if (response.data.success) {
-                Swal.fire({
-                  icon: "success",
-                  title: "Cancelled!",
-                  text: "Order Cancel Successfully.",
-                  showConfirmButton: false,
-                  timer: 1200
-                })
-              } else {
-                Swal.fire({
-                  icon: "success",
-                  title: "Cancelled!",
-                  text: responce.data.message,
-                  showConfirmButton: false,
-                  timer: 1200
-                })
-              }
-            })
-        }
-      })
-        .catch((error) => {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Something went wrong while cancel the order!"
-          })
-        })
-
+  Swal.fire({
+    title: "Cancel Order",
+    html: `
+      <p>Are you sure you want to cancel the full order?</p>
+      <select id="cancel-reason" class="swal2-input">
+        <option disabled selected>Select a reason</option>
+        ${optionsHtml}
+      </select>
+    `,
+    showCancelButton: true,
+    confirmButtonColor: "#B5654B",
+    cancelButtonColor: "#6B4C3B",
+    confirmButtonText: "Yes, Cancel it!",
+    preConfirm: () => {
+      const selectedReason = document.getElementById("cancel-reason").value;
+      if (!selectedReason) {
+        Swal.showValidationMessage("Please select a reason.");
+        return false;
+      }
+      return selectedReason;
     }
-
-
-    function returnOrder(orderId) {
-      Swal.fire({
-        title: 'Return!',
-        input: 'textarea',
-        inputLabel: 'Reason for return',
-        inputPlaceholder: 'Enter your reason here...',
-        inputAttributes: {
-          'aria-label': 'Reason for return'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Submit',
-        preConfirm: (reason) => {
-          if (!reason.trim()) {
-            Swal.showValidationMessage('Reason is required');
-          } else {
-            return reason;
-          }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.post('/orders/cancel', {
+        orderId,
+        reason: result.value
+      }).then(response => {
+        if (response.data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Cancelled!",
+            text: "Order cancelled successfully.",
+            showConfirmButton: false,
+            timer: 1200
+          }).then(() => location.reload());
+        } else {
+          Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
         }
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.patch('/orders/return', {
-            orderId,
-            reason: result.value
-          }).then(response => {
-            if (response.data.success) {
-              Swal.fire({
-                icon: "success",
-                title: "Return Requested!",
-                text: "Your return request has been submitted.",
-                showConfirmButton: false,
-                timer: 1500
-              }).then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Oops!",
-                text: response.data.message || "Return request failed.",
-              });
-            }
-          }).catch(error => {
+      }).catch(() => {
+        Swal.fire("Oops...", "Something went wrong while cancelling the order!", "error");
+      });
+    }
+  });
+}
+
+
+  function returnOrder(orderId) {
+    Swal.fire({
+      title: 'Return Order',
+      input: 'textarea',
+      inputLabel: 'Reason for return',
+      inputPlaceholder: 'Enter your reason here...',
+      inputAttributes: {
+        'aria-label': 'Reason for return'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Submit',
+      confirmButtonColor: "#B5654B",
+      cancelButtonColor: "#6B4C3B",
+      preConfirm: (reason) => {
+        if (!reason.trim()) {
+          Swal.showValidationMessage('Reason is required');
+        } else {
+          return reason;
+        }
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.patch('/orders/return', {
+          orderId,
+          reason: result.value
+        }).then(response => {
+          if (response.data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Return Requested!",
+              text: "Your return request has been submitted.",
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+              location.reload();
+            });
+          } else {
             Swal.fire({
               icon: "error",
               title: "Oops!",
-              text: "Something went wrong while submitting return request.",
+              text: response.data.message || "Return request failed.",
             });
+          }
+        }).catch(error => {
+          Swal.fire({
+            icon: "error",
+            title: "Oops!",
+            text: "Something went wrong while submitting return request.",
           });
-        }
-      });
-    }
-  </script>
+        });
+      }
+    });
+  }
+</script>
 
-  <%- include('../partials/userPartial/footer') %>
+<%- include("../partials/userPartial/footer") %>

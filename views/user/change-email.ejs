@@ -1,157 +1,153 @@
 <%- include("../../views/partials/userPartial/header") %>
 
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #fff;
-        }
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #FFF8F3;
+  }
 
-        .sidebar {
-            background-color: #f1f1f1;
-            padding: 30px 20px;
-            min-height: 100%;
-        }
+  .sidebar {
+    background-color: #F2E8DC;
+    padding: 30px 20px;
+    min-height: 100%;
+  }
 
-        .sidebar h5 {
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
+  .sidebar h5 {
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
 
-        .sidebar a {
-            display: block;
-            color: #000;
-            margin-bottom: 10px;
-            font-weight: 500;
-            text-decoration: none;
-        }
+  .sidebar a {
+    display: block;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 500;
+    text-decoration: none;
+  }
 
-        .account-header {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 42px;
-            font-weight: 600;
-            letter-spacing: 2px;
-        }
+  .form-section {
+    background-color: #F2E8DC;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
 
-        .form-section {
-            padding: 30px 50px;
-        }
+  .form-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
 
-        .form-label {
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
+  .form-control {
+    border-radius: 8px;
+    height: 45px;
+  }
 
-        .form-control {
-            border-radius: 8px;
-            height: 45px;
-        }
+  .submit-btn {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
+    color: white;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 25px;
+    margin-top: 20px;
+    transition: 0.3s;
+  }
 
-        .submit-btn {
-            background-color: #57c9d5;
-            color: white;
-            padding: 10px 30px;
-            border: none;
-            border-radius: 25px;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
+  .submit-btn:hover {
+    opacity: 0.9;
+  }
 
-        .submit-btn:hover {
-            background-color: #44b0bb;
-        }
-    </style>
+  .banner {
+    position: relative;
+  }
 
+  .banner img {
+    height: 350px;
+    object-fit: cover;
+    width: 100%;
+  }
 
-    <!-- Banner/Header -->
-    <div class="container-fluid p-0">
-        <img src="/images/profile-banner.jpg" class="img-fluid w-100" style="height: 300px; object-fit: cover;"
-            alt="Banner">
-        <div class="account-header">ACCOUNT</div>
+  .banner h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 42px;
+    font-weight: 700;
+    text-shadow: 2px 2px 5px #000;
+  }
+
+  footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+  }
+</style>
+
+<!-- Banner/Header -->
+<section class="hero text-center bg-light p-0 mb-4">
+  <div class="banner">
+    <img src="/wallpaper/luxlook-wall4.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <h1>CHANGE EMAIL</h1>
+  </div>
+</section>
+
+<!-- Main Content -->
+<div class="container mt-5">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 sidebar" style="margin-right: 57px;">
+      <h5>SETTINGS</h5>
+      <a href="/orders">Orders</a>
+      <a href="/profile">Personal Info</a>
+      <a href="/Addresses">Addresses</a>
+      <a href="/Wallet">Wallet</a>
     </div>
 
-    <!-- Main Content -->
-    <div class="container mt-5">
-        <div class="row">
-
-
-
-
-            <!-- Form Section -->
-            <div class="col-md-9 form-section">
-                <h4 class="mb-4">Change Email</h4>
-                <form action="/profile/change-email" method="POST" onsubmit="return validateLoginForm()">
-                    <div class="mb-4">
-                        <label for="currentEmail" class="form-label">Current Email</label>
-                        <input type="email" name="currentEmail" id="currentEmail" class="form-control"
-                            placeholder="Enter your currentEmail" required>
-                        <%if(message){%>
-                            <div class="error-message" id="error-message" style="color: darkred;">
-                                <%=message%>
-                            </div>
-                            <%}%>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="submit-btn">Verify</button>
-                    </div>
-                </form>
+    <!-- Form Section -->
+    <div class="col-md-8 form-section">
+      <h4 class="mb-4">Change Email</h4>
+      <form action="/profile/change-email" method="POST" onsubmit="return validateLoginForm()">
+        <div class="mb-4">
+          <label for="currentEmail" class="form-label">Current Email</label>
+          <input type="email" name="currentEmail" id="currentEmail" class="form-control" placeholder="Enter your current email" required>
+          <% if (message) { %>
+            <div class="error-message" id="error-message" style="color: darkred;">
+              <%= message %>
             </div>
-
+          <% } %>
         </div>
+        <div class="text-center">
+          <button type="submit" class="submit-btn">Verify</button>
+        </div>
+      </form>
     </div>
+  </div>
+</div>
 
-    <script>
-        function validateLoginForm() {
-            const emailInput = document.getElementById("currentEmail")
-            const emailError = document.getElementById("error-message")
-            const emailValue = emailInput.value.trim()
-            const emailPattern = /^([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/
+<script>
+  function validateLoginForm() {
+    const emailInput = document.getElementById("currentEmail");
+    const emailError = document.getElementById("error-message");
+    const emailValue = emailInput.value.trim();
+    const emailPattern = /^([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/;
 
+    if (emailValue === "") {
+      emailError.textContent = "Please enter the email.";
+      emailInput.classList.add("is-invalid");
+      return false;
+    } else if (!emailValue.match(emailPattern)) {
+      emailError.textContent = "Please enter a valid email address.";
+      emailInput.classList.add("is-invalid");
+      return false;
+    } else {
+      emailError.textContent = "";
+      emailInput.classList.remove("is-invalid");
+      return true;
+    }
+  }
+</script>
 
-            if (emailValue === "") {
-                emailError.textContent = "Please Enter The Email."
-                emailInput.classList.add("is-invalid")
-                return false
-            } else if (!emailValue.match(emailPattern)) {
-                emailError.textContent = "Please Enter a Valied Email Address"
-                emailInput = classList.add("is-invalid")
-                return false
-            } else {
-                emailError.textContent = ""
-                emailInput = classList.remove("is-invalid")
-                return false
-
-            }
-        }
-
-        document.getElementById("emailForm").addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            const currentEmail = document.getElementById("currentEmail").value.trim();
-
-            try {
-                const response = await axios.post("/profile/change-email", { currentEmail });
-
-                if (response.data.success) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "OTP Sent",
-                        text: "Check your email for the OTP",
-                        confirmButtonColor: "#57c9d5"
-                    }).then(() => {
-                        window.location.href = response.data.redirectUrl;
-                    });
-                } else {
-                    Swal.fire("Failed", "Email could not be sent", "error");
-                }
-            } catch (err) {
-                Swal.fire("Error", "Something went wrong", "error");
-            }
-        });
-
-
-    </script>
-    <%-include("../../views/partials/userPartial/footer")%>
+<%- include("../../views/partials/userPartial/footer") %>

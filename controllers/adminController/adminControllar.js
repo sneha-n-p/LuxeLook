@@ -1,6 +1,7 @@
 const User = require('../../models/userSchema')
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
+const StatusCode = require('../../statusCode')
 
 
 const pageError = async (req, res) => {
@@ -24,9 +25,9 @@ const loadLogin = async (req, res) => {
 const postLogin = async (req, res) => {
     try {
         const { email, password } = req.body
-        const admin = await User.findOne({ email:email, isAdmin: true })
+        const admin = await User.findOne({ email: email, isAdmin: true })
         if (admin) {
-            const passwordMatch = await bcrypt.compare(password,admin.password)
+            const passwordMatch = await bcrypt.compare(password, admin.password)
             if (!passwordMatch) {
                 console.log('done')
                 req.session.message = 'invalid credentials'
@@ -40,7 +41,7 @@ const postLogin = async (req, res) => {
         }
     } catch (error) {
         console.log('login error', error)
-        return res.redirect("/admin/pageError")
+        return res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
 
     }
 }
@@ -50,7 +51,7 @@ const loadDashboard = async (req, res) => {
             res.render('dashboard')
         }
     } catch (error) {
-        res.redirect('/pageError')
+        res.status(StatusCode.NOT_FOUND).redirect('/pageError')
     }
 }
 
@@ -59,13 +60,13 @@ const logout = async (req, res) => {
         req.session.destroy(err => {
             if (err) {
                 console.log("Error destroy session", err)
-                return res.redirect("/pageError")
+                return res.status(StatusCode.NOT_FOUND).redirect("/pageError")
             }
             res.redirect("/admin/login")
         })
     } catch (error) {
         console.log("unexpected error during logout", error)
-        res.redirect("/pageError")
+        res.status(StatusCode.NOT_FOUND).redirect("/pageError")
     }
 }
 

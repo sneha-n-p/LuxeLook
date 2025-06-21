@@ -7,6 +7,7 @@ const env = require("dotenv").config()
 const session = require("express-session")
 const path = require('path')
 const fs = require('fs')
+const StatusCode = require("../../statusCode")
 
 function generateOtp() {
   console.log('otp')
@@ -63,7 +64,7 @@ const loadForgotPassword = async (req, res) => {
   try {
     res.render("forgotPassword")
   } catch (error) {
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -80,7 +81,7 @@ const forgotEmailValid = async (req, res) => {
         req.session.email = email
         res.render('sent-otp')
       } else {
-        res.json({ success: false, message: "FAiled to send OTP,please try again" })
+        res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Failed to send OTP,please try again" })
       }
     } else {
       res.render("forgotPassword", {
@@ -88,14 +89,14 @@ const forgotEmailValid = async (req, res) => {
       })
     }
   } catch (error) {
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
 const resendOtp = async (req, res) => {
   try {
     if (!req.session.email) {
-      return res.status(400).json({ success: false, message: "Email not found in session" })
+      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: "Email not found in session" })
     }
     console.log("hloooo")
 
@@ -106,14 +107,14 @@ const resendOtp = async (req, res) => {
     const emailSent = await sendVarificationEmail(email, newOtp)
 
     if (emailSent) {
-      res.status(200).json({ success: true, message: "OTP Resent successfully" })
+      res.status(StatusCode.OK).json({ success: true, message: "OTP Resent successfully" })
     } else {
-      res.status(500).json({ success: false, message: "Failed to resend OTP. Please try again." })
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to resend OTP. Please try again." })
     }
 
   } catch (error) {
     console.error("Error resending OTP ", error)
-    res.status(500).json({ success: false, message: "Internal server error. Please try again." })
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error. Please try again." })
   }
 }
 
@@ -123,7 +124,7 @@ const verifyOtp = async (req, res) => {
   console.log("req.session.userOtp:", req.session.userOtp)
 
   if (req.session.userOtp === otp) {
-    res.json({ success: true, redirectUrl: "/reset-password" })
+    res.status(StatusCode.OK).json({ success: true, redirectUrl: "/reset-password" })
   } else {
     return res.render('send-otp', { error: "Invalid OTP" })
   }
@@ -133,7 +134,7 @@ const loadResetPassword = async (req, res) => {
   try {
     res.render('reset-password', { message: "" })
   } catch (error) {
-    res.redirect('/pageNotFound')
+    res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
   }
 }
 
@@ -156,7 +157,7 @@ const confirmPassword = async (req, res) => {
       res.render("reset-password", { message: ' password is not match' })
     }
   } catch (error) {
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -164,7 +165,7 @@ const loadProfile = async (req, res) => {
   try {
     const userId = req.session.user
     const userData = await User.findById(userId).populate('availableCoupons')
-    const orderData = await Order.find({ userId: userId }).sort({createdOn:-1}).limit(3)
+    const orderData = await Order.find({ userId: userId }).sort({ createdOn: -1 }).limit(3)
     console.log('orderData:', orderData)
     const addressData = await Address.findById(userId)
     console.log(userData.image[0])
@@ -172,11 +173,11 @@ const loadProfile = async (req, res) => {
       user: userData,
       userAddress: addressData,
       latestOrders: orderData,
-       activePage: 'profile'
+      activePage: 'profile'
     })
   } catch (error) {
     console.log('error:occur', error)
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -187,10 +188,10 @@ const loadEditProfile = async (req, res) => {
     const userData = await User.findById(userId)
     console.log('userId:', userId)
 
-    res.render("edit-profile", { user: userData,activePage:'edit-profile' })
+    res.render("edit-profile", { user: userData, activePage: 'edit-profile' })
   } catch (error) {
     console.log(error)
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -224,12 +225,12 @@ const updateProfile = async (req, res) => {
       user.image = '/uploads/profile/' + fileName;
     }
     await user.save()
-    res.status(200).json({ success: true })
+    res.status(StatusCode.OK).json({ success: true })
 
 
   } catch (error) {
     console.log(error)
-    res.status(500).json({ message: "server Error" })
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: "server Error" })
   }
 }
 
@@ -246,61 +247,59 @@ const loadChangeEmail = async (req, res) => {
 
     if (!userData) {
       console.log("No user found with ID:", userId);
-      return res.redirect("/pageNotFound");
+      return res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
     }
 
-    res.render("change-email", { user: userData, message: null,activePage:"change-email" });
+    res.render("change-email", { user: userData, message: null, activePage: "change-email" });
   } catch (error) {
     console.error("Error loading change email page:", error);
-    res.redirect("/pageNotFound");
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
 };
 
 
 const changeEmailValidation = async (req, res) => {
   try {
-    const { currentEmail } = req.body
-    console.log(req.body)
-    const userId = req.session.user
-    const userExist = await User.findById(userId)
-    console.log('userExist:', userExist)
+    const { currentEmail } = req.body;
+    console.log(req.body);
+    const userId = req.session.user;
+    const userExist = await User.findById(userId);
+    console.log('userExist:', userExist);
 
     if (userExist.email === currentEmail) {
-      const otp = generateOtp()
-      console.log("otp:", otp)
+      const otp = generateOtp();
+      console.log("otp:", otp);
 
-      const emailSent = await sendVarificationEmail(currentEmail, otp)
+      const emailSent = await sendVarificationEmail(currentEmail, otp);
       if (emailSent) {
-        req.session.userOtp = otp
-        req.session.userData = req.body
-        req.session.email = currentEmail
-        console.log("Email Sent:", currentEmail)
-        console.log("OTP:", otp)
+        req.session.userOtp = otp;
+        req.session.userData = req.body;
+        req.session.email = currentEmail;
+        console.log("Email Sent:", currentEmail);
+        console.log("OTP:", otp);
         res.redirect("/change-email-otp");
-
       } else {
-        res.status(200).json("email-error")
+        res.status(StatusCode.OK).json("email-error");
       }
-
     } else {
       res.render("change-email", {
         user: userExist,
-        message: "User this email not exist"
-      })
+        message: "User with this email does not exist",
+        activePage: "change-email" // Add this line
+      });
     }
-
   } catch (error) {
-    console.error(error)
-    res.redirect("/pageNotFound")
+    console.error(error);
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
-}
+};
 
 const loadEmailVerifyOtp = async (req, res) => {
   try {
     res.render("change-email-otp")
   } catch (error) {
     console.error(error)
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -311,7 +310,7 @@ const EmailVerifyOtp = async (req, res) => {
   console.log("req.session.userOtp:", req.session.userOtp)
 
   if (req.session.userOtp === otp) {
-    res.status(200).json({ success: true, redirectUrl: "/reset-email" })
+    res.status(StatusCode.OK).json({ success: true, redirectUrl: "/reset-email" })
   } else {
     return res.render('change-email-otp', { success: false, user: null, message: "Invalid OTP" })
   }
@@ -322,7 +321,7 @@ const loadResetEmail = async (req, res) => {
     res.render("reset-email")
   } catch (error) {
     console.error(error)
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -332,26 +331,26 @@ const resetEmail = async (req, res) => {
     const userId = req.session.user;
     const user = await User.findById(userId);
 
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    if (!user) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "User not found" });
 
     if (newEmail === user.email) {
-      return res.status(200).json({ success: false, message: "New email cannot be the same as the old email" });
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "New email cannot be the same as the old email" });
     }
 
 
     const emailExists = await User.findOne({ email: newEmail });
     if (emailExists) {
-      return res.status(200).json({ success: false, message: "Email is already in use" });
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Email is already in use" });
     }
 
     user.email = newEmail;
     await user.save();
 
-    res.status(200).json({ success: true });
+    res.status(StatusCode.OK).json({ success: true });
 
   } catch (err) {
     console.error("Reset Email Error:", err);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
   }
 };
 
@@ -369,13 +368,13 @@ const changePassword = async (req, res) => {
 
     if (!userData) {
       console.log("No user found with ID:", userId);
-      return res.redirect("/pageNotFound");
+      return res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
     }
 
-    res.render("change-password", { user: userData, message: null ,activePage:"change-password"});
+    res.render("change-password", { user: userData, message: null, activePage: "change-password" });
   } catch (error) {
     console.error("Error loading change email page:", error);
-    res.redirect("/pageNotFound");
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
 
 }
@@ -398,7 +397,7 @@ const changePasswordValid = async (req, res) => {
         res.render("change-password-otp")
         console.log("OTP:", otp)
       } else {
-        res.json({
+        res.status(StatusCode.BAD_REQUEST).json({
           success: false,
           message: "Failed to send otp. please try again "
         })
@@ -406,12 +405,13 @@ const changePasswordValid = async (req, res) => {
     } else {
       res.render("change-password", {
         user: userExist,
-        message: "User with this email not exist"
+        message: "User with this email not exist",
+        activePage: "change-password"
       })
     }
   } catch (error) {
     console.log("Error in cange password validation", error)
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -420,7 +420,7 @@ const loadPasswordVerifyingOtp = async (req, res) => {
     res.render("change-password-otp")
   } catch (error) {
     console.error(error)
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -431,19 +431,19 @@ const PasswordVerifyingOtp = async (req, res) => {
   console.log("req.session.userOtp:", req.session.userOtp)
 
   if (req.session.userOtp === otp) {
-    res.status(200).json({ success: true, redirectUrl: "/profile/reset-password" })
+    res.status(StatusCode.OK).json({ success: true, redirectUrl: "/profile/reset-password" })
   } else {
-    return res.json({ success: false, user: null, message: "Invalid OTP" })
+    return res.status(StatusCode.BAD_REQUEST).json({ success: false, user: null, message: "Invalid OTP" })
   }
 }
 
 
 const loadresetPassword = async (req, res) => {
   try {
-    res.render("profile-resetPassword", { message: null })
+    res.render("profile-resetPassword", { message: null, activePage: "profile-resetPassword" })
   } catch (error) {
     console.error(error)
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
@@ -452,6 +452,10 @@ const resetPassword = async (req, res) => {
     console.log(req.body)
     const { newPassword, confirmPassword } = req.body
     const email = req.session.email
+    let user = null
+    if (email) {
+      user = await User.findOne({ email });
+    }
     if (newPassword === confirmPassword) {
       const passwordHash = await securePassword(newPassword)
       console.log("passwordHash", passwordHash)
@@ -461,24 +465,24 @@ const resetPassword = async (req, res) => {
       )
       res.redirect("/profile")
     } else {
-      res.render("profile-resetPassword", { message: ' password is not match' })
+      res.render("profile-resetPassword", { message: ' password is not match', activePage: "profile-resetPassword", user: user })
     }
 
   } catch (error) {
-    res.redirect("/pageNotFound")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
 
-const addProfile =  async (req, res) => {
+const addProfile = async (req, res) => {
   try {
-      const userId = req.params.id
-      const imagePath = `/uploads/${req.file.filename}`
+    const userId = req.params.id
+    const imagePath = `/uploads/${req.file.filename}`
 
-      await User.findByIdAndUpdate(userId, { image: imagePath })
+    await User.findByIdAndUpdate(userId, { image: imagePath })
 
-      res.json({ success: true, imagePath })
+    res.status(StatusCode.OK).json({ success: true, imagePath })
   } catch (error) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Error uploading image' })
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Error uploading image' })
   }
 }
 

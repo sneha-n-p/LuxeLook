@@ -1,371 +1,464 @@
-<%- include('../partials/userPartial/header') %>
+<%- include("../../views/partials/userPartial/header") %>
 
-<style>
-    .account-banner {
-        background: url('/images/account-banner.jpg') center/cover no-repeat;
-        height: 250px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 48px;
-        font-weight: 600;
-        color: #111;
-    }
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FFF8F3;
+        }
 
-    .order-info-box {
-        background: #fff;
-        border: 1px solid #ccc;
-        padding: 30px;
-        border-radius: 10px;
-    }
+        .banner {
+            position: relative;
+        }
 
-    .order-info-title {
-        font-size: 24px;
-        font-weight: 600;
-        margin-bottom: 20px;
-    }
+        .banner img {
+            height: 414px;
+            object-fit: cover;
+            width: 100%;
+        }
 
-    .product-detail-card {
-        border-bottom: 1px solid #ddd;
-        padding: 15px 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
+        .banner h1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 42px;
+            font-weight: 700;
+            text-shadow: 2px 2px 8px black;
+        }
 
-    .product-detail-card img {
-        width: 70px;
-        height: 90px;
-        object-fit: cover;
-        border-radius: 6px;
-        margin-right: 20px;
-    }
+        .sidebar {
+            background-color: #F2E8DC;
+            padding: 30px 20px;
+            height: auto;
+            color: #6B4C3B;
+            border-radius: 8px;
+        }
 
-    .product-detail-left {
-        display: flex;
-        align-items: center;
-    }
+        .sidebar h5 {
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
 
-    .product-detail-text {
-        flex: 1;
-    }
+        .sidebar a {
+            display: block;
+            color: #333;
+            margin-bottom: 10px;
+            text-decoration: none;
+            font-weight: 500;
+        }
 
-    .badge-status {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-weight: 500;
-    }
+        .sidebar a:hover {
+            color: #B5654B;
+        }
 
-    .badge-delivered {
-        background-color: #28a745;
-        color: #fff;
-    }
+        .product-detail-section {
+            background-color: #FCF4ED;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    .badge-pending {
-        background-color: #ffc107;
-        color: #000;
-    }
+        .product-detail-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-    .back-btn {
-        display: inline-block;
-        margin-top: 20px;
-        padding: 8px 16px;
-        background-color: #007bff;
-        color: #fff;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 500;
-    }
+        .product-detail-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    .action-btn {
-        padding: 6px 14px;
-        border: none;
-        border-radius: 20px;
-        font-weight: 500;
-        cursor: pointer;
-        font-size: 14px;
-    }
+        .product-detail-card img {
+            width: 70px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 20px;
+        }
 
-    .btn-return {
-        background-color: #dc3545;
-        color: #fff;
-    }
+        .product-detail-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
 
-    .btn-cancel {
-        background-color: #6c757d;
-        color: #fff;
-    }
+        .product-detail-text {
+            flex: 1;
+        }
 
-    .download-btn {
-        display: inline-block;
-        margin-top: 20px;
-        margin-left: 10px;
-        padding: 8px 16px;
-        background-color: #17a2b8;
-        color: #fff;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: 500;
-        cursor: pointer;
-    }
-</style>
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
 
-<section class="relative mb-10">
-  <img src="/wallpaper/wall4.jpg" alt="Wallet Banner" class="w-full h-[400px] object-cover">
-  <h1 class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-5xl">ORDERS-DETAILS</h1>
-</section>
+        .badge-delivered {
+            background-color: #28a745;
+            color: #fff;
+        }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="order-info-box" id="order-info-box">
-                <div class="order-info-title">Order #<%= order.orderId %></div>
-                <p><strong>Status:</strong>
-                    <% if (order.status.trim()==='Delivered' ) { %>
-                        <span class="badge-status badge-delivered">DELIVERED</span>
-                    <% } else if (order.status.trim()==='Pending' ) { %>
-                        <span class="badge-status badge-pending">PENDING</span>
+        .badge-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .badge-other {
+            background-color: #6B4C3B;
+            color: #fff;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, #B5654B, #D17C63);
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-return {
+            background: linear-gradient(90deg, #dc3545, #e4606d);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(90deg, #661820, #8a2c3b);
+        }
+
+        .btn-download {
+            background: linear-gradient(90deg, #17a2b8, #3bc7d8);
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+    </style>
+
+    <!-- Banner -->
+    <section class="hero text-center bg-light p-0 mb-4">
+        <div class="banner">
+            <img src="/wallpaper/wall4.jpg" alt="Order Details Banner" class="img-fluid w-100">
+            <h1>ORDER DETAILS</h1>
+        </div>
+    </section>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <h5>SETTINGS</h5>
+                <a href="/orders">Orders</a>
+                <a href="/profile">Personal Info</a>
+                <a href="/addresses">Addresses</a>
+                <a href="/wallet">Wallet</a>
+            </div>
+
+            <!-- Content Area -->
+            <div class="col-md-10 product-detail-section" id="product-detail-section">
+                <% if (!order || order.orderedItems.length===0) { %>
+                    <p class="text-center text-muted">No order details found.</p>
                     <% } else { %>
-                        <span class="badge-status bg-secondary text-white">
-                            <%= order.status.toUpperCase() %>
-                        </span>
-                    <% } %>
-                </p>
-                <p><strong>Total Price:</strong> ₹<%= order.totalPrice %></p>
-                <p><strong>Final Amount:</strong> ₹<%= order.finalAmount %></p>
-                <% if (order.address && order.address.length > 0) { %>
-                    <pencoding: utf-8p><p><strong>Address:</strong>
-                        <%= order.address[0].name %>, 
-                        <%= order.address[0].streetAddress %><% if(order.address[0].apartment) { %>, <%= order.address[0].apartment %><% } %>,
-                        <%= order.address[0].city %>, 
-                        <%= order.address[0].state %> - 
-                        <%= order.address[0].pincode %><br>
-                        Phone: <%= order.address[0].phone %>
-                        <% if(order.address[0].altPhone){ %><br>Alt Phone: <%= order.address[0].altPhone %><% } %>
-                    </p>
-                <% } %>
-                <p><strong>Coupon Applied:</strong>
-                    <%= order.couponApplied ? 'Yes' : 'No' %>
-                </p>
-                <p><strong>Order Date:</strong>
-                    <%= order.createdOn.toDateString() %>
-                </p>
-                <hr>
-                <h5 class="mb-3">Ordered Items</h5>
-                <% order.orderedItems.forEach(item=> { %>
-                    <div class="product-detail-card">
-                        <div class="product-detail-left">
-                            <img src="<%= item.product.productImage[0] %>" alt="Product Image">
-                            <div class="product-detail-text">
-                                <h6><%= item.product.productName %></h6>
-                                <p>Quantity: <%= item.quantity %> | Price: ₹<%= item.price %> | Status: <%= item.status %></p>
-                            </div>
-                        </div>
-                        <div>
-                            <% if (item.status.trim()==='Delivered' ) { %>
-                                <button type="button" onclick="returned('<%= order._id %>','<%= item.product._id %>')" class="action-btn btn-return">RETURN</button>
-                            <% } else if (item.status.trim()==='Ordered') { %>
-                                <button onclick="cancelSingleProduct('<%= item.product._id %>','<%= order._id %>')"
-                                    class="action-btn btn-cancel">CANCEL</button>
+                        <h5 class="mb-4 fw-bold">Order #<%= order.orderId %>
+                        </h5>
+                        <p><strong>Status:</strong>
+                            <% if (order.status.trim()==='Delivered' ) { %>
+                                <span class="badge-status badge-delivered">DELIVERED</span>
+                                <% } else if (order.status.trim()==='Pending' ) { %>
+                                    <span class="badge-status badge-pending">PENDING</span>
+                                    <% } else { %>
+                                        <span class="badge-status badge-other">
+                                            <%= order.status.trim().toUpperCase() %>
+                                        </span>
+                                        <% } %>
+                        </p>
+                        <p><strong>Total Price:</strong> ₹<%= order.totalPrice.toFixed(2) %>
+                        </p>
+                        <p><strong>Final Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %>
+                        </p>
+                        <% if (order.address && order.address.length> 0) { %>
+                            <p><strong>Address:</strong>
+                                <%= order.address[0].name %>,
+                                    <%= order.address[0].streetAddress %>
+                                        <% if (order.address[0].apartment) { %>, <%= order.address[0].apartment %>
+                                                <% } %>,
+                                                    <%= order.address[0].city %>,
+                                                        <%= order.address[0].state %> -
+                                                            <%= order.address[0].pincode %><br>
+                                                                Phone: <%= order.address[0].phone %>
+                                                                    <% if (order.address[0].altPhone) { %><br>Alt Phone:
+                                                                        <%= order.address[0].altPhone %>
+                                                                            <% } %>
+                            </p>
                             <% } else { %>
-                                <span>N/A</span>
-                            <% } %>
-                        </div>
-                    </div>
-                <% }) %>
-                <a href="/orders" class="back-btn">← Back to Orders</a>
-                <button onclick="showDownloadOptions()" class="download-btn">Download Invoice</button>
+                                <p><strong>Address:</strong> Not provided</p>
+                                <% } %>
+                                    <p><strong>Coupon Applied:</strong>
+                                        <%= order.couponApplied ? 'Yes' : 'No' %>
+                                    </p>
+                                    <p><strong>Order Date:</strong>
+                                        <%= order.createdOn.toDateString() %>
+                                    </p>
+                                    <hr>
+                                    <h5 class="mb-3 fw-bold">Ordered Items</h5>
+                                    <% order.orderedItems.forEach(item=> { %>
+                                        <div class="product-detail-card">
+                                            <div class="product-detail-left">
+                                                <img src="<%= item.product.productImage[0] %>"
+                                                    alt="<%= item.product.productName %>">
+                                                <div class="product-detail-text">
+                                                    <h6 class="fw-bold">
+                                                        <%= item.product.productName %>
+                                                    </h6>
+                                                    <p>Quantity: <%= item.quantity %> | Price: ₹<%=
+                                                                item.price.toFixed(2) %> | Status: <%= item.status %> | size : <%=item.size%>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <% if (item.status.trim()==='Delivered' ) { %>
+                                                    <button class="submit-btn btn-return"
+                                                        onclick="returned('<%= order._id %>', '<%= item.product._id %>')">RETURN</button>
+                                                    <% } else if (item.status.trim()==='Ordered' ) { %>
+                                                        <button class="submit-btn btn-cancel"
+                                                            onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>')">CANCEL</button>
+                                                        <% } else { %>
+                                                            <span class="text-muted">N/A</span>
+                                                            <% } %>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                            <div class="mt-4">
+                                                <a href="/orders" class="submit-btn">← Back to Orders</a>
+                                                <button class="submit-btn btn-download"
+                                                    onclick="showDownloadOptions()">Download Invoice</button>
+                                            </div>
+                                            <% } %>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        const showSwal = (config) => {
+            return Swal.fire({
+                ...config,
+                confirmButtonColor: "#B5654B",
+                cancelButtonColor: "#6B4C3B"
+            });
+        };
 
-<script>
-    function cancelSingleProduct(productId, orderId) {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to cancel the order!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, Cancel it!"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.post('/orders/details', { productId, orderId })
-                    .then(response => {
-                        if (response.data.success) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Cancelled!",
-                                text: "Order Cancelled Successfully.",
-                                showConfirmButton: false,
-                                timer: 1200
-                            });
-                            location.reload();
-                        } else {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Cancelled!",
-                                text: response.data.message,
-                                showConfirmButton: false,
-                                timer: 1200
-                            });
-                        }
-                    })
-                    .catch((error) => {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Oops...",
-                            text: "Something went wrong while cancelling the order!"
-                        });
-                    });
-            }
-        });
+        function cancelSingleProduct(productId, orderId) {
+  const reasons = [
+    "Found a better price elsewhere",
+    "Ordered by mistake",
+    "No longer needed",
+    "Expected delivery time too long",
+    "Other"
+  ];
+
+  let optionsHtml = reasons.map(reason =>
+    `<option value="${reason}">${reason}</option>`
+  ).join("");
+
+  Swal.fire({
+    title: "Cancel Product",
+    html: `
+      <p>Select a reason for cancellation:</p>
+      <select id="cancel-reason" class="swal2-input">
+        <option disabled selected>Select a reason</option>
+        ${optionsHtml}
+      </select>
+    `,
+    showCancelButton: true,
+    confirmButtonText: "Yes, Cancel it!",
+    preConfirm: () => {
+      const selectedReason = document.getElementById("cancel-reason").value;
+      if (!selectedReason) {
+        Swal.showValidationMessage("Please select a reason.");
+        return false;
+      }
+      return selectedReason;
     }
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.post('/orders/cancel-item', {
+          productId,
+          orderId,
+          reason: result.value
+        });
 
-    function returned(orderId, productId) {
-        Swal.fire({
-            title: 'Return: Product',
-            input: 'textarea',
-            inputLabel: 'Reason for return',
-            inputPlaceholder: 'Enter your reason here...',
-            inputAttributes: {
-                'aria-label': 'Reason for return'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Submit',
-            preConfirm: (reason) => {
-                if (!reason.trim()) {
-                    Swal.showValidationMessage('Reason is required');
-                } else {
+        if (response.data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Cancelled!",
+            text: "Item cancelled successfully.",
+            showConfirmButton: false,
+            timer: 1200
+          }).then(() => location.reload());
+        } else {
+          Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
+        }
+      } catch (error) {
+        Swal.fire("Oops...", "Something went wrong while cancelling the item.", "error");
+      }
+    }
+  });
+}
+
+        function returned(orderId, productId) {
+            showSwal({
+                title: 'Return Product',
+                input: 'textarea',
+                inputLabel: 'Reason for return',
+                inputPlaceholder: 'Enter your reason here...',
+                inputAttributes: { 'aria-label': 'Reason for return' },
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                preConfirm: (reason) => {
+                    if (!reason.trim()) {
+                        Swal.showValidationMessage('Reason is required');
+                    }
                     return reason;
                 }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.patch('/orders/return', {
-                    orderId,
-                    productId,
-                    reason: result.value
-                }).then(response => {
-                    if (response.data.success) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Return Requested!",
-                            text: "Your return request has been submitted.",
-                            showConfirmButton: false,
-                            timer: 1500
-                        }).then(() => {
-                            location.reload();
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.patch('/orders/return', { orderId, productId, reason: result.value })
+                        .then(response => {
+                            if (response.data.success) {
+                                showSwal({
+                                    icon: "success",
+                                    title: "Return Requested!",
+                                    text: "Your return request has been submitted.",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => location.reload());
+                            } else {
+                                showSwal({
+                                    icon: "error",
+                                    title: "Oops!",
+                                    text: response.data.message || "Return request failed."
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            showSwal({
+                                icon: "error",
+                                title: "Oops!",
+                                text: "Something went wrong while submitting return request."
+                            });
                         });
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Oops!",
-                            text: response.data.message || "Return request failed.",
-                        });
-                    }
-                }).catch(error => {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops!",
-                        text: "Something went wrong while submitting return request.",
-                    });
-                });
-            }
-        });
-    }
-
-    function showDownloadOptions() {
-        Swal.fire({
-            title: 'Download Invoice',
-            text: 'Choose the format to download the invoice:',
-            showCancelButton: true,
-            confirmButtonText: 'Excel',
-            cancelButtonText: 'JPG',
-            showDenyButton: true,
-            denyButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                downloadExcel();
-            } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
-                downloadJPG();
-            }
-        });
-    }
-
-    function downloadExcel() {
-        console.log("haii excel")
-        const orderData = {
-            orderId: '<%= order.orderId %>',
-            status: '<%= order.status %>',
-            totalPrice: '₹<%= order.totalPrice %>',
-            finalAmount: '₹<%= order.finalAmount %>',
-            address: <% if (order.address && order.address.length > 0) { %>'<%= order.address[0].name %>, <%= order.address[0].streetAddress %><%= order.address[0].apartment ? ", " + order.address[0].apartment : "" %>, <%= order.address[0].city %>, <%= order.address[0].state %> - <%= order.address[0].pincode %>, Phone: <%= order.address[0].phone %><%= order.address[0].altPhone ? ", Alt Phone: " + order.address[0].altPhone : "" %>'<% } else { %>'No address provided'<% } %>,
-            couponApplied: '<%= order.couponApplied ? "Yes" : "No" %>',
-            orderDate: '<%= order.createdOn.toDateString() %>',
-            orderedItems: [
-                <% order.orderedItems.forEach((item, index) => { %>
-                    {
-                        productName: '<%= item.product.productName %>',
-                        quantity: <%= item.quantity %>,
-                        price: '₹<%= item.price %>',
-                        status: '<%= item.status %>'
-                    }<%= index < order.orderedItems.length - 1 ? ',' : '' %>
-                    <% }) %>
-                ]
-            };
-            
-            const worksheetData = [
-                ['Order ID', orderData.orderId],
-                ['Status', orderData.status],
-                ['Total Price', orderData.totalPrice],
-                ['Final Amount', orderData.finalAmount],
-                ['Address', orderData.address],
-                ['Coupon Applied', orderData.couponApplied],
-                ['Order Date', orderData.orderDate],
-                [],
-                ['Ordered Items'],
-                ['Product Name', 'Quantity', 'Price', 'Status']
-            ];
-            
-            orderData.orderedItems.forEach(item => {
-                worksheetData.push([
-                    item.productName,
-                    item.quantity,
-                    item.price,
-                    item.status
-                ]);
+                }
             });
-            
-            const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Order Details');
-            XLSX.write(wb, 'Order_<%= order.orderId %>.xlsx');
         }
-        
+
+        function showDownloadOptions() {
+            showSwal({
+                title: 'Download Invoice',
+                text: 'Choose the format to download the invoice:',
+                showCancelButton: true,
+                confirmButtonText: 'Excel',
+                cancelButtonText: 'JPG',
+                showDenyButton: true,
+                denyButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    downloadExcel();
+                } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
+                    downloadJPG();
+                }
+            });
+        }
+
+        function downloadExcel() {
+            console.log("Generating Excel");
+            const orderData = {
+                orderId: '<%= order.orderId %>',
+                status: '<%= order.status %>',
+                totalPrice: '₹<%= order.totalPrice.toFixed(2) %>',
+                finalAmount: '₹<%= order.finalAmount.toFixed(2) %>',
+                address: <% if(order.address && order.address.length > 0) { %> '<%= order.address[0].name %>, <%= order.address[0].streetAddress %><%= order.address[0].apartment ? ", " + order.address[0].apartment : "" %>, <%= order.address[0].city %>, <%= order.address[0].state %> - <%= order.address[0].pincode %>, Phone: <%= order.address[0].phone %><%= order.address[0].altPhone ? ", Alt Phone: " + order.address[0].altPhone : "" %>' <% } else { %> 'No address provided' <% } %>,
+                    couponApplied: '<%= order.couponApplied ? "Yes" : "No" %>',
+                        orderDate: '<%= order.createdOn.toDateString() %>',
+                            orderedItems: [
+        <% order.orderedItems.forEach((item, index) => { %>
+                            {
+                                productName: '<%= item.product.productName %>',
+                                quantity: <%= item.quantity %>,
+                                price: '₹<%= item.price.toFixed(2) %>',
+                                status: '<%= item.status %>'
+                            } <%= index < order.orderedItems.length - 1 ? ',' : '' %>
+        <% }) %>
+      ]
+    };
+
+        const worksheetData = [
+            ['Order ID', orderData.orderId],
+            ['Status', orderData.status],
+            ['Total Price', orderData.totalPrice],
+            ['Final Amount', orderData.finalAmount],
+            ['Address', orderData.address],
+            ['Coupon Applied', orderData.couponApplied],
+            ['Order Date', orderData.orderDate],
+            [],
+            ['Ordered Items'],
+            ['Product Name', 'Quantity', 'Price', 'Status']
+        ];
+
+        orderData.orderedItems.forEach(item => {
+            worksheetData.push([
+                item.productName,
+                item.quantity,
+                item.price,
+                item.status
+            ]);
+        });
+
+        const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Order Details');
+        XLSX.write(wb, 'Order_<%= order.orderId %>.xlsx');
+  }
+
         function downloadJPG() {
-            console.log("haii excel")
-            const element = document.getElementById('order-info-box');
+            console.log("Generating JPG");
+            const element = document.getElementById('product-detail-section');
             html2canvas(element, { scale: 2 }).then(canvas => {
                 const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/jpeg');
-            link.download = 'Order_<%= order.orderId %>.jpg';
-            link.click();
-        }).catch(error => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Something went wrong while generating the JPG!'
+                link.href = canvas.toDataURL('image/jpeg');
+                link.download = 'Order_<%= order.orderId %>.jpg';
+                link.click();
+            }).catch(error => {
+                showSwal({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong while generating the JPG!'
+                });
             });
-        });
-    }
-</script>
+        }
+    </script>
 
-<%- include('../partials/userPartial/footer') %>
+    <%- include("../../views/partials/userPartial/footer") %>

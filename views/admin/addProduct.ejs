@@ -60,29 +60,45 @@
     max-width: 900px;
     margin: 0 auto;
   }
+
+  .image-preview {
+    max-width: 150px;
+    max-height: 150px;
+    margin-top: 10px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .error-message {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+    display: none;
+  }
 </style>
 
 <div class="product-form">
-  <form name="productForm" id="productForm" action="/admin/add-product" method="POST" enctype="multipart/form-data">
+  <form name="productForm" id="add-productForm" action="/admin/add-product" method="POST" enctype="multipart/form-data">
     <div class="row mb-4">
       <div class="col-12 col-md-6">
         <div class="mb-3">
           <label class="form-label">Product Name:</label>
-          <p id="name-error"></p>
-          <input type="text" class="form-control" id="name" name="name" required pattern="^[A-Za-z ]+$"
+          <div id="name-error" class="error-message"></div>
+          <input type="text" class="form-control" id="name" name="ProductName" required pattern="^[A-Za-z ]+$"
             title="Only alphabets and spaces allowed." />
         </div>
 
         <div class="mb-3">
           <label class="form-label">Product Description:</label>
-          <p id="description-error"></p>
+          <div id="description-error" class="error-message"></div>
           <textarea class="form-control" id="description" name="description" rows="3" required pattern="^[A-Za-z ]+$"
             title="Only alphabets and spaces allowed."></textarea>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Product Category:</label>
-          <p id="category-error"></p>
+          <div id="category-error" class="error-message"></div>
           <select class="form-select" id="category" name="category" required>
             <option value="" selected disabled>Select categories</option>
             <% categories.forEach(category => { %>
@@ -95,30 +111,42 @@
 
         <div class="mb-3">
           <label class="form-label">Offer (%):</label>
-          <p id="offer-error"></p>
+          <div id="offer-error" class="error-message"></div>
           <input type="number" class="form-control" id="offer" name="offer" min="0" max="99" placeholder="Optional" />
         </div>
+
         <div class="mb-3">
           <label class="form-label">Price</label>
-          <p id="price-error"></p>
-          <input type="number" class="form-control" id="price" name="price" min="0"
-            placeholder="Greater than SalesPrice" />
+          <div id="price-error" class="error-message"></div>
+          <input type="number" class="form-control" id="price" name="price" min="0" placeholder="Greater than SalesPrice" required />
         </div>
+
         <div class="mb-3">
           <label class="form-label">Sales Price</label>
-          <p id="salesPrice-error"></p>
-          <input type="number" class="form-control" id="salesPrice" name="salesPrice" min="1"
-            placeholder="Enter the salesPrice" />
+          <div id="salesPrice-error" class="error-message"></div>
+          <input type="number" class="form-control" id="salesPrice" name="salesPrice" min="0" placeholder="Less than Price" required />
         </div>
-        <div class="mb-3">
-          <label class="form-label">Size</label>
-          <p id="Size-error"></p>
-          <input type="text" class="form-control" id="size" name="Size" min="1" placeholder="Enter the Size" />
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Stock</label>
-          <p id="Stock-error"></p>
-          <input type="number" class="form-control" id="stock" name="Stock" min="0" placeholder="Enter the Stock" />
+
+        <div class="mb-3" id="variant-section">
+          <label class="form-label">Product Variants:</label>
+          <div id="variant-container">
+            <div class="variant-row d-flex gap-2 mb-2">
+              <div>
+                <div id="variantSize-error-0" class="error-message"></div>
+                <input type="text" id="variant-size" name="variantSize[]" class="form-control" placeholder="Size" required />
+              </div>
+              <div>
+                <div id="variantSalePrice-error-0" class="error-message"></div>
+                <input type="number" id="variant-salePrice" name="variantSalePrice[]" class="form-control" placeholder="Sale Price" required />
+              </div>
+              <div>
+                <div id="variantQuantity-error-0" class="error-message"></div>
+                <input type="number" id="variant-quantity" name="variantQuantity[]" class="form-control" placeholder="Quantity" required />
+              </div>
+              <button type="button" class="btn btn-danger" onclick="removeVariant(this)">✖</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary mt-2" onclick="addVariant()">+ Add Variant</button>
         </div>
       </div>
     </div>
@@ -128,11 +156,11 @@
       <% for (let i = 1; i <= 4; i++) { %>
         <div class="image-upload-group" id="images">
           <label for="image<%= i %>">Image <%= i %></label>
+          <div id="image<%= i %>-error" class="error-message"></div>
           <input type="file" name="image<%= i %>" id="image<%= i %>" class="form-control" accept=".jpg, .jpeg, .png"
             onchange="previewImage(event, <%= i %>)">
           <img id="preview<%= i %>" src="#" alt="Image preview" class="image-preview" style="display: none;">
           <button type="button" class="btn btn-primary mt-2" onclick="cropImage(<%= i %>)">Save Image <%= i %></button>
-          <div id="image<%= i %>-error" class="error-message"></div>
           <div class="croppedPreview<%= i %>"></div>
         </div>
       <% } %>
@@ -148,117 +176,140 @@
 <script src="https://unpkg.com/sweetalert2@11"></script>
 
 <script>
+  let variantCount = 0;
+
   function clearErrorMessages() {
     const errorElements = document.querySelectorAll(".error-message");
-    errorElements.forEach((el) => (el.textContent = ""));
+    errorElements.forEach((el) => {
+      el.textContent = "";
+      el.style.display = "none";
+    });
   }
 
   function displayErrorMessage(elementId, message) {
     const errorElement = document.getElementById(elementId);
     if (errorElement) {
       errorElement.textContent = message;
-      errorElement.style.color = "#ef4444";
+      errorElement.style.display = "block";
     }
   }
 
   function validateForm() {
-    clearErrorMessages();
-    const name = document.getElementById("name").value.trim();
-    const description = document.getElementById("description").value.trim();
-    const offer = document.getElementById("offer").value.trim();
-    const price = document.getElementById("price").value.trim();
-    const salesPrice = document.getElementById("salesPrice").value.trim();
-    const category = document.getElementById("category").value;
-    const size = document.getElementById("size").value.trim();
-    const stock = document.getElementById("stock").value.trim();
-    const form = document.getElementById("productForm");
+  clearErrorMessages();
+  let isValid = true;
 
-    const namePattern = /^[A-Za-z ]+$/;
-    const numberPattern = /^\d+(\.\d{1,2})?$/;
+  // Fetch values
+  const name = document.getElementById("name").value.trim();
+  console.log(name)
+  const description = document.getElementById("description").value.trim();
+  const category = document.getElementById("category").value;
+  const offer = document.getElementById("offer").value.trim();
+  const price = document.getElementById("price").value.trim();
+  const salesPrice = document.getElementById("salesPrice").value.trim();
 
-    let isValid = true;
+  const namePattern = /^[A-Za-z ]+$/;
+  const numberPattern = /^\d+(\.\d{1,2})?$/;
 
-    if (!name) {
-      displayErrorMessage("name-error", "Please enter a product name");
-      isValid = false;
-    } else if (!namePattern.test(name)) {
-      displayErrorMessage("name-error", "Product name should contain only alphabets and spaces");
-      isValid = false;
-    }
-
-    if (!description) {
-      displayErrorMessage("description-error", "Please enter a product description");
-      isValid = false;
-    } else if (!namePattern.test(description)) {
-      displayErrorMessage("description-error", "Product description should contain only alphabets and spaces");
-      isValid = false;
-    }
-
-    if (offer && (isNaN(offer) || offer < 0 || offer > 99)) {
-      displayErrorMessage("offer-error", "Offer should be a number between 0 and 99");
-      isValid = false;
-    }
-
-    if (!price) {
-      displayErrorMessage("price-error", "Please enter a price");
-      isValid = false;
-    } else if (!numberPattern.test(price) || parseFloat(price) < 0) {
-      displayErrorMessage("price-error", "Please enter a valid non-negative price");
-      isValid = false;
-    }
-
-    if (salesPrice && (!numberPattern.test(salesPrice) || parseFloat(salesPrice) < 0)) {
-      displayErrorMessage("salesPrice-error", "Please enter a valid non-negative sales price");
-      isValid = false;
-    }
-
-    if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
-      displayErrorMessage("price-error", "Regular price must be greater than sales price");
-      isValid = false;
-    }
-
-    if (!category) {
-      displayErrorMessage("category-error", "Please select a category");
-      isValid = false;
-    }
-    if (!size) {
-      displayErrorMessage("size-error", "Please enter proper Size");
-      isValid = false;
-    }
-    if (!stock) {
-      displayErrorMessage("stock-error", "Please enter the number");
-      isValid = false;
-    }
-
-    for (let i = 1; i <= 4; i++) {
-      const imageInput = document.getElementById(`image${i}`);
-      imageInput.disabled = true; // Disable original image inputs
-    }
-
-    let imageUploaded = false;
-    for (let i = 1; i <= 4; i++) {
-      const croppedPreview = document.querySelector(`.croppedPreview${i} img`);
-      if (croppedPreview && croppedPreview.src) {
-        imageUploaded = true;
-        break;
-      }
-    }
-    if (!imageUploaded) {
-      Swal.fire({
-        title: "Error!",
-        text: "Please upload and crop at least one product image.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-      isValid = false;
-    }
-
-    return isValid;
+  // Name validation
+  if (!name) {
+    displayErrorMessage("name-error", "Product name is required");
+    isValid = false;
+  } else if (!namePattern.test(name)) {
+    displayErrorMessage("name-error", "Only alphabets and spaces allowed");
+    isValid = false;
   }
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("productForm");
+  // Description validation
+  if (!description) {
+    displayErrorMessage("description-error", "Description is required");
+    isValid = false;
+  } else if (!namePattern.test(description)) {
+    displayErrorMessage("description-error", "Only alphabets and spaces allowed");
+    isValid = false;
+  }
 
+  // Category validation
+  if (!category) {
+    displayErrorMessage("category-error", "Please select a category");
+    isValid = false;
+  }
+
+  // Offer validation (optional)
+  if (offer) {
+    const numOffer = parseInt(offer);
+    if (isNaN(numOffer) || numOffer < 0 || numOffer > 99) {
+      displayErrorMessage("offer-error", "Offer must be a number between 0 and 99");
+      isValid = false;
+    }
+  }
+
+  // Price validation
+  if (!price) {
+    displayErrorMessage("price-error", "Price is required");
+    isValid = false;
+  } else if (!numberPattern.test(price) || parseFloat(price) <= 0) {
+    displayErrorMessage("price-error", "Enter a valid price greater than 0");
+    isValid = false;
+  }
+
+  // Sales Price validation
+  if (!salesPrice) {
+    displayErrorMessage("salesPrice-error", "Sales price is required");
+    isValid = false;
+  } else if (!numberPattern.test(salesPrice) || parseFloat(salesPrice) <= 0) {
+    displayErrorMessage("salesPrice-error", "Enter a valid sales price greater than 0");
+    isValid = false;
+  }
+
+  if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
+    displayErrorMessage("salesPrice-error", "Price must be greater than sales price");
+    isValid = false;
+  }
+
+  // Variant validations
+  const variantSizes = document.getElementsByName("variantSize[]");
+  const variantSalePrices = document.getElementsByName("variantSalePrice[]");
+  const variantQuantities = document.getElementsByName("variantQuantity[]");
+
+  for (let i = 0; i < variantSizes.length; i++) {
+    const size = variantSizes[i].value.trim();
+    const salePrice = variantSalePrices[i].value.trim();
+    const quantity = variantQuantities[i].value.trim();
+
+    if (!size) {
+      displayErrorMessage(`variantSize-error-${i}`, "Size is required");
+      isValid = false;
+    }
+    if (!salePrice || !numberPattern.test(salePrice) || parseFloat(salePrice) <= 0) {
+      displayErrorMessage(`variantSalePrice-error-${i}`, "Valid sale price required");
+      isValid = false;
+    }
+    if (!quantity || isNaN(quantity) || parseInt(quantity) < 0) {
+      displayErrorMessage(`variantQuantity-error-${i}`, "Valid quantity required");
+      isValid = false;
+    }
+  }
+
+  // Image validation (check at least 1 cropped image)
+  let imageUploaded = false;
+  for (let i = 1; i <= 4; i++) {
+    const croppedPreview = document.querySelector(`.croppedPreview${i} img`);
+    if (croppedPreview && croppedPreview.src) {
+      imageUploaded = true;
+      break;
+    }
+  }
+  if (!imageUploaded) {
+    displayErrorMessage("image1-error", "Please upload and crop at least one image");
+    isValid = false;
+  }
+
+  return isValid;
+}
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+const form = document.getElementById("add-productForm")
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
 
@@ -280,7 +331,7 @@
             },
           });
 
-          const data = resp.data;
+          const data = resp.data
           if (data.success) {
             Swal.fire({
               title: "Success!",
@@ -328,22 +379,11 @@
     const input = event.target;
     const file = input.files[0];
 
-    // Define allowed file types
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
     if (file) {
-      console.log(`File selected for image${index}:`, file.name);
-
-      // Check if the file type is allowed
       if (!allowedTypes.includes(file.type)) {
-        Swal.fire({
-          title: 'Error!',
-          text: 'Only JPG, JPEG, and PNG images are allowed.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-
-        // Clear the input
+        displayErrorMessage(`image${index}-error`, "Only JPG, JPEG, and PNG images are allowed");
         input.value = '';
         const preview = document.getElementById(`preview${index}`);
         preview.style.display = 'none';
@@ -385,46 +425,29 @@
             });
           } catch (error) {
             console.error(`Error initializing Cropper for image ${index}:`, error);
-            Swal.fire({
-              title: "Error!",
-              text: "Failed to initialize image cropper.",
-              icon: "error",
-              confirmButtonText: "OK",
-            });
+            displayErrorMessage(`image${index}-error`, "Failed to initialize image cropper");
           }
         };
 
         preview.onerror = function () {
           console.error(`Error loading image for preview${index}`);
-          Swal.fire({
-            title: "Error!",
-            text: "Failed to load the image for cropping.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
+          displayErrorMessage(`image${index}-error`, "Failed to load the image for cropping");
         };
       };
       reader.readAsDataURL(file);
-    } else {
-      console.log(`No file selected for image${index}`);
     }
   }
 
   function cropImage(index) {
     if (!croppers[index]) {
-      Swal.fire({
-        title: "Error!",
-        text: "Please select an image first.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      displayErrorMessage(`image${index}-error`, "Please select an image first");
       return;
     }
 
     try {
       const canvas = croppers[index].getCroppedCanvas({
-        width: 800,
-        height: 800,
+        width: 200,
+        height: 200,
         imageSmoothingEnabled: true,
         imageSmoothingQuality: "high",
       });
@@ -469,12 +492,34 @@
       });
     } catch (error) {
       console.error(`Error cropping image ${index}:`, error);
-      Swal.fire({
-        title: "Error!",
-        text: "Failed to crop the image.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      displayErrorMessage(`image${index}-error`, "Failed to crop the image");
     }
+  }
+
+  function addVariant() {
+    variantCount++;
+    const container = document.getElementById('variant-container');
+    const variantRow = document.createElement('div');
+    variantRow.className = 'variant-row d-flex gap-2 mb-2';
+    variantRow.innerHTML = `
+      <div>
+        <div id="variantSize-error-${variantCount}" class="error-message"></div>
+        <input type="text" name="variantSize[]" class="form-control" placeholder="Size" required />
+      </div>
+      <div>
+        <div id="variantSalePrice-error-${variantCount}" class="error-message"></div>
+        <input type="number" name="variantSalePrice[]" class="form-control" placeholder="Sale Price" required />
+      </div>
+      <div>
+        <div id="variantQuantity-error-${variantCount}" class="error-message"></div>
+        <input type="number" name="variantQuantity[]" class="form-control" placeholder="Quantity" required />
+      </div>
+      <button type="button" class="btn btn-danger" onclick="removeVariant(this)">✖</button>
+    `;
+    container.appendChild(variantRow);
+  }
+
+  function removeVariant(btn) {
+    btn.parentElement.remove();
   }
 </script>

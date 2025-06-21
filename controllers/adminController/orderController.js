@@ -3,6 +3,7 @@ const Product = require('../../models/productSchema')
 const Order = require("../../models/orderSchema")
 const mongoose = require('mongoose')
 const Wallet = require('../../models/walletSchema')
+const StatusCode = require('../../statusCode')
 
 const loadOrder = async (req, res) => {
     try {
@@ -31,7 +32,7 @@ const loadOrder = async (req, res) => {
         })
     } catch (error) {
         console.error(error)
-        res.redirect('/pageNotFound')
+        res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
     }
 }
 const loadViewDetails = async (req, res) => {
@@ -42,7 +43,7 @@ const loadViewDetails = async (req, res) => {
         return res.render('viewDetails', { order })
     } catch (error) {
         console.error(error)
-        res.redirect('/pageNotFound')
+        res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
     }
 }
 
@@ -52,24 +53,24 @@ const updateOrderStatus = async (req, res) => {
         console.log(req.body)
 
         if (!['Pending', 'Shipped', 'Out For Delivery', 'Delivered'].includes(newStatus)) {
-            return res.status(400).json({ success: false, message: 'Invalid status value' });
+            return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid status value' });
         }
 
-        const order = await Order.findById( orderId );
+        const order = await Order.findById(orderId);
         if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
+            return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Order not found' });
         }
 
         if (newStatus === 'Delivered') {
             if (!order.orderedItems || !Array.isArray(order.orderedItems)) {
-                return res.status(500).json({ success: false, message: 'Invalid order items' });
+                return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid order items' });
             }
             order.orderedItems.forEach((item) => {
-                if(item.status!=='Cancelled'){
+                if (item.status !== 'Cancelled') {
                     item.status = 'Delivered';
                 }
             });
-            order.markModified('orderedItems'); 
+            order.markModified('orderedItems');
         }
 
         order.status = newStatus;
@@ -78,7 +79,7 @@ const updateOrderStatus = async (req, res) => {
         return res.json({ success: true, message: 'Order status updated successfully' });
     } catch (error) {
         console.error('Update status error:', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
     }
 };
 
@@ -89,7 +90,7 @@ const verifyRequest = async (req, res) => {
 
         const order = await Order.findById(orderId);
         if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
+            return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Order not found' });
         }
 
         const id = new mongoose.Types.ObjectId(productId);
@@ -106,7 +107,7 @@ const verifyRequest = async (req, res) => {
         });
 
         if (!itemFound) {
-            return res.status(404).json({ success: false, message: 'Product not found in order' });
+            return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found in order' });
         }
 
         if (order.orderedItems.length === 1) {
@@ -115,8 +116,8 @@ const verifyRequest = async (req, res) => {
 
         if (action === 'Returned') {
             const product = await Product.findById(id)
-            console.log("productItem:",productItem)
-            let total = product.quatity+productItem.quantity
+            console.log("productItem:", productItem)
+            let total = product.quatity + productItem.quantity
             product.quatity = total
             await product.save()
             const userId = order.userId;
@@ -128,7 +129,7 @@ const verifyRequest = async (req, res) => {
                 amount: refundAmount,
                 description: `Refund of ${orderId}`,
                 date: new Date(),
-                reason:'Return'
+                reason: 'Return'
             };
 
             if (!wallet) {
@@ -147,10 +148,10 @@ const verifyRequest = async (req, res) => {
         }
 
         await order.save();
-        return res.status(200).json({ success: true, message: `Return request ${action === 'Returned' ? 'accepted' : 'rejected'} successfully.` });
+        return res.status(StatusCode.OK).json({ success: true, message: `Return request ${action === 'Returned' ? 'accepted' : 'rejected'} successfully.` });
     } catch (error) {
         console.error('Return verification error:', error);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
+        return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
     }
 };
 

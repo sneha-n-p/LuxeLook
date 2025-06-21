@@ -1,6 +1,6 @@
 <%-include("../../views/partials/userPartial/header")%>
 
-<style>
+<!-- <style>
     body {
         background: #fff;
         font-family: 'Poppins', sans-serif;
@@ -118,22 +118,206 @@
     .small {
         font-size: 12px;
     }
+</style> -->
+
+<style>
+body {
+    background: #f4f4f4;
+    font-family: 'Poppins', sans-serif;
+    color: #1a1a1a;
+}
+
+.banner {
+    height: 250px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner h1 {
+    color: #fff;
+    font-size: 3.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.cart-table {
+    background: #F2E8DC;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.cart-table th {
+    background: #000;
+    color: #fff;
+    padding: 16px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cart-table td {
+    vertical-align: middle;
+    padding: 20px 14px;
+    font-size: 14px;
+}
+
+.cart-product-img {
+    height: 110px;
+    width: 90px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+.quantity-input {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    text-align: center;
+    background: #F2E8DC;
+    color: #000;
+}
+
+.cart-totals-box {
+    border-radius: 14px;
+    padding: 28px;
+    background: #F2E8DC;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.cart-totals-box h5 {
+    font-size: 17px;
+    font-weight: 600;
+    color: #000;
+}
+
+.cart-totals-box span {
+    font-size: 14px;
+}
+
+.checkout-btn {
+ background: linear-gradient(90deg, #B5654B  , #D17C63 );
+    color: #fff;
+    border: none;
+    padding: 12px 36px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.checkout-btn:hover {
+    background: #333;
+}
+
+.btn-outline-dark {
+    border-radius: 35px;
+    padding: 8px 22px;
+    font-size: 0.9rem;
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-dark:hover {
+    background: #000;
+    color: #fff;
+}
+
+.btn-dark {
+    background: #000;
+    border: none;
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+.btn-dark:hover {
+    background: #333;
+    color: #fff;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 25px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.Empty-cart {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.Empty-cart span {
+    font-size: 26px;
+    font-weight: 600;
+    color: #444;
+}
+
+.Empty-cart button {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.Empty-cart button:hover {
+    background-color: #333;
+}
+
+.text-danger {
+    color: red;
+}
+
+.small {
+    font-size: 12px;
+}
+
+.hero h1 {
+    color: #ffffff;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.table th, .table td {
+    vertical-align: middle !important;
+}
 </style>
+
 
 <section class="hero text-center bg-light p-0 mb-4">
     <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
         style="height: 400px; object-fit: cover;">
-    <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">CART</h1>
+<h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg" style="text-shadow: 2px 2px 8px black;">CART</h1>
 </section>
 
 <div class="container my-5">
     <% if (cart.length > 0) { %>
-    <table class="table cart-table text-center">
+    <table class="table cart-table text-center ">
         <thead>
             <tr>
                 <th></th>
                 <th>Product</th>
                 <th>Price</th>
+                <th>Size</th>
                 <th>Quantity</th>
                 <th>Total</th>
                 <th>Action</th>
@@ -142,8 +326,9 @@
         <tbody>
             <% for (let product of cart) { 
                 const quantity = product.quantity < 1 ? 1 : product.quantity;
-                const price = product.productId.salePrice;
-                const totalPrice = price * quantity;
+                const price = product.price;
+                const size = product.size;
+                const totalPrice = product.totalPrice;
                 const available = product.productId.quatity;
             %>
             <tr>
@@ -153,6 +338,7 @@
                     <small><%= product.productId.description %></small>
                 </td>
                 <td>₹<%= price %></td>
+                <td><%=size%></td>
                 <td>
                     <% if (available <= 0) { %>
                         <input type="number" value="0" class="quantity-input" disabled>

@@ -102,21 +102,31 @@
                 <p id="price-error"></p>
                 <input type="number" class="form-control" id="price" value="<%=product.regularPrice%>" name="price" min="0" placeholder="Greater than SalesPrice" />
             </div>
-            <div class="mb-3">
-                <label class="form-label">Sales Price</label>
-                <p id="salesPrice-error"></p>
-                <input type="number" class="form-control" id="salesPrice" value="<%=product.salePrice%>" name="salesPrice" min="0" placeholder="Optional" />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Size</label>
-                <p id="size-error"></p>
-                <input type="text" class="form-control" id="size" value="<%=product.size%>" name="Size" placeholder="Enter the Size" />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Stock</label>
-                <p id="stock-error"></p>
-                <input type="number" class="form-control" id="stock" value="<%=product.quatity%>" name="Stock" min="0" placeholder="Enter the Stock" />
-            </div>
+            <div id="variant-section">
+  <label class="form-label">Product Variants</label>
+  <div id="variant-container">
+    <% if (product.variant && product.variant.length > 0) { %>
+      <% product.variant.forEach((v, i) => { %>
+        <div class="variant-row mb-3" data-index="<%= i %>">
+          <input type="text" name="variantSize[]" class="form-control d-inline w-25 me-2" value="<%= v.size %>" placeholder="Size" required />
+          <input type="number" name="variantPrice[]" class="form-control d-inline w-25 me-2" value="<%= v.salePrice %>" placeholder="Sales Price" required />
+          <input type="number" name="variantQuantity[]" class="form-control d-inline w-25 me-2" value="<%= v.quantity %>" placeholder="Stock" required />
+          <button type="button" class="btn btn-danger" onclick="removeVariant(this)">Remove</button>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <!-- If no variants exist -->
+      <div class="variant-row mb-3" data-index="0">
+        <input type="text" name="variantSize[]" class="form-control d-inline w-25 me-2" placeholder="Size" required />
+        <input type="number" name="variantPrice[]" class="form-control d-inline w-25 me-2" placeholder="Sales Price" required />
+        <input type="number" name="variantQuantity[]" class="form-control d-inline w-25 me-2" placeholder="Stock" required />
+        <button type="button" class="btn btn-danger" onclick="removeVariant(this)">Remove</button>
+      </div>
+    <% } %>
+  </div>
+  <button type="button" class="btn btn-primary mt-2" onclick="addVariant()">+ Add Variant</button>
+</div>
+
         </div>
 
         <div class="mb-4">
@@ -367,4 +377,24 @@ form.addEventListener('submit', async function (event) {
         Swal.fire('Error', `An error occurred during submission: ${error.message}`, 'error');
     }
 });
+
+function addVariant() {
+    const container = document.getElementById("variant-container");
+    const index = container.children.length;
+    const newVariant = document.createElement("div");
+    newVariant.className = "variant-row mb-3";
+    newVariant.dataset.index = index;
+    newVariant.innerHTML = `
+      <input type="text" name="variantSize[]" class="form-control d-inline w-25 me-2" placeholder="Size" required />
+      <input type="number" name="variantPrice[]" class="form-control d-inline w-25 me-2" placeholder="Sales Price" required />
+      <input type="number" name="variantQuantity[]" class="form-control d-inline w-25 me-2" placeholder="Stock" required />
+      <button type="button" class="btn btn-danger" onclick="removeVariant(this)">Remove</button>
+    `;
+    container.appendChild(newVariant);
+  }
+
+  function removeVariant(button) {
+    const row = button.closest(".variant-row");
+    if (row) row.remove();
+  }
 </script>

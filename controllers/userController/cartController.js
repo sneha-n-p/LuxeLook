@@ -7,6 +7,7 @@ const Address = require("../../models/addressSchema")
 const Coupon = require("../../models/couponSchema")
 const env = require("dotenv").config()
 const mongoose = require('mongoose')
+const StatusCode = require("../../statusCode")
 
 const loadcart = async (req, res) => {
     try {
@@ -32,7 +33,7 @@ const loadcart = async (req, res) => {
         }).countDocuments()
 
         const totalPages = Math.ceil(count / limit);
-        
+
 
         if (req.session.user) {
             const id = req.session.user
@@ -43,7 +44,7 @@ const loadcart = async (req, res) => {
             console.log('items:', items)
             const subTotal = items.reduce((acc, curr) => {
                 return acc + (curr.totalPrice || 0);
-            }, 0);
+            }, 0); 
 
             res.render("cart", {
                 cart: items,
@@ -57,7 +58,7 @@ const loadcart = async (req, res) => {
         }
     } catch (error) {
         console.error(error)
-        res.redirect("/pageNotFound")
+        res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
     }
 }
 
@@ -84,11 +85,11 @@ const procedToCheckOut = async (req, res) => {
                 }
             );
         }
-        return res.json({ success: true });
+        return res.status(StatusCode.OK).json({ success: true });
 
     } catch (error) {
         console.error("Error updating cart quantities:", error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
     }
 };
 
@@ -99,22 +100,25 @@ const procedToCheckOut = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
-        const productId = req.body.productId
+        const {productId,quantity,size} = req.body
         const productData = await Product.findById(productId)
+        const variant = productData.variant.filter((variant)=>variant.size === size)
+        console.log(variant)
         const userId = req.session.user
         const cart = await Cart.findOne({ userId })
         const newCart = {
             productId: productId,
-            quantity: 1,
-            price: productData.salePrice,
-            totalPrice: productData.salePrice * 1
+            quantity: quantity,
+            size : size,
+            price: variant[0].salePrice,
+            totalPrice: variant[0].salePrice * quantity
         }
         const user = await User.findById(userId)
         const wishlistIndex = user.wishlist.indexOf(productId);
         if (wishlistIndex !== -1) {
             user.wishlist.splice(wishlistIndex, 1);
             await user.save();
-        }
+        }//daaa enthokernnuuu   git
         if (cart) {
 
             const existingItem = cart.items.find(item =>
@@ -124,22 +128,22 @@ const addToCart = async (req, res) => {
                 existingItem.quantity += 1
                 existingItem.totalPrice = existingItem.quantity * existingItem.price
                 await cart.save()
-                return res.status(200).json({ success: true, message: "Product Added Succesfully" })
+                return res.status(StatusCode.OK).json({ success: true, message: "Product Added Succesfully" })
             }
             cart.items.push(newCart)
             await cart.save()
-            return res.status(200).json({ success: true, message: "Product Added Succesfully" })
+            return res.status(StatusCode.OK).json({ success: true, message: "Product Added Succesfully" })
         }
         const saveCartData = new Cart({
             userId: userId,
             items: [newCart]
         })
         await saveCartData.save()
-        return res.status(200).json({ success: true, message: "Product Added To Cart" })
+        return res.status(StatusCode.OK).json({ success: true, message: "Product Added To Cart" })
 
     } catch (error) {
         console.error(error)
-        return res.status(500).json({ success: false, message: "Server Error" })
+        return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" })
     }
 }
 
@@ -152,11 +156,11 @@ const removeProductCart = async (req, res) => {
         console.log('index:', index);
         await cart.items.splice(index, 1)
         await cart.save()
-        return res.status(200).json({ success: true, cartCount: cart.items.length });
+        return res.status(StatusCode.OK).json({ success: true, cartCount: cart.items.length });
 
     } catch (error) {
         console.error(error)
-        return res.status(500).json({ success: false, message: "Server Error" })
+        return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" })
     }
 }
 
@@ -171,7 +175,7 @@ const loadCheckOut = async (req, res) => {
         let razorpayKey = process.env.RAZORPAY_KEY_ID
         if (cart && cart.items.length > 0) {
             cartItems = cart.items.map(item => {
-                const totalPrice = item.productId.salePrice * item.quantity;
+                const totalPrice = item.totalPrice;
                 subtotal += totalPrice;
                 return {
                     product: {
@@ -179,25 +183,27 @@ const loadCheckOut = async (req, res) => {
                         imageUrl: item.productId.productImage[0],
                     },
                     quantity: item.quantity,
-                    totalPrice: totalPrice
+                    totalPrice: totalPrice,
+                    size:item.size
                 };
             });
         }
         if (address) {
             const addresses = address.address
+            console.log('Address:', addresses)
             console.log('cartItems:', cartItems)
-            const delivery = subtotal > 1000 ? 0 : 50
+            const delivery = 0
             const discount = 0
             const finalTotal = subtotal + delivery - discount;
 
-const coupons = await Coupon.find({
-  minimumPrice: { $lte: finalTotal },
-  $or: [
-    { restricted: false },
-    { restricted: true, userId: new mongoose.Types.ObjectId(userId) }
-  ]
-});
-console.log('coupons:',coupons)
+            const coupons = await Coupon.find({
+                minimumPrice: { $lte: finalTotal },
+                $or: [
+                    { restricted: false },
+                    { restricted: true, userId: new mongoose.Types.ObjectId(userId) }
+                ]
+            });
+            console.log('coupons:', coupons)
 
 
             res.render('checkout', {
@@ -233,7 +239,7 @@ console.log('coupons:',coupons)
 
     } catch (error) {
         console.error(error);
-        res.redirect('/pageNotFound');
+        res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound');
     }
 }
 

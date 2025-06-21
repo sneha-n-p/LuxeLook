@@ -5,10 +5,11 @@ const fs = require("fs")
 const path = require("path")
 const sharp = require("sharp")
 const mongoose = require("mongoose")
+const StatusCode = require("../../statusCode")
 
 
-const productInfo = async (req, res) => {
-  try{
+const productInfo = async (req, res) => {//daa user le alleaah
+  try {
     let search = ""
     if (req.query.search) {
       search = req.query.search
@@ -46,78 +47,176 @@ const loadAddProduct = async (req, res) => {
     res.render("addProduct", { categories });
   } catch (error) {
     console.error(error);
-    res.status(404).redirect("/admin/pageError");
+    res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError");
   }
 };
 
 const addproduct = async (req, res) => {
   try {
-    console.log("Request received at /admin/addProducts")
-    console.log("Form Data:", req.body)
-    console.log("Uploaded Files:", req.files)
-
     const {
-      name,
+      ProductName,
       description,
       category,
       offer,
       price,
       salesPrice,
-      Stock,
-      Size,
-      croppedImage
-    } = req.body
+      variantSize,
+      variantSalePrice,
+      variantQuantity
+    } = req.body;
+    const errors = {};
 
-    // console.log('Variants received:', variants)
-
-    if (!name || !description || !price || !salesPrice || !category) {
-      return res.status(500).json({ success: false, message: "All fields are required." })
+    // Validation logic
+    if (!ProductName || !/^[A-Za-z ]+$/.test(ProductName)) {
+      errors.name = "Product name is required and should contain only alphabetsDefaulters alphabets and spaces";
     }
 
-    const categoryDoc = await Category.findOne({ name: category })
-    if (!categoryDoc || !mongoose.Types.ObjectId.isValid(categoryDoc._id)) {
-      return res.status(500).json({ success: false, message: "Invalid category." })
+    if (!description || !/^[A-Za-z ]+$/.test(description)) {
+      errors.description = "Description is required and should contain only alphabets and spaces";
     }
 
-    let imagesPaths = req.files.map((file, i) => {
-      const fileName = `product-${Date.now()}-${i}-${file.originalname.replace(/\s+/g, "-")}.webp`;
-      const outputPath = path.join(__dirname, "../../public/uploads/products", fileName);
+    if (!category) {
+      errors.category = "Product category is required";
+    }
 
-      try {
-        sharp(file.path)
-          .resize(800, 800, { fit: 'inside', withoutEnlargement: true })
-          .toFormat("webp")
-          .toFile(outputPath);
-      } catch (err) {
-        console.error("Image processing error:", err);
+    if (!price || isNaN(price) || Number(price) <= 0) {
+      errors.price = "Enter a valid price greater than 0";
+    }
+
+    if (!salesPrice || isNaN(salesPrice) || Number(salesPrice) <= 0) {
+      errors.salesPrice = "Enter a valid sales price greater than 0";
+    }
+
+    if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
+      errors.price = "Regular price must be greater than sales price";
+    }
+
+    let variants = [];
+    if (Array.isArray(variantSize)) {
+      for (let i = 0; i < variantSize.length; i++) {
+        if (!variantSize[i]) {
+          errors[`variantSize${i}`] = "Size is required";
+        }
+        if (!variantSalePrice[i] || isNaN(variantSalePrice[i]) || Number(variantSalePrice[i]) <= 0) {
+          errors[`variantSalePrice${i}`] = "Enter a valid sale price greater than 0";
+        }
+        if (!variantQuantity[i] || isNaN(variantQuantity[i]) || Number(variantQuantity[i]) < 0) {
+          errors[`variantQuantity${i}`] = "Enter a valid non-negative quantity";
+        }
+        if (variantSize[i]) {
+          variants.push({
+            size: variantSize[i],
+            salePrice: parseFloat(variantSalePrice[i]),
+            quantity: parseInt(variantQuantity[i]),
+          });
+        }
       }
+    } else if (variantSize) {
+      if (!variantSize) {
+        errors.variantSize = "Size is required";
+      }
+      if (!variantSalePrice || isNaN(variantSalePrice) || Number(variantSalePrice) <= 0) {
+        errors.variantSalePrice = "Enter a valid sale price greater than 0";
+      }
+      if (!variantQuantity || isNaN(variantQuantity) || Number(variantQuantity) < 0) {
+        errors.variantQuantity = "Enter a valid non-negative quantity";
+      }
+      variants.push({
+        size: variantSize,
+        salePrice: parseFloat(variantSalePrice),
+        quantity: parseInt(variantQuantity),
+      });
+    }
+    console.log(errors)
+    if (Object.keys(errors).length > 0) {
+      console.log('Error in validation')
+      return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
+        message: "Validation errors occurred",
+        errors,
+        categories: await Category.find(),
+        formData: req.body
+      });
+    }
 
-      return `/uploads/products/${fileName}`;
-    });
+    const categoryDoc = await Category.findOne({ name: category });
+    if (!categoryDoc || !mongoose.Types.ObjectId.isValid(categoryDoc._id)) {
+      console.log('Error in category')
+      errors.category = "Invalid category";
+      return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
+        message: "Invalid category",
+        errors,
+        categories: await Category.find(),
+        formData: req.body
+      });
+    }
+
+    let imagesPaths = [];
+
+    for (let i = 1; i <= 4; i++) {
+      const file = req.files.find(f => f.fieldname === `image${i}`);
+      if (file) {
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(file.mimetype)) {
+          errors[i] = "Only JPG, JPEG, and PNG images are allowed";
+        } else {
+          const fileName = `product-${Date.now()}-${i}-${file.originalname.replace(/\s+/g, "-")}.webp`;
+          const outputPath = path.join(__dirname, "../../public/uploads/products", fileName);
+
+          try {
+            await sharp(file.path)
+              .resize(800, 800, { fit: 'inside', withoutEnlargement: true })
+              .toFormat("webp")
+              .toFile(outputPath);
+
+            imagesPaths.push(`/uploads/products/${fileName}`);
+          } catch (err) {
+            console.error("Image processing error:", err);
+            errors[i] = "Failed to process image";
+          }
+        }
+      }
+    }
 
 
-    console.log(imagesPaths);
 
+    if (imagesPaths.length === 0) {
+      errors.image1 = "At least one image is required";
+    }
 
-
+    if (Object.keys(errors).length > 0) {
+      console.log('Erroreed')
+      console.log(errors)
+      return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
+        message: "Validation errors occurred",
+        errors,
+        categories: await Category.find(),
+        formData: req.body
+      });
+    }
     const newProduct = new Product({
-      productName: name,
+      productName: ProductName,
       description,
-      quatity: Stock,
-      size: Size,
+      quantity: variants.reduce((sum, v) => sum + v.quantity, 0),
+      size: variants.map(v => v.size),
       category: categoryDoc._id,
-      offer: offer,
+      offer: parseFloat(offer) || 0,
       regularPrice: parseFloat(price),
       salePrice: parseFloat(salesPrice),
-      productImage: imagesPaths
-      // variants: parsedVariants
-    })
+      productImage: imagesPaths,
+      variant: variants
+    });
 
-    await newProduct.save()
-    console.log("Product saved successfully!")
-    return res.status(200).json({ success: true, message: 'Product added successfully',url:"/admin/products" })
+    await newProduct.save();
+    console.log("Product saved successfully!");
+    return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });
   } catch (error) {
-    console.error("Error adding product:", error)
+    console.error("Error adding product:", error);
+    return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("add-product", {
+      message: "Failed to add product. Please try again.",
+      errors: {},
+      categories: await Category.find(),
+      formData: req.body
+    });
   }
 
 }
@@ -141,7 +240,7 @@ const deleteSingleImage = async (req, res) => {
 
     const product = await Product.findById(productIdToServer)
     if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" })
+      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: "Product not found" })
     }
 
     product.productImage.splice(imageIndex, 1)
@@ -158,14 +257,14 @@ const deleteSingleImage = async (req, res) => {
     }
 
     await product.save()
-    res.json({ success: true, message: "Image deleted successfully" })
+    res.status(StatusCode.OK).json({ success: true, message: "Image deleted successfully" })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ success: false, message: "Server error" })
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" })
   }
 }
 
-const postProduct = async (req, res) => {
+const postProduct = async (req, res) => { //ith eatha function add product
   try {
     console.log('Received body:', req.body);
     console.log('Received files:', req.files);
@@ -178,20 +277,21 @@ const postProduct = async (req, res) => {
       offer,
       price,
       salesPrice,
-      Size,
-      Stock,
+      variantSize,
+      variantPrice,
+      variantQuantity,
       existingImage1,
       existingImage2,
       existingImage3,
       existingImage4
     } = req.body;
 
-    if (!name || !description || !category || !price || !Size || !Stock) {
-      return res.status(400).json({ success: false, message: 'All required fields must be provided' });
+    if (!name || !description || !category || !price || !variantSize || !variantQuantity) {
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'All required fields must be provided' });
     }
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({ success: false, message: 'Invalid product ID' });
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid product ID' });
     }
 
     const images = [];
@@ -207,8 +307,23 @@ const postProduct = async (req, res) => {
 
     const filteredImages = images.filter(img => img !== null);
 
+    const variant = []
+    let stock = 0
+    const addVariant = async()=>{
+      for(i=0;i<variantSize.length;i++){
+        let obj = {
+          size : variantSize[i],
+          salePrice : Number(variantPrice[i]),
+          quantity : Number(variantQuantity[i])
+        }
+        stock+=Number(variantQuantity[i])
+        variant.push(obj)
+      }
+    }
+    addVariant()
+
     if (filteredImages.length === 0) {
-      return res.status(400).json({ success: false, message: 'At least one image is required' });
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'At least one image is required' });
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -220,27 +335,28 @@ const postProduct = async (req, res) => {
         offer: offer ? parseFloat(offer) : 0,
         regularPrice: parseFloat(price),
         salePrice: salesPrice ? parseFloat(salesPrice) : parseFloat(price),
-        size: Size,
-        quatity: parseInt(Stock),
+        size: variantSize,
+        variant : variant,
+        quatity: stock,
         productImage: filteredImages
       },
       { new: true, runValidators: true }
     );
 
     if (!updatedProduct) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
     }
 
     res.json({ success: true, message: 'Product updated successfully', product: updatedProduct });
   } catch (error) {
     console.error('Error updating product:', error);
     if (error instanceof multer.MulterError) {
-      return res.status(400).json({ success: false, message: `File upload error: ${error.message}` });
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `File upload error: ${error.message}` });
     }
     if (error.message.includes('Only JPEG/PNG images are allowed')) {
-      return res.status(400).json({ success: false, message: error.message });
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: error.message });
     }
-    res.status(500).json({ success: false, message: 'Failed to update product' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to update product' });
   }
 }
 
@@ -260,13 +376,13 @@ const blockProduct = async (req, res) => {
     const blocked = await Product.findByIdAndUpdate(id, { isBlocked: true }, { new: true })
 
     if (blocked) {
-      return res.json({ success: true, message: "Product blocked successfully" })
+      return res.status(StatusCode.OK).json({ success: true, message: "Product blocked successfully" })
     } else {
-      return res.json({ success: false, message: "Error occurred while blocking product. Please try again." })
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Error occurred while blocking product. Please try again." })
     }
   } catch (error) {
     console.error("Error blocking product:", error)
-    res.status(404).redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
   }
 }
 
@@ -286,22 +402,22 @@ const unblockProduct = async (req, res) => {
     const blocked = await Product.findByIdAndUpdate(id, { isBlocked: false }, { new: true })
 
     if (blocked) {
-      return res.json({ success: true, message: "Product blocked successfully" })
+      return res.status(StatusCode.OK).json({ success: true, message: "Product blocked successfully" })
     } else {
-      return res.json({ success: false, message: "Error occurred while blocking product. Please try again." })
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Error occurred while blocking product. Please try again." })
     }
   } catch (error) {
     console.error("Error blocking product:", error)
-    res.status(500).redirect("/pageerror")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageerror")
   }
 }
 
-const addProductOffer = async(req,res)=>{
+const addProductOffer = async (req, res) => {
   try {
     const { id, offer } = req.body;
 
     const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+    if (!product) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
 
     const category = await Category.findOne({ name: product.category });
     const categoryOffer = category?.offer || 0;
@@ -315,30 +431,30 @@ const addProductOffer = async(req,res)=>{
 
     await product.save();
 
-    res.json({ success: true, finalOffer, salePrice });
+    res.status(StatusCode.CREATED).json({ success: true, finalOffer, salePrice });
   } catch (err) {
     console.error('Error in addProductOffer:', err);
-    res.status(500).json({ success: false, message: 'Internal Server Error' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
   }
 }
 
-const getProductEdit = async(req,res)=>{
+const getProductEdit = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     res.json({ offer: product.offer });
   } catch (err) {
-      console.log(err)
-    res.status(500).json({ error: 'Server error' });
+    console.log(err)
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Server error' });
   }
 }
-const editProductOffer = async(req,res)=>{
- try {
+const editProductOffer = async (req, res) => {
+  try {
     const { id, offer: newOffer } = req.body;
 
     const product = await Product.findById(id).populate('category')
 
     if (!product) {
-      return res.json({ success: false, message: "Product not found" });
+      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
     }
 
     const categoryOffer = product.category.offer || 0;
@@ -359,10 +475,10 @@ const editProductOffer = async(req,res)=>{
 
   } catch (error) {
     console.error("Offer update error:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
   }
 }
-const removeProductOffer = async(req,res)=>{
+const removeProductOffer = async (req, res) => {
   try {
     const productId = req.body.id;
     const product = await Product.findById(productId);
@@ -378,10 +494,10 @@ const removeProductOffer = async(req,res)=>{
       salePrice: appliedOffer > 0 ? salePrice : product.regularPrice,
     });
 
-    res.json({ success: true, message: 'Product offer removed', finalOffer: appliedOffer, salePrice });
+    res.status(StatusCode.OK).json({ success: true, message: 'Product offer removed', finalOffer: appliedOffer, salePrice });
   } catch (error) {
     console.error('Error removing product offer:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
   }
 }
 

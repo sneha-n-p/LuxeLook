@@ -95,7 +95,7 @@
             <table class="table table-hover table-borderless">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>NO</th>
                         <th>IMAGE</th>
                         <th>NAME</th>
                         <th>DESCRIPTION</th>
@@ -107,9 +107,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% products.forEach(function(product) { %>
+                    <% products.forEach(function(product,index) { %>
                         <tr>
-                            <td style="color: #000;">#<%= product.id %>
+                            <td style="color: #000;"><%= index+1 %>
                             </td>
                             <td>
                                 <img src="<%= product.productImage[0] %>" alt="Product Image" width="45" height="60"

@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const Coupon = require('../../models/couponSchema')
 const Wallet = require('../../models/walletSchema')
 const moment = require('moment')
+const StatusCode = require('../../statusCode')
 
 
 const loadCoupon = async (req, res) => {
@@ -22,17 +23,18 @@ const loadCoupon = async (req, res) => {
       .sort({ createdOn: -1 })
       .skip(skip)
       .limit(limit)
+
     const totalCoupons = await Coupon.countDocuments()
     const totalPages = Math.ceil(totalCoupons / limit)
-    res.render('coupons', { 
+    res.render('coupons', {
       coupons: findCoupons,
-            totalPages,
-            currentPage: page,
-            search 
-          })
+      totalPages,
+      currentPage: page,
+      search
+    })
   } catch (error) {
     console.error('coupon pageee:', error)
-    res.redirect('/pageError')
+    res.status(StatusCode.NOT_FOUND).redirect('/pageError')
   }
 }
 
@@ -57,7 +59,7 @@ const createCoupon = async (req, res) => {
     return res.redirect("/admin/coupons")
   } catch (error) {
     console.error('coupon pageee:', error)
-    res.redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
   }
 }
 
@@ -66,7 +68,7 @@ const loadEditCoupon = async (req, res) => {
     const id = req.params.id;
     const findCoupon = await Coupon.findById(id);
     if (!findCoupon) {
-      return res.redirect("/admin/pageerror");
+      return res.status(StatusCode.NOT_FOUND).redirect("/admin/pageerror");
     }
 
     const formattedCouponData = {
@@ -79,7 +81,7 @@ const loadEditCoupon = async (req, res) => {
     });
   } catch (error) {
     console.log("edit coupon error:", error);
-    res.redirect("/admin/pageerror");
+    res.status(StatusCode.NOT_FOUND).redirect("/admin/pageerror");
   }
 };
 
@@ -90,7 +92,7 @@ const updateCoupon = async (req, res) => {
     const selectedCoupon = await Coupon.findById(objectId);
 
     if (!selectedCoupon) {
-      return res.status(404).send("Coupon not found");
+      return res.status(StatusCode.NOT_FOUND).send("Coupon not found");
     }
 
     const startDateObj = new Date(startDate);
@@ -112,11 +114,11 @@ const updateCoupon = async (req, res) => {
     if (updatedCoupon.modifiedCount > 0) {
       res.send("Coupon updated successfully");
     } else {
-      res.status(500).send("Coupon update failed");
+      res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Coupon update failed");
     }
   } catch (error) {
     console.error("Update coupon error:", error);
-    res.status(500).send("Server error");
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Server error");
   }
 };
 
@@ -133,7 +135,7 @@ const listCategory = async (req, res) => {
     }
   } catch (error) {
     console.error(error)
-    res.redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
   }
 }
 
@@ -147,14 +149,14 @@ const unlistCategory = async (req, res) => {
       if (req.session.coupon === id) {
         req.session.coupon = false
       }
-      res.json({ success: true })
+      res.status(StatusCode.OK).json({ success: true })
     }
     else {
       console.error(error)
     }
   } catch (error) {
     console.error(error)
-    res.redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
   }
 }
 

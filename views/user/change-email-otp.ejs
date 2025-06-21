@@ -47,7 +47,7 @@
       border-radius: 10px;
     }
     .submit-btn {
-      background-color: #57c9d5;
+ background: linear-gradient(90deg, #B5654B  , #D17C63 );
       color: white;
       padding: 10px 30px;
       border: none;
@@ -57,7 +57,7 @@
       transition: 0.3s;
     }
     .submit-btn:hover {
-      background-color: #44b0bb;
+ background: linear-gradient(90deg, #B5654B  , #D17C63 );
     }
     .resend-text {
       text-align: center;
@@ -79,7 +79,7 @@
   </div>
 
   <!-- OTP Box -->
-  <div class="otp-box">
+  <div class="otp-box" style="background-color: #F2E8DC;">
     <div class="otp-title">Enter the OTP sent to your email</div>
     <form  id="otpForm" action="/verifying-changeEmail-otp" method="POST" onsubmit="return validateOTPform()">
       <input type="text" name="otp" maxlength="6" class="form-control otp-input mb-3" id="otpInput" placeholder="------" required>
@@ -87,7 +87,7 @@
       <button type="submit" class="submit-btn" id="btn-submit">Verify OTP</button>
     </form>
 
-    <div id="timer">OTP valid for: <span id="countdown">60</span> seconds</div>
+    <div id="timer" style="text-align: center;">OTP valid for: <span id="countdown">60</span> seconds</div>
     <div class="expired-msg" id="expiredMsg" style="display: none; color:red">OTP expired</div>
 
     <div class="resend-text">

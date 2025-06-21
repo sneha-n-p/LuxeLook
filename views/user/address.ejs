@@ -3,62 +3,74 @@
 <style>
   body {
     font-family: 'Poppins', sans-serif;
-    background: #fff;
+    background-color: #FFF8F3;
   }
 
-  .account-banner {
-    background: url('/images/banner-address.jpg') center/cover no-repeat;
-    height: 300px;
-    position: relative;
+  .sidebar {
+    background-color: #F2E8DC;
+    padding: 30px 20px;
+    height: auto;
+    color: #6B4C3B;
   }
 
-  .account-title {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 42px;
-    font-weight: 600;
-    color: #000;
+  .sidebar h5 {
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-transform: uppercase;
   }
 
-  .account-wrapper {
-    display: flex;
-    margin-top: 40px;
+  .sidebar a {
+    display: block;
+    color: #333;
+    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: 500;
   }
 
   .content-area {
-    flex: 1;
-    padding: 30px 40px;
+    background-color: #FCF4ED;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
 
   .address-card {
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     padding: 15px 20px;
     border-radius: 8px;
     margin-bottom: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fefefe;
+    background: #fff;
   }
 
   .address-info {
     max-width: 80%;
   }
 
-  .delete-btn {
-    background-color: #dc3545;
+  .add-btn, .edit-btn, .delete-btn {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
     color: white;
     border: none;
     padding: 6px 15px;
     border-radius: 20px;
     font-size: 14px;
     transition: 0.3s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .delete-btn {
+    background: linear-gradient(90deg, #dc3545, #b52b38);
+  }
+
+  .add-btn:hover, .edit-btn:hover {
+    opacity: 0.9;
   }
 
   .delete-btn:hover {
-    background-color: #b52b38;
+    opacity: 0.9;
   }
 
   .pagination-wrapper {
@@ -75,7 +87,7 @@
 
   .pagination li a {
     padding: 8px 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     margin: 0 2px;
     text-decoration: none;
     color: #333;
@@ -84,71 +96,50 @@
   }
 
   .pagination li.active a {
-    background-color: #57c9d5;
+    background: linear-gradient(90deg, #B5654B, #D17C63);
     color: white;
     border: none;
   }
 
-  .add-btn {
-    background-color: #57c9d5;
-    border: none;
+  .banner {
+    position: relative;
+  }
+
+  .banner img {
+    height: 414px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .banner h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     color: white;
-    padding: 10px 25px;
-    border-radius: 25px;
-    font-size: 14px;
-    transition: 0.3s;
-    margin-top: 20px;
+    font-size: 42px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px black;
   }
 
-  .add-btn:hover {
-    background-color: #44b0bb;
+  footer {
+    background-color: #f8f9fa;
+    padding: 20px;
   }
-
-  .edit-btn {
-    background-color: #44b0bb;
-    color: white;
-    border: none;
-    padding: 6px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    transition: 0.3s;
-    text-decoration: none;
-  }
-  /* Unified Sidebar CSS */
-.sidebar {
-  background-color: #f5f5f5;
-  padding: 30px 20px;
-  height: auto;
-  border-radius: 8px;
-}
-
-.sidebar h5 {
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.sidebar a {
-  display: block;
-  color: #333;
-  margin-bottom: 10px;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.sidebar a:hover {
-  color: #57c9d5;
-}
 </style>
 
+<!-- Banner -->
 <section class="hero text-center bg-light p-0 mb-4">
-  <img src="wallpaper/luxelook-wall6.jpg" alt="Shop Banner" class="img-fluid w-100"
-       style="height: 400px; object-fit: cover;">
-  <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4">ADDRESSES</h1>
+  <div class="banner">
+    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <h1>MY ADDRESSES</h1>
+  </div>
 </section>
 
+<!-- Wrapper -->
 <div class="container-fluid">
   <div class="row">
+    <!-- Sidebar -->
     <div class="col-md-2 sidebar">
       <h5>SETTINGS</h5>
       <a href="/orders">Orders</a>
@@ -157,8 +148,9 @@
       <a href="/wallet">Wallet</a>
     </div>
 
+    <!-- Content Area -->
     <div class="col-md-10 content-area">
-      <h5 class="mb-4 fw-bold">MY ADDRESSES</h5>
+      <h5 class="mb-4 fw-bold">My Addresses</h5>
 
       <% if (addresses && addresses.length > 0) { %>
         <% addresses.forEach(function(address) { %>
@@ -172,10 +164,10 @@
                 <div>Alt Phone: <%= address.altPhone %></div>
               <% } %>
             </div>
-            <form>
-              <a href="/edit-address/<%=address._id%>" class="edit-btn">Edit</a>
-              <button type="button" class="delete-btn" onclick="confirmRemove('<%=address._id%>')">Delete</button>
-            </form>
+            <div>
+              <a href="/edit-address/<%= address._id %>" class="edit-btn">Edit</a>
+              <button type="button" class="delete-btn" onclick="confirmRemove('<%= address._id %>')">Delete</button>
+            </div>
           </div>
         <% }) %>
 
@@ -203,7 +195,7 @@
   function confirmRemove(addressId) {
     Swal.fire({
       title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      text: "Are you delete this address!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -235,5 +227,10 @@
     });
   }
 </script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Axios for AJAX requests -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <%- include("../../views/partials/userPartial/footer") %>

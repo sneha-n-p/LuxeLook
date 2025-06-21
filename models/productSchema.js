@@ -49,7 +49,7 @@ const productSchema = new Schema({
         default: false
     },
     size:{
-        type: String,
+        type: Array,
         required:true
     },
     status: {

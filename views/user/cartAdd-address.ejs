@@ -1,205 +1,192 @@
-<%-include("../../views/partials/userPartial/header")%>
 
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #fff;
-    }
-    .account-banner {
-      background: url('/images/banner-add-address.jpg') center/cover no-repeat;
-      height: 300px;
-      position: relative;
-    }
-    .account-title {
-      position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 42px;
-      font-weight: 600;
-      color: #000;
-    }
-    .account-wrapper {
-      display: flex;
-      margin-top: 40px;
-    }
-    .sidebar {
-      width: 220px;
-      background: #f3f3f3;
-      padding: 30px 20px;
-    }
-    .sidebar h6 {
-      font-weight: 600;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      font-size: 14px;
-    }
-    .sidebar ul {
-      padding-left: 0;
-      list-style: none;
-    }
-    .sidebar ul li {
-      padding: 8px 0;
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .sidebar ul li.active {
-      font-weight: bold;
-    }
-    .content-area {
-      flex: 1;
-      padding: 30px 40px;
-    }
-    .form-label {
-      font-weight: 500;
-      font-size: 14px;
-    }
-    .form-control, .form-select {
-      border-radius: 0;
-      border: 1px solid #ccc;
-      padding: 10px;
-      font-size: 14px;
-    }
-    .submit-btn {
-      background-color: #57c9d5;
-      border: none;
-      color: white;
-      padding: 10px 30px;
-      border-radius: 25px;
-      font-size: 15px;
-      transition: 0.3s;
-    }
-    .submit-btn:hover {
-      background-color: #44b0bb;
-    }
-    .Error-message {
-      color: red;
-      font-size: 0.75rem;
-      display: none;
-    }
-  </style>
-</head>
-<body>
+<%- include("../../views/partials/userPartial/header") %>
 
- <section class="relative mb-10">
-  <img src="wallpaper\luxelook-wall5.jpg" alt="Wallet Banner" class="w-full h-[400px] object-cover">
-  <h1 class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white font-bold text-5xl">ADD-ADDRESS</h1>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #FFF8F3;
+  }
+
+  .sidebar {
+    background-color: #F2E8DC;
+    padding: 30px 20px;
+    height: auto;
+    color: #6B4C3B;
+  }
+
+  .sidebar h5 {
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .sidebar a {
+    display: block;
+    color: #333;
+    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .form-section {
+    background-color: #FCF4ED;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .form-control, .form-select {
+    border-radius: 8px;
+    height: 45px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 14px;
+    background-color: #fff;
+  }
+
+  .submit-btn, .return-btn {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
+    color: white;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    transition: 0.3s;
+    width: 100%;
+  }
+
+  .submit-btn:hover, .return-btn:hover {
+    opacity: 0.9;
+  }
+
+  .banner {
+    position: relative;
+  }
+
+  .banner img {
+    height: 414px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .banner h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 42px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px black;
+  }
+
+  .error-message {
+    color: darkred;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: none;
+  }
+
+  footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+  }
+</style>
+
+<!-- Banner -->
+<section class="hero text-center bg-light p-0 mb-4">
+  <div class="banner">
+    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <h1>ADD ADDRESS</h1>
+  </div>
 </section>
 
-  <div class="container-fluid account-wrapper">
+<!-- Wrapper -->
+<div class="container-fluid">
+  <div class="row">
     <!-- Sidebar -->
-    <div class="sidebar">
-      <h6>SETTINGS</h6>
-      <ul>
-        <li><a href="/orders">Orders</a></li>
-        <li><a href="/profile">Personal Info</a></li>
-        <li><a href="/addresses">Addresses</a></li>
-        <li><a href="/wallet">Wallet</a></li>
-      </ul>
+    <div class="col-md-2 sidebar">
+      <h5>SETTINGS</h5>
+      <a href="/orders">Orders</a>
+      <a href="/profile">Personal Info</a>
+      <a href="/addresses">Addresses</a>
+      <a href="/wallet">Wallet</a>
     </div>
 
     <!-- Content Area -->
-    <div class="content-area">
-      <h5 class="mb-4 fw-bold">ADD ADDRESS</h5>
-
-      <form  id="addAddressForm" action="/cart-add-address" method="POST" class="row g-3">
+    <div class="col-md-10 form-section">
+      <h5 class="mb-4 fw-bold">Add Your Address</h5>
+      <form id="addAddressForm" action="/cart-add-address" method="POST" class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Name</label>
-          <input type="text"id="name" class="form-control" name="name" required>
-          <div id="Error1" class="Error-message"></div>
-
-          <div class="col-md-6">
-                  <label class="form-label">State</label>
-                  <select class="form-select" id ="state" name="state" required>
-                      <option selected disabled>Choose a State...</option>
-                      <option value="Andhra Pradesh">Andhra Pradesh</option>
-                      <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                      <option value="Assam">Assam</option>
-                      <option value="Bihar">Bihar</option>
-                      <option value="Chhattisgarh">Chhattisgarh</option>
-                      <option value="Goa">Goa</option>
-                      <option value="Gujarat">Gujarat</option>
-                      <option value="Haryana">Haryana</option>
-                      <option value="Himachal Pradesh">Himachal Pradesh</option>
-                      <option value="Jharkhand">Jharkhand</option>
-                      <option value="Karnataka">Karnataka</option>
-                      <option value="Kerala">Kerala</option>
-                      <option value="Madhya Pradesh">Madhya Pradesh</option>
-                      <option value="Maharashtra">Maharashtra</option>
-                      <option value="Manipur">Manipur</option>
-                      <option value="Meghalaya">Meghalaya</option>
-                      <option value="Mizoram">Mizoram</option>
-                      <option value="Nagaland">Nagaland</option>
-                      <option value="Odisha">Odisha</option>
-                      <option value="Punjab">Punjab</option>
-                      <option value="Rajasthan">Rajasthan</option>
-                      <option value="Sikkim">Sikkim</option>
-                      <option value="Tamil Nadu">Tamil Nadu</option>
-                      <option value="Telangana">Telangana</option>
-                      <option value="Tripura">Tripura</option>
-                      <option value="Uttar Pradesh">Uttar Pradesh</option>
-                      <option value="Uttarakhand">Uttarakhand</option>
-                      <option value="West Bengal">West Bengal</option>
-                      <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                      <option value="Chandigarh">Chandigarh</option>
-                      <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-                      <option value="Delhi">Delhi</option>
-                      <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                      <option value="Ladakh">Ladakh</option>
-                      <option value="Lakshadweep">Lakshadweep</option>
-                      <option value="Puducherry">Puducherry</option>
-                    </select>
-                
-            </div>
-          
-
+          <label class="form-label" for="name">Name</label>
+          <input type="text" id="name" class="form-control" name="name" required>
+          <div id="Error1" class="error-message"></div>
+        </div>
         <div class="col-md-6">
-          <label class="form-label">Street Address</label>
+          <label class="form-label" for="state">State</label>
+          <select class="form-select" id="state" name="state" required>
+            <option value="" selected disabled>Choose a State...</option>
+            <% const states = [
+              "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
+              "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
+              "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+              "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
+              "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
+              "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh",
+              "Lakshadweep", "Puducherry"
+            ]; %>
+            <% states.forEach(state => { %>
+              <option value="<%= state %>"><%= state %></option>
+            <% }) %>
+          </select>
+          <div id="Error9" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="streetAddress">Street Address</label>
           <input type="text" id="streetAddress" class="form-control" name="streetAddress" required>
-          <div id="Error2" class="Error-message"></div>
-
+          <div id="Error2" class="error-message"></div>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Apartment, suite, unit etc (optional)</label>
+          <label class="form-label" for="apartment">Apartment, suite, unit etc (optional)</label>
           <input type="text" id="apartment" class="form-control" name="apartment">
-          <div id="Error3" class="Error-message"></div>
-
-        </div>
-
-        <div class="col-md-6">
-          <label class="form-label">Town / City</label>
-          <input type="text" id = "city" class="form-control" name="city" required>
-          <div id="Error4" class="Error-message"></div>
-
+          <div id="Error3" class="error-message"></div>
         </div>
         <div class="col-md-6">
-          <label class="form-label">pincode / ZIP</label>
+          <label class="form-label" for="city">Town / City</label>
+          <input type="text" id="city" class="form-control" name="city" required>
+          <div id="Error4" class="error-message"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="pincode">Pincode / ZIP</label>
           <input type="text" id="pincode" class="form-control" name="pincode" required>
-          <div id="Error5" class="Error-message"></div>
-
+          <div id="Error5" class="error-message"></div>
         </div>
-
         <div class="col-md-6">
-          <label class="form-label">Phone</label>
+          <label class="form-label" for="phone">Phone</label>
           <input type="text" id="phone" class="form-control" name="phone" required>
-          <div id="Error6" class="Error-message"></div>
-
+          <div id="Error6" class="error-message"></div>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Alternative Phone</label>
+          <label class="form-label" for="altPhone">Alternative Phone</label>
           <input type="text" id="altPhone" class="form-control" name="altPhone">
-          <div id="Error7" class="Error-message"></div>
-
+          <div id="Error7" class="error-message"></div>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="addressType">Select Address Type</label>
-          <select id="addressType" name="addressType" class="form-control" required>
-            <option value="" disabled selected>Select Address Type</option> <!-- Placeholder -->
+          <select id="addressType" name="addressType" class="form-select" required>
+            <option value="" disabled selected>Select Address Type</option>
             <option value="Home">Home</option>
             <option value="Work">Work</option>
             <option value="Other">Other</option>
           </select>
-          <div id="Error8" class="Error-message"></div>
+          <div id="Error8" class="error-message"></div>
         </div>
         <div class="col-md-6">
           <label class="form-label d-block">Set as Default Address</label>
@@ -212,16 +199,18 @@
             <label class="form-check-label" for="defaultNo">No</label>
           </div>
         </div>
-        
         <div class="col-12 mt-3">
           <button type="submit" class="submit-btn">Add Address</button>
+        </div>
+        <div class="col-12 mt-3">
+          <a href="/checkout" class="return-btn d-block text-center">Return to Checkout</a>
         </div>
       </form>
     </div>
   </div>
+</div>
 
-      
-      <script>
+<script>
   const addAddressForm = document.getElementById('addAddressForm');
 
   const showError = (elementId, message) => {
@@ -268,11 +257,11 @@
     hideError('Error3');
 
     if (!/^[A-Za-z\s]{3,}$/.test(city)) {
-  showError('Error4', 'City name must contain only letters and be at least 3 characters.');
-  isValid = false;
-} else {
-  hideError('Error4');
-}
+      showError('Error4', 'City name must contain only letters and be at least 3 characters.');
+      isValid = false;
+    } else {
+      hideError('Error4');
+    }
 
     if (!/^\d{6}$/.test(pincode) || /^(\d)\1{5}$/.test(pincode)) {
       showError('Error5', 'Pincode must be 6 digits and not all same digits.');
@@ -303,8 +292,10 @@
     }
 
     if (!state) {
-      alert('Please select a state.');
+      showError('Error9', 'Please select a state.');
       isValid = false;
+    } else {
+      hideError('Error9');
     }
 
     if (isValid) {
@@ -313,8 +304,7 @@
   });
 </script>
 
-      
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-</body>
-
-
+<%- include("../../views/partials/userPartial/footer") %>
