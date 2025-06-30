@@ -12,7 +12,6 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-
   <style>
     body {
       background-color: #0f172a;
@@ -37,6 +36,11 @@
 
     .sidebar a:hover {
       color: #38bdf8;
+    }
+
+    .sidebar a.active {
+      color: #38bdf8;
+      font-weight: bold;
     }
 
     .main-content {
@@ -96,7 +100,6 @@
 </head>
 
 <body>
-
   <div class="sidebar">
     <h5 class="text-white">LuxeLook</h5>
     <a href="/admin" id="dashboard">Dashboard</a>
@@ -111,8 +114,6 @@
         Logout
       </button>
     </form>
-
-
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -120,9 +121,9 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script>
+    // Logout confirmation
     document.getElementById('logoutBtn').addEventListener('click', function (e) {
       e.preventDefault();
-
       Swal.fire({
         title: 'Are you sure?',
         text: 'You will be logged out of the admin panel.',
@@ -137,4 +138,18 @@
         }
       });
     });
+
+    // Highlight active page
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentPath = window.location.pathname;
+      const sidebarLinks = document.querySelectorAll('.sidebar a');
+      sidebarLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+          link.classList.add('active');
+        }
+      });
+    });
   </script>
+</body>
+
+</html>

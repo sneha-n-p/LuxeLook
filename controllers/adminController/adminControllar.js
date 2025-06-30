@@ -5,7 +5,7 @@ const StatusCode = require('../../statusCode')
 
 
 const pageError = async (req, res) => {
-    res.render('admin-Error')
+    res.render('pageError')
 }
 
 
@@ -51,7 +51,7 @@ const loadDashboard = async (req, res) => {
             res.render('dashboard')
         }
     } catch (error) {
-        res.status(StatusCode.NOT_FOUND).redirect('/pageError')
+        res.status(StatusCode.NOT_FOUND).redirect('/admin/pageError')
     }
 }
 
@@ -60,13 +60,13 @@ const logout = async (req, res) => {
         req.session.destroy(err => {
             if (err) {
                 console.log("Error destroy session", err)
-                return res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+                return res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
             }
             res.redirect("/admin/login")
         })
     } catch (error) {
         console.log("unexpected error during logout", error)
-        res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+        res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
     }
 }
 

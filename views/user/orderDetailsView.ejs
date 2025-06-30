@@ -167,7 +167,7 @@
             <!-- Sidebar -->
             <div class="col-md-2 sidebar">
                 <h5>SETTINGS</h5>
-                <a href="/orders">Orders</a>
+      <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">Orders</a>
                 <a href="/profile">Personal Info</a>
                 <a href="/addresses">Addresses</a>
                 <a href="/wallet">Wallet</a>
@@ -191,10 +191,8 @@
                                         </span>
                                         <% } %>
                         </p>
-                        <p><strong>Total Price:</strong> ₹<%= order.totalPrice.toFixed(2) %>
-                        </p>
-                        <p><strong>Final Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %>
-                        </p>
+                        
+                      
                         <% if (order.address && order.address.length> 0) { %>
                             <p><strong>Address:</strong>
                                 <%= order.address[0].name %>,
@@ -212,9 +210,18 @@
                             <% } else { %>
                                 <p><strong>Address:</strong> Not provided</p>
                                 <% } %>
+                                <p><strong>Total Price:</strong> ₹<%= order.totalPrice.toFixed(2) %>
+                        </p>
+                                <%if(order.couponApplied){%>
                                     <p><strong>Coupon Applied:</strong>
-                                        <%= order.couponApplied ? 'Yes' : 'No' %>
+                                        <%= order.couponApplied %>
                                     </p>
+                                    <p><strong>Discount:</strong> 
+                                        ₹<%= order.discount%>
+                                    </p>
+                                <%}%>
+                                 <p><strong>Final Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %>
+                        </p>
                                     <p><strong>Order Date:</strong>
                                         <%= order.createdOn.toDateString() %>
                                     </p>
@@ -230,7 +237,7 @@
                                                         <%= item.product.productName %>
                                                     </h6>
                                                     <p>Quantity: <%= item.quantity %> | Price: ₹<%=
-                                                                item.price.toFixed(2) %> | Status: <%= item.status %> | size : <%=item.size%>
+                                                                order.finalAmount.toFixed(2) %> | Status: <%= item.status %> | size : <%=item.size%>
                                                     </p>
                                                 </div>
                                             </div>
@@ -260,7 +267,9 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script>
         const showSwal = (config) => {
             return Swal.fire({
@@ -270,7 +279,7 @@
             });
         };
 
-        function cancelSingleProduct(productId, orderId) {
+       function cancelSingleProduct(productId, orderId) {
   const reasons = [
     "Found a better price elsewhere",
     "Ordered by mistake",
@@ -288,7 +297,7 @@
     html: `
       <p>Select a reason for cancellation:</p>
       <select id="cancel-reason" class="swal2-input">
-        <option disabled selected>Select a reason</option>
+        <option value="" disabled selected>Select a reason</option>
         ${optionsHtml}
       </select>
     `,
@@ -330,50 +339,71 @@
 }
 
         function returned(orderId, productId) {
-            showSwal({
-                title: 'Return Product',
-                input: 'textarea',
-                inputLabel: 'Reason for return',
-                inputPlaceholder: 'Enter your reason here...',
-                inputAttributes: { 'aria-label': 'Reason for return' },
-                showCancelButton: true,
-                confirmButtonText: 'Submit',
-                preConfirm: (reason) => {
-                    if (!reason.trim()) {
-                        Swal.showValidationMessage('Reason is required');
-                    }
-                    return reason;
+    const reasons = [
+        "Found a better price elsewhere",
+        "Order placed by mistake",
+        "Item won't arrive on time",
+        "Changed my mind",
+        "Other"
+    ];
+
+    const optionsHtml = reasons.map(reason =>
+        `<option value="${reason}">${reason}</option>`
+    ).join("");
+
+    Swal.fire({
+        title: 'Return Product',
+        html: `
+            <label for="returnReason">Select a reason:</label>
+            <select id="returnReason" class="swal2-input">
+                <option value="" disabled selected>Select reason</option>
+                ${optionsHtml}
+            </select>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        preConfirm: () => {
+            const selectedReason = document.getElementById('returnReason').value;
+            if (!selectedReason) {
+                Swal.showValidationMessage('Please select a return reason');
+            }
+            return selectedReason;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            axios.patch('/orders/return', {
+                orderId,
+                productId,
+                reason: result.value
+            })
+            .then(response => {
+                if (response.data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Return Requested!",
+                        text: "Your return request has been submitted.",
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops!",
+                        text: response.data.message || "Return request failed."
+                    });
                 }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.patch('/orders/return', { orderId, productId, reason: result.value })
-                        .then(response => {
-                            if (response.data.success) {
-                                showSwal({
-                                    icon: "success",
-                                    title: "Return Requested!",
-                                    text: "Your return request has been submitted.",
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                }).then(() => location.reload());
-                            } else {
-                                showSwal({
-                                    icon: "error",
-                                    title: "Oops!",
-                                    text: response.data.message || "Return request failed."
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            showSwal({
-                                icon: "error",
-                                title: "Oops!",
-                                text: "Something went wrong while submitting return request."
-                            });
-                        });
-                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops!",
+                    text: "Something went wrong while submitting return request."
+                });
             });
         }
+    });
+}
+
 
         function showDownloadOptions() {
             showSwal({
@@ -381,14 +411,14 @@
                 text: 'Choose the format to download the invoice:',
                 showCancelButton: true,
                 confirmButtonText: 'Excel',
-                cancelButtonText: 'JPG',
+                cancelButtonText: 'PDF',
                 showDenyButton: true,
                 denyButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
                     downloadExcel();
                 } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
-                    downloadJPG();
+                    downloadPDF();
                 }
             });
         }
@@ -443,22 +473,41 @@
         XLSX.write(wb, 'Order_<%= order.orderId %>.xlsx');
   }
 
-        function downloadJPG() {
-            console.log("Generating JPG");
-            const element = document.getElementById('product-detail-section');
-            html2canvas(element, { scale: 2 }).then(canvas => {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/jpeg');
-                link.download = 'Order_<%= order.orderId %>.jpg';
-                link.click();
-            }).catch(error => {
-                showSwal({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Something went wrong while generating the JPG!'
-                });
-            });
-        }
+       function downloadPDF() {
+    console.log("Generating PDF");
+
+    const element = document.getElementById('product-detail-section');
+    html2canvas(element, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        const imgProps = {
+            width: canvas.width,
+            height: canvas.height
+        };
+        const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+        const imgWidth = imgProps.width * ratio;
+        const imgHeight = imgProps.height * ratio;
+
+        const x = (pdfWidth - imgWidth) / 2;
+        const y = 10; 
+
+        pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+        pdf.save('Order_<%= order.orderId %>.pdf');
+    }).catch(error => {
+        showSwal({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong while generating the PDF!'
+        });
+        console.error("PDF generation error:", error);
+    });
+}
+
     </script>
 
     <%- include("../../views/partials/userPartial/footer") %>

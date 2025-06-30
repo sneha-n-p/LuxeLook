@@ -12,20 +12,18 @@ const loadWallet = async (req, res) => {
       return res.redirect('/login');
     }
 
-    // Handle search query
     let search = '';
     if (req.query.search) {
       search = req.query.search;
     }
 
-    // Handle page query
     let page = 1;
     if (req.query.page) {
       page = parseInt(req.query.page);
       if (isNaN(page) || page < 1) page = 1;
     }
 
-    const limit = 5; // Transactions per page, matching wishlist
+    const limit = 5; 
 
     // Find user and wallet
     const user = await User.findById(userId);
@@ -35,10 +33,9 @@ const loadWallet = async (req, res) => {
     let totalPages = 0;
 
     if (wallet && wallet.transactions.length > 0) {
-      // Use aggregation to filter and paginate transactions
       const pipeline = [
         { $match: { userId: user._id } },
-        { $unwind: '$transactions' }, // Flatten transactions array
+        { $unwind: '$transactions' },
         {
           $match: {
             $or: [
@@ -48,17 +45,17 @@ const loadWallet = async (req, res) => {
           }
         },
         {
-          $sort: { 'transactions.date': -1 } // Sort by date descending
+          $sort: { 'transactions.date': -1 }
         },
         {
-          $skip: (page - 1) * limit // Skip for pagination
+          $skip: (page - 1) * limit
         },
         {
-          $limit: limit // Limit for pagination
+          $limit: limit
         },
         {
           $project: {
-            transactions: 1 // Only return transactions
+            transactions: 1
           }
         }
       ];
@@ -66,7 +63,6 @@ const loadWallet = async (req, res) => {
       const paginatedResult = await Wallet.aggregate(pipeline);
       transactions = paginatedResult.map(item => item.transactions);
 
-      // Count total matching transactions for pagination
       const countPipeline = [
         { $match: { userId: user._id } },
         { $unwind: '$transactions' },
@@ -93,7 +89,8 @@ const loadWallet = async (req, res) => {
       totalPages,
       currentPage: page,
       search,
-      activePage: 'wallet'
+      activePage: 'wallet',
+      currentPath:'/wallet'
     });
   } catch (error) {
     console.error('Error loading wallet:', error.message, error.stack);

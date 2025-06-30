@@ -23,7 +23,7 @@ const categorySchema = new mongoose.Schema({
     },
     offer:{
         type:Number,
-        required:0
+        required:false
     }
     
 })

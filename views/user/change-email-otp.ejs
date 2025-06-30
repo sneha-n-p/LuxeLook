@@ -88,10 +88,10 @@
     </form>
 
     <div id="timer" style="text-align: center;">OTP valid for: <span id="countdown">60</span> seconds</div>
-    <div class="expired-msg" id="expiredMsg" style="display: none; color:red">OTP expired</div>
+    <div class="expired-msg" id="expiredMsg" style="display: none; color:red ">OTP expired</div>
 
     <div class="resend-text">
-      Didn't get the code? <button  id="resend-btn" onclick="resendOTP() " >Resend OTP</button>
+      Didn't get the code? <button  id="resend-btn" disabled onclick="resendOTP() " >Resend OTP</button>
     </div>
   </div>
 
@@ -99,7 +99,7 @@
     let countdown = 60;
     const countdownEl = document.getElementById('countdown');
     const otpInput = document.getElementById('otpInput');
-    const submitBtn = document.querySelector('.btn-submit');
+    const submitBtn = document.getElementById('btn-submit');
     const expiredMsg = document.getElementById('expiredMsg');
     const otpForm = document.getElementById('otpForm');
 
@@ -110,14 +110,24 @@
       countdown--;
       countdownEl.innerText = countdown;
 
-      if (countdown <= 0) {
+       if (countdown <= 0) {
+        console.log('countDown')
         clearInterval(timer);
         otpInput.disabled = true;
         submitBtn.disabled = true;
-        expiredMsg.style.display = 'block';
-      }
-    }, 1000);
+        document.getElementById("resend-btn").disabled = false;
+        if(submitBtn.disabled){
+    Swal.fire({
+      icon:'error',
+      title:'OTP Expired',
+      text:'Try Resend OTP',
+      timer:3000
 
+    })
+  }
+    }
+  }, 1000);
+  
     function validateOTPform() {
       const otpInput = document.getElementById("otpInput").value.trim()
 
@@ -161,18 +171,16 @@
 
 
     function resendOTP() {
-      console.log('clicked')
       document.getElementById("resend-btn").disabled = true
-      countdown = 30;
+      countdown = 60;
       otpInput.disabled = false
-      // submitBtn.disabled = false;
+      submitBtn.disabled = false;
       expiredMsg.style.display = "none"
       countdownEl.innerText = countdown;
       if(timer)clearInterval(timer);
 
       timer = setInterval(() => {
-        countdown--;
-        console.log(countdown)
+        countdown--; 
         countdownEl.innerText = countdown;
 
         if (countdown <= 0) {

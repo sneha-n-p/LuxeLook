@@ -53,7 +53,8 @@ const addCategory = async (req, res) => {
 
   try {
     console.log(req.body);
-    const existingCategory = await category.findOne({ name });
+    const Tname = name.trim()
+const existingCategory = await category.findOne({ name: { $regex: new RegExp(`^${Tname}$`, 'i') } });
     if (existingCategory) {
       return res.status(StatusCode.BAD_REQUEST).json({ error: "Category already exists" });
     }
@@ -93,7 +94,7 @@ const unlistCategory = async (req, res) => {
     }
   } catch (error) {
     console.error(error)
-    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
 const listCategory = async (req, res) => {
@@ -109,7 +110,7 @@ const listCategory = async (req, res) => {
     }
   } catch (error) {
     console.error(error)
-    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
 const loadEditCategory = async (req, res) => {
@@ -128,25 +129,36 @@ const editCategory = async (req, res) => {
   try {
     const id = req.params.id
     const { name, description, offer, status } = req.body
-    const existingCategory = await category.findById(id)
-
+    const existingCategory = await category.findById(id);
     if (!existingCategory) {
-      return res.status(StatusCode.BAD_REQUEST).json({ error: "Category not exists. please Choose another name" })
+      return res.status(StatusCode.BAD_REQUEST).json({ error: "Category does not exist" });
     }
+
+    const trimmedName = name.trim().toLowerCase();
+    const duplicate = await category.findOne({
+      _id: { $ne: id },
+      name: { $regex: new RegExp(`^${trimmedName}$`, 'i') }
+    });
+
+    if (duplicate) {
+      return res.status(StatusCode.BAD_REQUEST).json({ error: "Category name already exists" });
+    }
+
     const updateCategory = await category.findByIdAndUpdate(id, {
-      name: name,
-      description: description,
-      offer: offer,
-      status: status
-    }, { new: true })
+      name: name.trim(),
+      description: description.trim(),
+      offer: offer || null,
+      status
+    }, { new: true });
 
     if (updateCategory) {
       return res.status(StatusCode.OK).json({ success: true, message: "Category updated successfully" });
     } else {
-      res.status(StatusCode.BAD_REQUEST).json({ error: "Category Not Found" })
+      res.status(StatusCode.BAD_REQUEST).json({ error: "Failed to update category" });
     }
   } catch (error) {
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" })
+    console.error("Edit category error:", error);
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 }
 

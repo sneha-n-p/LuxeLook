@@ -110,19 +110,21 @@
 
   <section class="hero text-center bg-light p-0 mb-4">
     <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
-         style="height: 400px; object-fit: cover;">
+         style="height: 700px; object-fit: cover;">
 <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg" style="text-shadow: 2px 2px 8px black;">PROFILE</h1>
   </section>
 
   <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-2 sidebar" style="height: auto; background-color: #F2E8DC; color:#6B4C3B ">
-        <h5>SETTINGS</h5>
-        <a href="/orders" style="text-decoration: none;">Orders</a>
-        <a href="/profile" style="text-decoration: none;">Personal Info</a>
-        <a href="/addresses" style="text-decoration: none;">Addresses</a>
-        <a href="/wallet" style="text-decoration: none;">Wallet</a>
-      </div>
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-2 sidebar">
+      <h5>SETTINGS</h5>
+      <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">Orders</a>
+      <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">Personal Info</a>
+      <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">Addresses</a>
+      <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">Wallet</a>
+    </div>
+
 
         <div class="col-md-10 profile-container d-flex flex-column align-items-center">
   <!-- Centered Profile Image -->
@@ -179,7 +181,7 @@
         <h5 class="text-center mb-3"><strong>Recent Orders</strong></h5>
         <div class="row justify-content-center">
           <% latestOrders.forEach(order => { %>
-            <div class="col-md-4 order-box" style="background-color: #FCF4ED;">
+            <div class="col-md-6 order-box" style="background-color: #FCF4ED;">
               <h6>Order ID: <%= order.orderId %></h6>
               <p><strong>Date:</strong> <span class="order-date" data-date="<%= order.createdOn %>"></span></p>
               <p><strong>Status:</strong> <%= order.status %></p>

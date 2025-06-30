@@ -16,11 +16,11 @@ const applyCoupon = async (req, res) => {
     const validCoupon = await Coupon.findOne({ name: coupon, islist: true });
 
     if (!validCoupon) {
-      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid coupon' });
+      return res.status(400).json({ success: false, message: 'Invalid coupon' });
     }
 
     if (validCoupon.usedBy.includes(userId)) {
-      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Coupon already used' });
+      return res.status(400).json({ success: false, message: 'Coupon already used' });
     }
 
     const discount = validCoupon.offerPrice;
@@ -35,9 +35,10 @@ const applyCoupon = async (req, res) => {
 
   } catch (error) {
     console.error('Coupon apply error:', error);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
 
 
 module.exports = {

@@ -54,7 +54,7 @@ router.post ("/profile/edit",upload.single('profileImage'),profileController.upd
 
 router.get("/profile/change-email",userAuth,profileController.loadChangeEmail)
 router.post("/profile/change-email",userAuth,profileController.changeEmailValidation)
-router.get("/change-email-otp",userAuth,profileController.loadEmailVerifyOtp)
+// router.get("/change-email-otp",userAuth,profileController.loadEmailVerifyOtp)
 router.post("/verifying-changeEmail-otp",profileController.EmailVerifyOtp)
 router.get("/reset-email",userAuth,profileController.loadResetEmail)
 router.post("/reset-email",profileController.resetEmail)
@@ -64,7 +64,7 @@ router.post("/profile/change-password",userAuth,profileController.changePassword
 router.get("/verifying-changePassword-otp",userAuth,profileController.loadPasswordVerifyingOtp)
 router.post("/changePassword-otp",profileController.PasswordVerifyingOtp)
 router.get("/profile/reset-password",userAuth,profileController.loadresetPassword)
-router.post("/profile/reset-password",userAuth,profileController.resetPassword)
+router.post("/profile/reset-password",userAuth,profileController.resetPassword) 
 router.post('/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
 
 

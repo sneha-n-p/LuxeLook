@@ -34,7 +34,7 @@ const loadCoupon = async (req, res) => {
     })
   } catch (error) {
     console.error('coupon pageee:', error)
-    res.status(StatusCode.NOT_FOUND).redirect('/pageError')
+    res.status(StatusCode.NOT_FOUND).redirect('/admin/pageError')
   }
 }
 
@@ -62,6 +62,7 @@ const createCoupon = async (req, res) => {
     res.status(StatusCode.NOT_FOUND).redirect("/pageError")
   }
 }
+
 
 const loadEditCoupon = async (req, res) => {
   try {
@@ -135,7 +136,7 @@ const listCategory = async (req, res) => {
     }
   } catch (error) {
     console.error(error)
-    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
 
@@ -156,7 +157,7 @@ const unlistCategory = async (req, res) => {
     }
   } catch (error) {
     console.error(error)
-    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
 

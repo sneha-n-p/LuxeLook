@@ -80,6 +80,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
+    bottom: 50%;
     transform: translate(-50%, -50%);
     color: white;
     font-size: 42px;
@@ -116,7 +117,7 @@
       <h5>SETTINGS</h5>
       <a href="/orders">Orders</a>
       <a href="/profile">Personal Info</a>
-      <a href="/addresses">Addresses</a>
+      <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">Addresses</a>
       <a href="/wallet">Wallet</a>
     </div>
 

@@ -141,7 +141,7 @@ footer {
 <!-- Banner Section -->
  <section class="hero text-center bg-light p-0 mb-4">
           <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
-              style="height: 400px; object-fit: cover;">
+              style="height: 600px; object-fit: cover;">
 <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg" style="text-shadow: 2px 2px 8px black;">SHOP</h1>
         
   </section>
@@ -151,6 +151,7 @@ footer {
   <!-- Search -->
   <div class="search-bar">
     <input id="searchInput" type="text" class="form-control me-2" value="<%= search %>" placeholder="Search products...">
+    <div id="productCard"></div>
     <button class="btn btn-dark ms-2" onclick="searchProducts()">Search</button>
   </div>
 
@@ -162,7 +163,19 @@ footer {
           <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
           <div class="card-body">
             <h5 class="card-title"><%= products[i].productName %></h5>
-            <p class="card-text">₹ <%= products[i].salePrice %></p>
+<% if (products[i].bestOffer > 0) { %>
+  <p class="card-text mb-1">
+    <strick class="text-muted">₹<%= products[i].regularPrice %></strick>
+    <span class="text-success ms-2">-<%= products[i].bestOffer %>%</span>
+  </p>
+  <p class="card-text fw-bold text-dark">₹<%= products[i].salePrice %></p>
+    <h3><%= products[i].regularPrice %></h3>
+
+<% } else { %>
+  <p class="card-text fw-bold text-dark">₹<%= products[i].salePrice %></p>
+<% } %>
+
+
             <div>
               <a href="/product-details/<%= products[i]._id %>">
                 <button class="btn btn-outline-dark btn-sm">View Details</button>
@@ -171,9 +184,8 @@ footer {
             <% if (products[i].quatity > 0) { %>
               <div class="mt-2">
                 <button class="wishlist-symbol" onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
-                <button class="wishlist-symbol" onclick="addToCart('<%=products[i]._id%>')">&#128722;</button>
               </div>
-            <% } else { %>
+              <% } else { %>
               <div class="text-danger mt-2"><strong>Out of Stock</strong></div>
             <% } %>
           </div>
@@ -220,33 +232,60 @@ footer {
         });
       }).catch(() => {
         Swal.fire({
-          title: "Server Error",
+          title: "Error Occured",
           icon: "error",
           showConfirmButton: false,
+          text :'Already exist in wishlist',
           timer: 1500
         });
       });
   }
 
-  function addToCart(productId) {
-    axios.post("/addToCart", { productId })
-      .then(function (responce) {
-        Swal.fire({
-          title: responce.data.success ? "Added to Cart" : "Error",
-          icon: responce.data.success ? 'success' : 'error',
-          text: responce.data.message || '',
-          showConfirmButton: false,
-          timer: 1500
-        });
-      }).catch(() => {
-        Swal.fire({
-          title: "Server Error",
-          icon: "error",
-          showConfirmButton: false,
-          timer: 1500
-        });
-      });
-  }
+  // function addToCart(productId) {
+  //   axios.post("/addToCart", { productId })
+  //     .then(function (responce) {
+  //       Swal.fire({
+  //         title: responce.data.success ? "Added to Cart" : "Error",
+  //         icon: responce.data.success ? 'success' : 'error',
+  //         text: responce.data.message || '',
+  //         showConfirmButton: false,
+  //         timer: 1500
+  //       });
+  //     }).catch(() => {
+  //       Swal.fire({
+  //         title: "Server Error",
+  //         icon: "error",
+  //         showConfirmButton: false,
+  //         timer: 1500
+  //       });
+  //     });
+  // }
+
+
+  
+//     const input = document.getElementById("searchInput")
+// let debounceTimeout;
+
+// input.addEventListener('input', (event) => {
+//   clearTimeout(debounceTimeout);
+//   debounceTimeout = setTimeout(async () => {
+//     const search = event.target.value;
+//     console.log("Search:", search);
+
+//     try {
+//       const res = await axios.get(`/shop?search=${search}&&page=1`, {
+//         headers: { "X-Requested-With": "XMLHttpRequest" }
+//       });
+//       if (res.status === 200) {
+//         document.getElementById('productCard').innerHTML = res.data;
+//       }
+//     } catch (err) {
+//       console.error("Search request failed:", err);
+//     }
+//   }, 300);
+// });
+
+
 
   function searchProducts() {
     const query = document.getElementById("searchInput").value.trim();

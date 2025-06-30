@@ -1,0 +1,11 @@
+<% if (products.length > 0) { %>
+  <% products.forEach(product => { %>
+    <div class="product-card">
+      <h5><%= product.productName %></h5>
+      <p>₹<%= product.price %></p>
+      <!-- Add image, button, etc. if needed -->
+    </div>
+  <% }) %>
+<% } else { %>
+  <p>No products found.</p>
+<% } %>

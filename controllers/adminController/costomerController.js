@@ -57,7 +57,7 @@ const userBlocked = async (req, res) => {
         }
     } catch (error) {
         console.error(error)
-        res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+        res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
     }
 }
 const userUnblocked = async (req, res) => {
@@ -73,7 +73,7 @@ const userUnblocked = async (req, res) => {
         }
     } catch (error) {
         console.error(error)
-        res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+        res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
     }
 }
 

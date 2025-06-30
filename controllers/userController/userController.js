@@ -3,6 +3,7 @@ const env = require("dotenv").config()
 const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
 const Product = require("../../models/productSchema")
+const Category = require('../../models/categorySchema')
 const Coupon = require('../../models/couponSchema')
 const StatusCode = require('../../statusCode')
 
@@ -15,21 +16,41 @@ const pageNotFound = async (req, res) => {
 }
 
 const loadHomePage = async (req, res) => {
-    try {
-        const user = req.session.user
-        if (user) {
-            const products = await Product.find({ isBlocked: false })
-            const userData = await User.findOne({ _id: user })
-            res.render('home', { user: userData, products, activePage: 'home' })
-        } else {
-            const products = await Product.find()
-            return res.render('home', { user: null, products })
-        }
-    } catch (error) {
-        console.log("homePage not found", error)
-        res.status(StatusCode.INTERNAL_SERVER_ERROR).send("server error")
+  try {
+    const user = req.session.user;
+
+    const products = await Product.find({ isBlocked: false }).populate('category');
+    const categorys = await Category.find({ status: "Listed" });
+
+    const processedProducts = products.map(product => {
+      const productOffer = product.offer || 0;
+      const categoryOffer = product.category?.offer || 0;
+      const bestOffer = Math.max(productOffer, categoryOffer);
+
+      const regularPrice = product.regularPrice;
+      const salePrice = Math.round(regularPrice - (regularPrice * bestOffer / 100));
+
+      return {
+        ...product._doc,
+        bestOffer,
+        salePrice,
+        regularPrice,
+      };
+    });
+
+    if (user) {
+      const userData = await User.findById(user);
+      return res.render("home", { user: userData, products: processedProducts, categorys, activePage: "home" });
+    } else {
+      return res.render("home", { user: null, products: processedProducts, categorys, activePage: "home" });
     }
-}
+
+  } catch (error) {
+    console.log("homePage not found", error);
+    res.status(500).send("Server error");
+  }
+};
+
 
 
 const loadSignup = async (req, res) => {
@@ -103,13 +124,58 @@ const postSignup = async (req, res) => {
 
 
 const loadShopping = async (req, res) => {
-    try {
-        return res.render("shop", { user: req.session.user, activePage: 'shop' })
-    } catch (error) {
-        console.log('Shopping page not loading', error)
-        res.status(StatusCode.INTERNAL_SERVER_ERROR).send('Server Error')
-    }
-}
+  try {
+    const user = req.session.user;
+    const search = req.query.search || '';
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12;
+
+    const query = search
+      ? { productName: { $regex: search, $options: "i" }, isBlocked: false }
+      : { isBlocked: false };
+
+    const productDocs = await Product.find(query)
+      .populate('category') 
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalCount = await Product.countDocuments(query);
+    const totalPages = Math.ceil(totalCount / limit);
+
+    const products = productDocs.map(product => {
+      const productOffer = product.offer || 0;
+      const categoryOffer = (product.category && typeof product.category.offer === 'number') ? product.category.offer : 0;
+
+      const bestOffer = Math.max(productOffer, categoryOffer);
+
+      console.log(`[${product.productName}] -> Product: ${productOffer}%, Category: ${categoryOffer}% → Best: ${bestOffer}%`);
+
+      const salePrice = bestOffer > 0
+        ? Math.round(product.regularPrice - (product.regularPrice * bestOffer / 100))
+        : product.regularPrice;
+
+      return {
+        ...product._doc,
+        bestOffer,
+        salePrice
+      };
+    });
+
+    return res.render("shop", {
+      user,
+      products,
+      search,
+      currentPage: page,
+      totalPages,
+      activePage: 'shop'
+    });
+
+  } catch (error) {
+    console.log('Shopping page not loading', error);
+    res.status(500).send('Server Error');
+  }
+};
+
 
 
 
@@ -240,6 +306,7 @@ const postLogin = async (req, res) => {
         }
         req.session.user = findUser._id
         res.redirect('/')
+        
     } catch (error) {
         console.error("login error:", error)
         res.status(StatusCode.BAD_REQUEST).render('login', { message: "login failed.Please try again later" })

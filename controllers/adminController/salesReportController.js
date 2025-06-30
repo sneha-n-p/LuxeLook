@@ -90,7 +90,7 @@ const loadSalesPage = async (req, res) => {
         break;
       case 'custom':
         if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
-          return res.status(StatusCode.NOT_FOUND).render('admin/pageerror', { message: 'Invalid date range' });
+          return res.status(StatusCode.NOT_FOUND).render('pageError', { message: 'Invalid date range' });
         }
         query.createdOn = {
           $gte: new Date(startDate),
@@ -118,7 +118,7 @@ const loadSalesPage = async (req, res) => {
     });
   } catch (error) {
     console.error('Error loading sales page:', error);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).render('admin/pageerror', { message: 'Server Error' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).render('pageError', { message: 'Server Error' });
   }
 };
 

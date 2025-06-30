@@ -48,7 +48,7 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Coupon"
 }],referredBy: {
-  type: String, // or Schema.Types.ObjectId if you want to reference actual User
+  type: String,
   default: null
 },
     cart:[{

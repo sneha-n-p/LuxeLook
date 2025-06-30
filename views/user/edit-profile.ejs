@@ -100,7 +100,9 @@
 
 <main>
   <!-- Profile Header -->
-  <section class="profile-header">
+  <section class="hero text-center bg-light p-0 mb-4">
+    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
+         style="height: 700px; object-fit: cover;">
 <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg" style="text-shadow: 2px 2px 8px black;">PROFILE</h1>
   </section>
 
@@ -111,7 +113,7 @@
       <div class="col-md-2 sidebar">
         <h5>SETTINGS</h5>
         <a href="/orders">Orders</a>
-        <a href="/profile">Personal Info</a>
+      <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">Personal Info</a>
         <a href="/Addresses">Addresses</a>
         <a href="/Wallet">Wallet</a>
       </div>
@@ -135,7 +137,7 @@
             <div class="mb-3">
               <label for="firstName" class="form-label">First Name</label>
               <div id="Error2" class="Error-message"></div>
-              <input type="text" class="form-control" id="firstName" name="firstName" value="<%= user.name %>">
+              <input type="text" class="form-control" id="firstName" name="firstName" value="<%= user.name %>" required >
             </div>
 
             <div class="mb-3">
@@ -147,11 +149,11 @@
             <div class="mb-3">
               <label for="phone" class="form-label">Phone</label>
               <div id="Error4" class="Error-message"></div>
-              <input type="text" class="form-control" id="phone" name="phone" value="<%= user.phone %>">
+              <input type="text" class="form-control" id="phone" name="phone" value="<%= user.phone %>" required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Gender</label>
+              <label class="form-label">Gender</label><br>
               <div id="Error5" class="Error-message"></div>
               <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="gender" id="male" value="Male"
@@ -236,10 +238,12 @@
       Error2.innerHTML = 'FirstName should contain only alphabets and be at least 3 characters long.';
       return;
     }
-    if (!/^[A-Za-z\s]+$/.test(lastName) || lastName.length < 3) {
+    if(lastName){
+      if (!/^[A-Za-z\s]+$/.test(lastName) || lastName.length < 3) {
       Error3.style.display = 'block';
       Error3.innerHTML = 'LastName should contain only alphabets and be at least 3 characters long.';
       return;
+    }
     }
     if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
       Error4.style.display = 'block';

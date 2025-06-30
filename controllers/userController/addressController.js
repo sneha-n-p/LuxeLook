@@ -30,7 +30,8 @@ const loadAddress = async (req, res) => {
             addresses,
             currentPage: page,
             totalPages,
-            activePage: 'address'
+            activePage: 'address',
+            currentPath:'/addresses'
         });
 
     } catch (error) {
@@ -44,7 +45,7 @@ const loadAddress = async (req, res) => {
 const loadAddAddress = async (req, res) => {
     try {
         const user = req.session.user
-        res.render("add-address", { user: user, activePage: 'add-address' })
+        res.render("add-address", { user: user, activePage: 'add-address',currentPath:'/addresses' })
     } catch (error) {
         console.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
@@ -90,7 +91,7 @@ const loadEditAddress = async (req, res) => {
         const addressId = new mongoose.Types.ObjectId(id)
         for (let add of addressData.address) {
             if (add._id.equals(addressId)) {
-                res.render("edit-Address", { user: userData, address: add, activePage: " edit-addresses" })
+                res.render("edit-Address", { user: userData, address: add, activePage: " edit-addresses",currentPath:'/addresses' })
             }
         }
         console.log(addressId)
@@ -157,7 +158,7 @@ const deleteAddress = async (req, res) => {
 const loadcartAddAddress = async (req, res) => {
     try {
         const user = req.session.user
-        res.render("cartAdd-address", { user: user, activePage: 'cartAdd-address' })
+        res.render("cartAdd-address", { user: user, activePage: 'cartAdd-address',currentPath:'/addresses' })
     } catch (error) {
         console.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")

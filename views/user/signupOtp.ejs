@@ -85,7 +85,7 @@
     <h5>Please enter the otp in the mail:</h5>
 
     <form id="otpForm" action="/verify-otp" method="POST" onsubmit="return validateOTPform()">
-      <input type="text" id="otpInput" name="otp" class="otp-input" placeholder="Enter OTP" required />
+      <input type="text" id="otpInput" maxlength="6" name="otp" class="otp-input" placeholder="Enter OTP" required />
       <button type="submit" class="btn btn-submit">Submit</button>
     </form>
 
@@ -93,7 +93,7 @@
     <div class="expired-msg" id="expiredMsg" style="display: none;">OTP expired</div>
 
     <div class="text-small">
-      Wrong Email? <button id="resend-btn" onclick="resendOTP()" disabled>Resend</button>
+      <a style="text-decoration: none;" href="/signup">Wrong Email? </a><button id="resend-btn" onclick="resendOTP()" disabled>Resend</button>
     </div>
 
   </div>
@@ -116,7 +116,7 @@
         otpInput.disabled = true;
         submitBtn.disabled = true;
         expiredMsg.style.display = 'block';
-        document.getElementById("resend-btn").disabled = false;  // ENABLE resend button
+        document.getElementById("resend-btn").disabled = false;
       }
 
     }, 1000);
@@ -153,7 +153,7 @@
           .catch(function (error) {
             Swal.fire({
               icon: "error",
-              title: "Internal Server Error",
+              title: "invalid OTP",
               text: "Please try again"
             });
           });

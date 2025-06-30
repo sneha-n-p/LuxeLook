@@ -29,7 +29,7 @@ router.post("/add-category",categoryController.addCategory)
 router.patch("/list-category",adminAuth,categoryController.listCategory)
 router.patch("/Unlist-category",adminAuth,categoryController.unlistCategory)
 router.get("/edit-category/:id",adminAuth,categoryController.loadEditCategory)
-router.post("/edit-category/:id",categoryController.editCategory)
+router.patch("/edit-category/:id",categoryController.editCategory)
 router.post('/add-category-offer',categoryController.addCategoryOffer)
 router.post('/remove-category-offer',categoryController.removeCategoryOffer)
 router.get('/get-category-offer/:id',adminAuth,categoryController.getCategoryEdit);
@@ -41,7 +41,7 @@ router.post("/add-product",upload.any(),productController.addproduct)
 router.get("/edit-product/:id",adminAuth,productController.editProduct)
 router.post('/edit-product/:id', upload.fields([
   { name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }
-]), productController.postProduct);
+]), productController.postEditProduct);
 router.post('/blockProduct',productController.blockProduct)
 router.post('/unblockProduct',productController.unblockProduct)
 router.post("/deleteImage",productController.deleteSingleImage)

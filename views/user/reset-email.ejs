@@ -70,7 +70,7 @@
   <!-- Reset Email Box -->
   <div class="email-box" style="background-color: #F2E8DC;">
     <div class="email-title">Enter your new email address</div>
-    <form action="/reset-email" id="resetEmailForm" method="POST">
+    <form action="/profile/change-email" id="resetEmailForm" method="POST" onsubmit="return validateLoginForm()">
       <div class="mb-3">
         <input type="email" name="newEmail" class="form-control" id='newEmail' placeholder="New Email Address" required>
       </div>
@@ -82,39 +82,33 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    document.getElementById('resetEmailForm').addEventListener('submit', async function (e) {
-      console.log('hiii')
-      e.preventDefault();
-      const newEmail = document.getElementById('newEmail').value.trim();
+  
+<script>
+  const emailInput = document.getElementById('newEmail');
+  const emailForm = document.getElementById('resetEmailForm');
+  const emailPattern = /^[a-zA-Z][a-zA-Z0-9._%+-]*@gmail\.com$/;
 
-      const emailPattern = /^[a-zA-Z0-9._%+-]{1,}@gmail\.com$/;
+  emailInput.addEventListener('input', () => {
+    const email = emailInput.value.trim();
+    if (!emailPattern.test(email)) {
+      emailInput.classList.add('is-invalid');
+    } else {
+      emailInput.classList.remove('is-invalid');
+    }
+  });
 
+  // Submit form
+  function validateLoginForm() {
+    const newEmail = emailInput.value.trim();
 
-      if (!emailPattern.test(newEmail)) {
-        return Swal.fire("Error", "Email must end with @gmail.com", "error");
-      }
+    if (!emailPattern.test(newEmail)) {
+      return Swal.fire("Error", "Email must start with a valid letter and end with @gmail.com", "error");
+    }
+    return true
 
-      try {
-        axios.post('/reset-email', { newEmail })
-          .then((response) => {
-            if (response.data.success) {
-              Swal.fire("Success", "Email changed successfully!", "success").then(() => {
-                window.location.href = "/profile";
-              });
-            } else {
-              Swal.fire("Error", response.data.message || "Something went wrong", "error");
-            }
-          })
-          .catch((error) => {
-            Swal.fire("Error", error.response?.data?.message || "Server error", "error");
-          });
-
-      } catch (error) {
-        console.error("Something went wrong:", error);
-      }
-    })
-  </script>
+    
+  }
+</script>
 
 </body>
 

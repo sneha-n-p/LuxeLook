@@ -43,6 +43,9 @@
     .btn-add:hover {
       background-color: #06b6d4;
     }
+    .edit-category-errors{
+      color: red;
+    }
   </style>
 </head>
 
@@ -55,22 +58,26 @@
       <form id="addCategoryForm">
         <div class="mb-3">
           <label for="categoryName" class="form-label">Category Name:</label>
+          <p class="edit-category-errors" id="category-name-Error"></p>
           <input type="text" class="form-control" id="categoryName" value="<%= Category.name %>" name="name" required pattern="^[A-Za-z]+$"
           title="Only alphabets allowed, no spaces or numbers.">
         </div>
 
         <div class="mb-3">
           <label for="categoryDescription" class="form-label">Description:</label>
+           <p class="edit-category-errors" id="category-Description-Error"></p>
           <textarea class="form-control" id="categoryDescription" name="description" rows="3" required pattern="^[A-Za-z]+$"
           title="Only alphabets allowed, no spaces or numbers."><%= Category.description %></textarea>
         </div>
 
         <div class="mb-3">
-          <label for="categoryOffer" class="form-label">Offer (%):</label>
+          <label for="categoryOffer" class="form-label">Offer (%):</label>       
+           <p class="edit-category-errors" id="category-Offer-Error"></p>
           <input type="number" class="form-control" id="categoryOffer" value="<%= Category.offer %>" name="offer" min="0" max="99" >
         </div>
         <div class="mb-3">
           <label for="status" class="form-label">Status:</label>
+           <p class="edit-category-errors" id="category-Status-Error"></p>
           <select class="form-select" id="status" name="status" required>
             <option value="" disabled <%= !Category.status ? "selected" : "" %>>Select status</option>
             <option value="Listed" <%= Category.status === "Listed" ? "selected" : "" %>>Listed</option>
@@ -86,44 +93,82 @@
 
   <!-- Bootstrap 5 JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <script>
-  const form = document.getElementById('addCategoryForm');
+const form = document.getElementById('addCategoryForm');
+  const categoryId = "<%= Category._id %>";
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(form);
+    document.getElementById("category-name-Error").textContent = "";
+    document.getElementById("category-Description-Error").textContent = "";
+    document.getElementById("category-Offer-Error").textContent = "";
+    document.getElementById("category-Status-Error").textContent = "";
+
+    const name = document.getElementById('categoryName').value.trim();
+    const description = document.getElementById('categoryDescription').value.trim();
+    const offer = document.getElementById('categoryOffer').value.trim();
+    const status = document.getElementById('status').value;
+
+    let isValid = true;
+
+    if (!name || !/^[A-Za-z ]+$/.test(name) || name.replace(/\s/g, "") === "") {
+      document.getElementById("category-name-Error").textContent = "Name must contain only letters and spaces.";
+      isValid = false;
+    }
+    if (!description || !/^[A-Za-z ]+$/.test(description) || description.replace(/\s/g, "") === "") {
+      document.getElementById("category-Description-Error").textContent = "Description must contain only letters and spaces.";
+      isValid = false;
+    }
+
+    if (offer) {
+      const offerValue = parseFloat(offer);
+      if (isNaN(offerValue) || offerValue < 0 || offerValue > 100) {
+        document.getElementById("category-Offer-Error").textContent = "Offer must be between 1 and 99.";
+        isValid = false;
+      }
+    }
+
+    if (!status) {
+      document.getElementById("category-Status-Error").textContent = "Please select a status.";
+      isValid = false;
+    }
+
+    if (!isValid) return;
 
     try {
-      const response = await axios.post('/admin/edit-category/<%= Category._id %>', {
-        name: formData.get('name'),
-        description: formData.get('description'),
-        offer: formData.get('offer'),
-        offerPrice: formData.get('offerPrice'),
-        status: formData.get('status')
+      const response = await axios.patch(`/admin/edit-category/${categoryId}`, {
+        name,
+        description,
+        offer,
+        status
       });
 
       if (response.data.success) {
         Swal.fire({
-          icon: 'success',
-          title: 'Category updated!',
+          icon: "success",
+          title: "Updated!",
           text: response.data.message,
-          confirmButtonColor: '#22c55e'
         }).then(() => {
-          window.location.href = '/admin/categories';
+          window.location.href = "/admin/categories";
         });
-        form.reset();
       }
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: error.response?.data?.error || 'Something went wrong!',
-        confirmButtonColor: '#ef4444'
-      });
+      const msg = error.response?.data?.error;
+
+      if (msg === "Category name already exists") {
+        document.getElementById("category-name-Error").textContent = "This category name already exists.";
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: msg || "Something went wrong!",
+        });
+      }
     }
   });
 </script>

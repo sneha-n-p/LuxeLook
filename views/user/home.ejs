@@ -203,40 +203,50 @@
 
 
   <section class="bestsellers py-5">
-    <div class="container">
-      <h2 class="text-center mb-4">Our Bestsellers</h2>
-      <div class="row">
-        <% for (let i=0; i < 4; i++) { %>
-          <% if (products[i]) { %>
-            <div class="col-md-3 mb-4 d-flex">
-  <div class="card w-100">
-    <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
-    <div class="card-body text-center">
-      <h5 class="card-title"><%= products[i].productName %></h5>
-      <p class="card-text"><strong>₹ <%= products[i].salePrice %></strong></p>
-      <div>
-        <a href="/product-details/<%=products[i]._id%>">
-          <button class="btn btn-outline-dark btn-sm" style=" background: linear-gradient(90deg, #B5654B  , #D17C63 ); color: #fff;">View Details</button>
-        </a>
-      </div>
+  <div class="container">
+    <h2 class="text-center mb-4">Our Bestsellers</h2>
+    <div class="row">
+      <% for (let i = 0; i < 4; i++) { %>
+        <% if (products[i]) { %>
+          <div class="col-md-3 mb-4 d-flex">
+            <div class="card w-100">
+              <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
+              <div class="card-body text-center">
+                <h5 class="card-title"><%= products[i].productName %></h5>
 
-      <% if (products[i].quatity > 0) { %>
-        <div class="mt-2">
-          <button class="wishlist-symbol" onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
-          <button class="wishlist-symbol" onclick="addToCart('<%=products[i]._id%>')">&#128722;</button>
-        </div>
-      <% } else { %>
-        <div class="text-danger mt-2"><strong>Out of Stock</strong></div>
+                <% if (products[i].bestOffer > 0) { %>
+                  <p class="card-text mb-1">
+                    <s class="text-muted">₹<%= products[i].regularPrice %></s>
+                    <span class="text-danger ms-2">-<%= products[i].bestOffer %>%</span>
+                  </p>
+                  <p class="card-text"><strong>₹<%= products[i].salePrice %></strong></p>
+                <% } else { %>
+                  <p class="card-text"><strong>₹<%= products[i].regularPrice %></strong></p>
+                <% } %>
+
+                <div>
+                  <a href="/product-details/<%= products[i]._id %>">
+                    <button class="btn btn-outline-dark btn-sm" style="background: linear-gradient(90deg, #B5654B, #D17C63); color: #fff;">View Details</button>
+                  </a>
+                </div>
+
+                <% if (products[i].quatity > 0) { %>
+                  <div class="mt-2">
+                    <button class="wishlist-symbol" onclick="addToWishlist('<%= products[i]._id %>')">&#10084;</button>
+                  </div>
+                <% } else { %>
+                  <div class="text-danger mt-2"><strong>Out of Stock</strong></div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        <% } %>
       <% } %>
     </div>
   </div>
-</div>
-            <% } %>
-              <% } %>
+</section>
 
-      </div>
-    </div>
-  </section>
+
   <script>
 
     function addToWishlist(productId) {
@@ -264,41 +274,41 @@
             title: "Error Occured",
             icon: "error",
             showConfirmButton: false,
-            text: "Internal Server Error",
+            text: "Already Exist in wishlist",
             timer: 1500
           })
         })
     }
-    function addToCart(productId) {
+    // function addToCart(productId) {
 
-      axios.post("/addToCart", { productId })
-        .then(function (responce) {
-          if (responce.data.success) {
-            Swal.fire({
-              title: `Add To Cart`,
-              icon: 'success',
-              showConfirmButton: false,
-              timer: 1500
-            })
-          } else {
-            Swal.fire({
-              title: "Error Occured",
-              icon: "error",
-              showConfirmButton: false,
-              text: responce.data.message,
-              timer: 1500
-            })
-          }
-        }).catch((error) => {
-          Swal.fire({
-            title: "Error Occured",
-            icon: "error",
-            showConfirmButton: false,
-            text: "Internal Server Error",
-            timer: 1500
-          })
-        })
-    }
+    //   axios.post("/addToCart", { productId })
+    //     .then(function (responce) {
+    //       if (responce.data.success) {
+    //         Swal.fire({
+    //           title: `Add To Cart`,
+    //           icon: 'success',
+    //           showConfirmButton: false,
+    //           timer: 1500
+    //         })
+    //       } else {
+    //         Swal.fire({
+    //           title: "Error Occured",
+    //           icon: "error",
+    //           showConfirmButton: false,
+    //           text: responce.data.message,
+    //           timer: 1500
+    //         })
+    //       }
+    //     }).catch((error) => {
+    //       Swal.fire({
+    //         title: "Error Occured",
+    //         icon: "error",
+    //         showConfirmButton: false,
+    //         text: "Internal Server Error",
+    //         timer: 1500
+    //       })
+    //     })
+    // }
 
 
   </script>

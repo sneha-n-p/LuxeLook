@@ -1,37 +1,10 @@
-<%-include("../../views/partials/adminPartial/header")%>
+<%- include("../../views/partials/adminPartial/header") %>
 
 <style>
   body {
-    background-color: #121212;
-    color: #fff;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  .sidebar {
-    background-color: #1e1e1e;
-    min-height: 100vh;
-    padding: 20px;
-    position: fixed;
-    width: 220px;
-    top: 0;
-    left: 0;
-  }
-
-  .sidebar a {
-    color: #bbb;
-    display: block;
-    padding: 12px;
-    text-decoration: none;
-    border-radius: 6px;
-  }
-
-  .sidebar a.active, .sidebar a:hover {
-    background-color: #333;
-    color: white;
-  }
-
-  .sidebar .logout {
-    color: red;
+    background-color: #0f172a;
+    color: #f1f5f9;
+    font-family: 'Segoe UI', sans-serif;
   }
 
   .main-content {
@@ -41,170 +14,207 @@
 
   .main-content h3 {
     margin-bottom: 20px;
+    color: #f1f5f9;
   }
 
   .table {
-    background-color: #1f1f1f;
-    color: #ddd;
+    color: #f1f5f9;
+    background-color: #1e293b;
     border-radius: 8px;
     overflow: hidden;
   }
 
-  .table th {
-    background-color: #2a2a2a;
-    color: #fff;
+  .table thead th {
+    background-color: #1e293b;
+    border-bottom: 2px solid #334155;
+    color: #f1f5f9;
+  }
+
+  .table tbody tr {
+    background-color: #1e293b;
+    border-bottom: 1px solid #334155;
   }
 
   .status-delivered {
-    background-color: green;
-    color: white;
-    padding: 4px 10px;
+    background-color: #22c55e;
+    color: #fff;
+    padding: 6px 14px;
     border-radius: 6px;
     font-size: 0.9rem;
   }
 
   .status-cancelled {
-    background-color: darkred;
-    color: white;
-    padding: 4px 10px;
+    background-color: #ef4444;
+    color: #fff;
+    padding: 6px 14px;
     border-radius: 6px;
     font-size: 0.9rem;
   }
 
   .status-pending {
-    background-color: orange;
-    color: white;
-    padding: 4px 10px;
+    background-color: #f59e0b;
+    color: #fff;
+    padding: 6px 14px;
     border-radius: 6px;
     font-size: 0.9rem;
   }
 
-  .action-icons i {
-    cursor: pointer;
-    font-size: 1.2rem;
-    margin-left: 10px;
-  }
-
-  .pagination {
-    margin-top: 20px;
-  }
-
-  .pagination .page-link {
-    background-color: transparent;
+  .viewDetail {
+    background-color: #22d3ee;
+    color: #0f172a;
     border: none;
-    color: #ccc;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
   }
 
-  .pagination .active .page-link {
-    background-color: #444;
-    color: white;
-    border-radius: 4px;
+  .viewDetail:hover {
+    background-color: #06b6d4;
   }
 
   .search-bar {
+    background-color: #1e293b;
+    border: none;
+    color: #f1f5f9;
+    padding: 10px 15px;
+    border-radius: 6px;
     width: 100%;
     max-width: 400px;
     margin-bottom: 25px;
   }
 
-  .search-bar input {
-    background-color: #2c2c2c;
-    color: #fff;
+  .search-bar::placeholder {
+    color: #cbd5e1;
+  }
+
+  .pagination .page-link {
+    background-color: #1e293b;
+    color: #f1f5f9;
     border: none;
-    padding: 10px 15px;
-    border-radius: 6px;
-    width: 100%;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #334155;
+  }
+
+  .pagination .page-link.active {
+    background-color: #22d3ee;
+    color: #0f172a;
   }
 
   .table td, .table th {
     vertical-align: middle;
     font-size: 0.95rem;
   }
-  .viewDetail{
-background-color: black;
-color: #fff;
-border-radius: 10px;
+  .search-container {
+    margin: 20px;
   }
 
+  .search-input {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 250px;
+  }
 </style>
 
-<div class="main-content">
-  <div class="search-bar">
-    <input type="text" placeholder="Search for Order Id">
-  </div>
-
-  <h3>Orders</h3>
-  <div class="table-responsive">
-    <table class="table table-borderless text-center">
-      <thead>
-        <tr>
-          <th>USER NAME</th>
-          <th>ORDER ID</th>
-          <th>ORDERED ITEMS</th>
-          <th>AMOUNT</th>
-          <th>ORDER DATE</th>
-          <th>STATUS</th>
-          <th>ACTION</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% orders.forEach(order => { %>
-          <tr>
-            <td style="color: #000;"><%= order.userId.name %></td>
-            <td style="color: #000;"><%= order.orderId %></td>
-            <td style="color: #000;">NO:<%= order.orderedItems.length %></td>
-            <td style="color: #000;">₹ <%= order.finalAmount %></td>
-            <td style="color: #000;"><%= order.createdOn.toDateString() %></td>
-            <td>
-              <% if (order.status === 'Delivered') { %>
-                <span class="status-delivered">Delivered</span>
-              <% } else if (order.status === 'Cancelled') { %>
-                <span class="status-cancelled">Cancelled</span>
-              <% } else { %>
-                <span class="status-pending"> <%=order.status%></span>
-              <% } %>
-            </td>
-            <td class="action-icons">
-                <button class="viewDetail" data-id="<%= order._id %>">viewDetail</button>
-            </td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="d-flex justify-content-between align-items-center mt-3">
-    <div style="color: #fff;">Showing 1 of <%= totalPages %>
+<body>
+  <div class="main-content">
+    <div class="search-bar">
+      <input type="text" id="orderSearch" class="search-bar" placeholder="Search for Order Id">
     </div>
-    <nav>
-        <ul class="pagination mb-0">
-            <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-            </li>
 
-            <% for (let i=1; i <=totalPages; i++) { %>
-                <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                    <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
-                        <%= i %>
-                    </a>
-                </li>
+    <h3>Orders</h3>
+    <div class="table-responsive">
+      <table class="table table-borderless text-center">
+        <thead>
+          <tr>
+            <th>USER NAME</th>
+            <th>ORDER ID</th>
+            <th>ORDERED ITEMS</th>
+            <th>AMOUNT</th>
+            <th>ORDER DATE</th>
+            <th>STATUS</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% orders.forEach(order => { %>
+            <tr>
+              <td style="color: black;"><%= order.userId.name %></td>
+              <td style="color: black;"><%= order.orderId %></td>
+              <td style="color: black;">NO: <%= order.orderedItems.length %></td>
+              <td style="color: black;">₹ <%= order.finalAmount %></td>
+              <td style="color: black;"><%= order.createdOn.toDateString() %></td>
+              <td style="color: black;">
+                <% if (order.status === 'Delivered') { %>
+                  <span class="status-delivered">Delivered</span>
+                <% } else if (order.status === 'Cancelled') { %>
+                  <span class="status-cancelled">Cancelled</span>
+                <% } else { %>
+                  <span class="status-pending"><%= order.status %></span>
                 <% } %>
+              </td>
+              <td style="color: black;">
+                <button class="viewDetail" data-id="<%= order._id %>">View Detail</button>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
 
-                    <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-                        <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-                    </li>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>Showing 1 of <%= totalPages %></div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+          </li>
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+            </li>
+          <% } %>
+          <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+          </li>
         </ul>
-    </nav>
+      </nav>
+    </div>
+  </div>
 
-</div>
-</div>
-<script>
-   document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.viewDetail').forEach(button => {
-      button.addEventListener('click', function () {
-        const orderId = this.dataset.id;
-        window.location.href = `/admin/orderDetails/${orderId}`;
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.viewDetail').forEach(button => {
+        button.addEventListener('click', function () {
+          const orderId = this.dataset.id;
+          window.location.href = `/admin/orderDetails/${orderId}`;
+        });
+      });
+
+      document.getElementById('orderSearch').addEventListener('keyup', function () {
+        let searchValue = this.value.toLowerCase();
+        let rows = document.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+          let orderId = row.children[1].textContent.toLowerCase();
+          if (orderId.includes(searchValue)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
       });
     });
+    document.getElementById("orderSearch").addEventListener("input", function () {
+    const searchValue = this.value.toLowerCase();
+    console.log("Searching for:", searchValue);
   });
   </script>
+</body>
+
+</html>

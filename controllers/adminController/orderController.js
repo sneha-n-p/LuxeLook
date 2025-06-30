@@ -32,7 +32,7 @@ const loadOrder = async (req, res) => {
         })
     } catch (error) {
         console.error(error)
-        res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
+        res.status(StatusCode.NOT_FOUND).redirect('/admin/pageError')
     }
 }
 const loadViewDetails = async (req, res) => {
@@ -43,7 +43,7 @@ const loadViewDetails = async (req, res) => {
         return res.render('viewDetails', { order })
     } catch (error) {
         console.error(error)
-        res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
+        res.status(StatusCode.NOT_FOUND).redirect('/admin/pageError')
     }
 }
 
@@ -82,6 +82,7 @@ const updateOrderStatus = async (req, res) => {
         return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
     }
 };
+
 
 const verifyRequest = async (req, res) => {
     try {

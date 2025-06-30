@@ -101,7 +101,7 @@
     <div class="col-md-3 sidebar" style="margin-right: 57px;">
       <h5>SETTINGS</h5>
       <a href="/orders">Orders</a>
-      <a href="/profile">Personal Info</a>
+      <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">Personal Info</a>
       <a href="/Addresses">Addresses</a>
       <a href="/Wallet">Wallet</a>
     </div>
@@ -109,7 +109,7 @@
     <!-- Form Section -->
     <div class="col-md-8 form-section">
       <h4 class="mb-4">Change Email</h4>
-      <form action="/profile/change-email" method="POST" onsubmit="return validateLoginForm()">
+      <form action="/reset-email" method="get" onsubmit="return validateLoginForm()">
         <div class="mb-4">
           <label for="currentEmail" class="form-label">Current Email</label>
           <input type="email" name="currentEmail" id="currentEmail" class="form-control" placeholder="Enter your current email" required>

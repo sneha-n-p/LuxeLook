@@ -97,7 +97,7 @@ const orderSchema = new Schema({
       },
       phone: {
         type: String,
-        required: true, // typo fixed: reuired to required
+        required: true,
       },
       altPhone: String,
     },

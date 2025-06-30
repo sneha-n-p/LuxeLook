@@ -307,7 +307,7 @@ if (!form) {
   console.error('Form with id="checkoutForm" not found in DOM');
 } else {
   form.addEventListener('submit', async function (e) {
-    e.preventDefault(); // Prevent default submission
+    e.preventDefault();
     
     const addressSelect = form.querySelector('select[name="addressId"]');
     console.log('hiiii')
@@ -318,11 +318,9 @@ if (!form) {
     const formData = new FormData(form);
   cartItems.forEach(item => {
     formData.append('size', item.size);
-    // append other fields like item.productId, quantity etc.
   });
-    console.log('Form data:', Object.fromEntries(formData)); // Debug form data
+    console.log('Form data:', Object.fromEntries(formData));
 
-    // Validate addressSelect
     if (!addressSelect || addressSelect.options.length === 0) {
       console.log('No address select element or no options available');
       Swal.fire({
@@ -336,7 +334,6 @@ if (!form) {
       return;
     }
 
-    // Validate addressId
     const addressId = addressSelect.value;
     if (!addressId) {
       console.log('No addressId selected');
@@ -476,8 +473,9 @@ if (!form) {
   body: JSON.stringify(plainObject)
         });
 
+        
         if (res.redirected) {
-          window.location.href = res.url; // Follow redirect (e.g., /orderSuccess)
+          window.location.href = res.url; 
         } else {
           const result = await res.json();
           if (result.success) {
@@ -509,6 +507,88 @@ if (!form) {
     }
   });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const copyButtons = document.querySelectorAll('.copy-coupon-btn');
+
+    copyButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        const couponCode = this.getAttribute('data-code');
+        
+        navigator.clipboard.writeText(couponCode).then(() => {
+          // Optional: give feedback to user
+          this.textContent = 'Copied!';
+          this.classList.add('btn-success');
+          
+          setTimeout(() => {
+            this.textContent = 'Copy';
+            this.classList.remove('btn-success');
+          }, 1500);
+        }).catch(err => {
+          console.error('Failed to copy coupon code: ', err);
+        });
+      });
+    });
+  });
+
+  document.getElementById('applyCouponBtn').addEventListener('click', async () => {
+    const couponCode = document.getElementById('couponInput').value.trim();
+    const subtotal = parseInt(document.getElementById('subtotal').textContent.replace('₹', ''));
+
+    if (!couponCode) {
+      Swal.fire('Empty Coupon', 'Please enter a coupon code.', 'warning');
+      return;
+    }
+
+    try {
+      const response = await fetch('/apply-coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coupon: couponCode, subtotal })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const discount = data.discount;
+        const finalTotal = data.finalTotal;
+
+        document.getElementById('discount').textContent = `₹${discount}`;
+        document.getElementById('finalTotal').textContent = `₹${finalTotal}`;
+        document.getElementById('hiddenFinalTotal').value = finalTotal;
+        document.getElementById('couponMessage').textContent = `Coupon applied! You saved ₹${discount}`;
+        document.getElementById('couponMessage').style.display = 'block';
+
+        let couponInput = document.getElementById('appliedCoupon');
+        let couponIdInput = document.getElementById('appliedCouponId');
+        if (!couponInput) {
+          couponInput = document.createElement('input');
+          couponInput.type = 'hidden';
+          couponInput.name = 'appliedCoupon';
+          couponInput.id = 'appliedCoupon';
+          form.appendChild(couponInput);
+        }
+        if (!couponIdInput) {
+          couponIdInput = document.createElement('input');
+          couponIdInput.type = 'hidden';
+          couponIdInput.name = 'couponId';
+          couponIdInput.id = 'appliedCouponId';
+          form.appendChild(couponIdInput);
+        }
+
+        couponInput.value = couponCode;
+        couponIdInput.value = data.couponId;
+
+      } else {
+        Swal.fire('Invalid Coupon', data.message, 'error');
+        document.getElementById('couponMessage').style.display = 'none';
+      }
+
+    } catch (error) {
+      console.error('Apply coupon error:', error);
+      Swal.fire('Error', 'Failed to apply coupon. Try again.', 'error');
+    }
+  });
 </script>
 
 <%- include("../../views/partials/userPartial/footer") %>

@@ -172,13 +172,11 @@ function previewImage(event, index) {
     const input = event.target;
     const file = input.files[0];
 
-    // Define allowed file types
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
     if (file) {
         console.log(`File selected for image${index + 1}:`, file.name);
 
-        // Check if the file type is allowed
         if (!allowedTypes.includes(file.type)) {
             Swal.fire({
                 title: 'Error!',
@@ -308,7 +306,6 @@ form.addEventListener('submit', async function (event) {
     event.preventDefault();
     let isValid = true;
 
-    // Validate other form inputs (name, description, etc.)
     document.querySelectorAll('input:not([type="file"]), textarea, select').forEach((input) => {
         if (!validateInput(input)) {
             isValid = false;
@@ -327,7 +324,7 @@ form.addEventListener('submit', async function (event) {
         console.log(`${pair[0]}:`, pair[1]);
     }
 
-    // Process cropped images
+    //  cropped images
     for (let i = 0; i < 4; i++) {
         if (croppers[i] && croppers[i].getCroppedCanvas()) {
             try {

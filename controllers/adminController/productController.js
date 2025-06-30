@@ -8,7 +8,7 @@ const mongoose = require("mongoose")
 const StatusCode = require("../../statusCode")
 
 
-const productInfo = async (req, res) => {//daa user le alleaah
+const productInfo = async (req, res) => {
   try {
     let search = ""
     if (req.query.search) {
@@ -66,7 +66,7 @@ const addproduct = async (req, res) => {
     } = req.body;
     const errors = {};
 
-    // Validation logic
+    // Validation 
     if (!ProductName || !/^[A-Za-z ]+$/.test(ProductName)) {
       errors.name = "Product name is required and should contain only alphabetsDefaulters alphabets and spaces";
     }
@@ -91,6 +91,7 @@ const addproduct = async (req, res) => {
       errors.price = "Regular price must be greater than sales price";
     }
 
+    let stock  =0
     let variants = [];
     if (Array.isArray(variantSize)) {
       for (let i = 0; i < variantSize.length; i++) {
@@ -109,6 +110,7 @@ const addproduct = async (req, res) => {
             salePrice: parseFloat(variantSalePrice[i]),
             quantity: parseInt(variantQuantity[i]),
           });
+          stock += parseInt(variantQuantity[i])
         }
       }
     } else if (variantSize) {
@@ -196,7 +198,7 @@ const addproduct = async (req, res) => {
     const newProduct = new Product({
       productName: ProductName,
       description,
-      quantity: variants.reduce((sum, v) => sum + v.quantity, 0),
+      quatity: stock,
       size: variants.map(v => v.size),
       category: categoryDoc._id,
       offer: parseFloat(offer) || 0,
@@ -211,7 +213,7 @@ const addproduct = async (req, res) => {
     return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });
   } catch (error) {
     console.error("Error adding product:", error);
-    return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("add-product", {
+    return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("addProduct", {
       message: "Failed to add product. Please try again.",
       errors: {},
       categories: await Category.find(),
@@ -229,7 +231,7 @@ const editProduct = async (req, res) => {
     res.render("editProduct", { categories, product })
   } catch (error) {
     console.error(error)
-    res.redirect("/pageNotFound")
+    res.redirect("/admin/pageError")
   }
 }
 
@@ -264,7 +266,7 @@ const deleteSingleImage = async (req, res) => {
   }
 }
 
-const postProduct = async (req, res) => { //ith eatha function add product
+const postEditProduct = async (req, res) => { 
   try {
     console.log('Received body:', req.body);
     console.log('Received files:', req.files);
@@ -382,7 +384,7 @@ const blockProduct = async (req, res) => {
     }
   } catch (error) {
     console.error("Error blocking product:", error)
-    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+    res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
 
@@ -408,7 +410,7 @@ const unblockProduct = async (req, res) => {
     }
   } catch (error) {
     console.error("Error blocking product:", error)
-    res.status(StatusCode.NOT_FOUND).redirect("/pageerror")
+    res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
 
@@ -417,26 +419,44 @@ const addProductOffer = async (req, res) => {
     const { id, offer } = req.body;
 
     const product = await Product.findById(id);
-    if (!product) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
+    if (!product) {
+      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
+    }
 
-    const category = await Category.findOne({ name: product.category });
+    const category = await Category.findById(product.category);
     const categoryOffer = category?.offer || 0;
 
     const finalOffer = Math.max(offer, categoryOffer);
-    const discount = product.regularPrice * (finalOffer / 100);
-    const salePrice = Math.round(product.regularPrice - discount);
 
+    const discount = product.regularPrice * (finalOffer / 100);
+    const newSalePrice = Math.round(product.regularPrice - discount);
     product.offer = finalOffer;
-    product.salePrice = salePrice;
+    product.salePrice = newSalePrice;
+
+    product.variant = product.variant.map(variant => {
+      const variantDiscount = variant.salePrice * (finalOffer / 100);
+      const updatedSalePrice = Math.round(variant.salePrice - variantDiscount);
+      return {
+        ...variant,
+        salePrice: updatedSalePrice
+      };
+    });
 
     await product.save();
 
-    res.status(StatusCode.CREATED).json({ success: true, finalOffer, salePrice });
+    res.status(StatusCode.CREATED).json({
+      success: true,
+      finalOffer,
+      salePrice: newSalePrice,
+      message: 'Offer applied successfully to product and variants'
+    });
+
   } catch (err) {
     console.error('Error in addProductOffer:', err);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
   }
-}
+};
+
 
 const getProductEdit = async (req, res) => {
   try {
@@ -507,7 +527,7 @@ module.exports = {
   addproduct,
   editProduct,
   deleteSingleImage,
-  postProduct,
+  postEditProduct,
   unblockProduct,
   blockProduct,
   addProductOffer,
