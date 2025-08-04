@@ -108,7 +108,7 @@ const addToCart = async (req, res) => {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid product variant" });
         }
 
-        const maxAllowed = stock < 5 ? stock : 5;
+        const maxAllowed = stock < 1 ? stock : 1;
 
         if (CarQquantity > maxAllowed) {
             return res.status(StatusCode.BAD_REQUEST).json({

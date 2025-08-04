@@ -167,7 +167,7 @@
             <!-- Sidebar -->
             <div class="col-md-2 sidebar">
                 <h5>SETTINGS</h5>
-      <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">Orders</a>
+                <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">Orders</a>
                 <a href="/profile">Personal Info</a>
                 <a href="/addresses">Addresses</a>
                 <a href="/wallet">Wallet</a>
@@ -191,8 +191,8 @@
                                         </span>
                                         <% } %>
                         </p>
-                        
-                      
+
+
                         <% if (order.address && order.address.length> 0) { %>
                             <p><strong>Address:</strong>
                                 <%= order.address[0].name %>,
@@ -210,56 +210,61 @@
                             <% } else { %>
                                 <p><strong>Address:</strong> Not provided</p>
                                 <% } %>
-                                <p><strong>Total Price:</strong> ₹<%= order.totalPrice.toFixed(2) %>
-                        </p>
-                                <%if(order.couponApplied){%>
-                                    <p><strong>Coupon Applied:</strong>
-                                        <%= order.couponApplied %>
+                                    <p><strong>Total Price:</strong> ₹<%= order.totalPrice.toFixed(2) %>
                                     </p>
-                                    <p><strong>Discount:</strong> 
-                                        ₹<%= order.discount%>
-                                    </p>
-                                <%}%>
-                                 <p><strong>Final Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %>
-                        </p>
-                                    <p><strong>Order Date:</strong>
-                                        <%= order.createdOn.toDateString() %>
-                                    </p>
-                                    <hr>
-                                    <h5 class="mb-3 fw-bold">Ordered Items</h5>
-                                    <% order.orderedItems.forEach(item=> { %>
-                                        <div class="product-detail-card">
-                                            <div class="product-detail-left">
-                                                <img src="<%= item.product.productImage[0] %>"
-                                                    alt="<%= item.product.productName %>">
-                                                <div class="product-detail-text">
-                                                    <h6 class="fw-bold">
-                                                        <%= item.product.productName %>
-                                                    </h6>
-                                                    <p>Quantity: <%= item.quantity %> | Price: ₹<%=
-                                                                order.finalAmount.toFixed(2) %> | Status: <%= item.status %> | size : <%=item.size%>
-                                                    </p>
+                                    <%if(order.couponApplied){%>
+                                        <p><strong>Coupon Applied:</strong>
+                                            <%= order.couponApplied %>
+                                        </p>
+                                        <p><strong>Discount:</strong>
+                                            ₹<%= order.discount%>
+                                        </p>
+                                        <%}%>
+                                            <p><strong>Final Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %>
+                                            </p>
+                                            <p><strong>Order Date:</strong>
+                                                <%= order.createdOn.toDateString() %>
+                                            </p>
+                                            <hr>
+                                            <h5 class="mb-3 fw-bold">Ordered Items</h5>
+                                            <% order.orderedItems.forEach(item=> { %>
+                                                <div class="product-detail-card">
+                                                    <div class="product-detail-left">
+                                                        <img src="<%= item.product.productImage[0] %>"
+                                                            alt="<%= item.product.productName %>">
+                                                        <div class="product-detail-text">
+                                                            <h6 class="fw-bold">
+                                                                <%= item.product.productName %>
+                                                            </h6>
+                                                            <p>Quantity: <%= item.quantity %> | Price: ₹<%= item.quantity*item.price %> | Status: <%=
+                                                                            item.status %> | size : <%=item.size%>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <% if (item.status.trim()==='Delivered' ) { %>
+                                                            <button class="submit-btn btn-return"
+                                                                onclick="singleReturned('<%= order._id %>', '<%= item.product._id %>')">RETURN</button>
+                                                            <% } else if (item.status.trim()==='Ordered' ) { %>
+                                                                <button class="submit-btn btn-cancel"
+                                                                    onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>')">CANCEL</button>
+                                                                <% } else if(item.status.trim()==='Return Request') { %>
+                                                                    <button class="submit-btn ">RETURN REQUESTED</button>
+                                                                <% } else { %>
+                                                                    <span class="text-muted"></span>
+                                                                    <% } %>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <% if (item.status.trim()==='Delivered' ) { %>
-                                                    <button class="submit-btn btn-return"
-                                                        onclick="returned('<%= order._id %>', '<%= item.product._id %>')">RETURN</button>
-                                                    <% } else if (item.status.trim()==='Ordered' ) { %>
-                                                        <button class="submit-btn btn-cancel"
-                                                            onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>')">CANCEL</button>
-                                                        <% } else { %>
-                                                            <span class="text-muted">N/A</span>
-                                                            <% } %>
-                                            </div>
-                                        </div>
-                                        <% }) %>
-                                            <div class="mt-4">
-                                                <a href="/orders" class="submit-btn">← Back to Orders</a>
-                                                <button class="submit-btn btn-download"
-                                                    onclick="showDownloadOptions()">Download Invoice</button>
-                                            </div>
-                                            <% } %>
+                                                <% }) %>
+                                                    <div class="mt-4">
+                                                        <a href="/orders" class="submit-btn">← Back to Orders</a>
+
+                                                        <%if(order.status.trim()==='Delivered'){%>
+                                                            <a href="/downloadInvoice?orderId=<%= order.orderId %>"
+                                                                class="btn btn-primary mt-2">Download Invoice</a>
+                                                         <%}%>
+                                                    </div>
+                                                    <% } %>
             </div>
         </div>
     </div>
@@ -268,7 +273,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
         const showSwal = (config) => {
@@ -279,130 +284,130 @@
             });
         };
 
-       function cancelSingleProduct(productId, orderId) {
-  const reasons = [
-    "Found a better price elsewhere",
-    "Ordered by mistake",
-    "No longer needed",
-    "Expected delivery time too long",
-    "Other"
-  ];
+        function cancelSingleProduct(productId, orderId) {
+            const reasons = [
+                "Found a better price elsewhere",
+                "Ordered by mistake",
+                "No longer needed",
+                "Expected delivery time too long",
+                "Other"
+            ];
 
-  let optionsHtml = reasons.map(reason =>
-    `<option value="${reason}">${reason}</option>`
-  ).join("");
+            let optionsHtml = reasons.map(reason =>
+                `<option value="${reason}">${reason}</option>`
+            ).join("");
 
-  Swal.fire({
-    title: "Cancel Product",
-    html: `
+            Swal.fire({
+                title: "Cancel Product",
+                html: `
       <p>Select a reason for cancellation:</p>
       <select id="cancel-reason" class="swal2-input">
         <option value="" disabled selected>Select a reason</option>
         ${optionsHtml}
       </select>
     `,
-    showCancelButton: true,
-    confirmButtonText: "Yes, Cancel it!",
-    preConfirm: () => {
-      const selectedReason = document.getElementById("cancel-reason").value;
-      if (!selectedReason) {
-        Swal.showValidationMessage("Please select a reason.");
-        return false;
-      }
-      return selectedReason;
-    }
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        const response = await axios.post('/orders/cancel-item', {
-          productId,
-          orderId,
-          reason: result.value
-        });
+                showCancelButton: true,
+                confirmButtonText: "Yes, Cancel it!",
+                preConfirm: () => {
+                    const selectedReason = document.getElementById("cancel-reason").value;
+                    if (!selectedReason) {
+                        Swal.showValidationMessage("Please select a reason.");
+                        return false;
+                    }
+                    return selectedReason;
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await axios.post('/orders/cancel-item', {
+                            productId,
+                            orderId,
+                            reason: result.value
+                        });
 
-        if (response.data.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Cancelled!",
-            text: "Item cancelled successfully.",
-            showConfirmButton: false,
-            timer: 1200
-          }).then(() => location.reload());
-        } else {
-          Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
+                        if (response.data.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Cancelled!",
+                                text: "Item cancelled successfully.",
+                                showConfirmButton: false,
+                                timer: 1200
+                            }).then(() => location.reload());
+                        } else {
+                            Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
+                        }
+                    } catch (error) {
+                        Swal.fire("Oops...", "Something went wrong while cancelling the item.", "error");
+                    }
+                }
+            });
         }
-      } catch (error) {
-        Swal.fire("Oops...", "Something went wrong while cancelling the item.", "error");
-      }
-    }
-  });
-}
 
-        function returned(orderId, productId) {
-    const reasons = [
-        "Found a better price elsewhere",
-        "Order placed by mistake",
-        "Item won't arrive on time",
-        "Changed my mind",
-        "Other"
-    ];
+        function singleReturned(orderId, productId) {
+            const reasons = [
+                "Found a better price elsewhere",
+                "Order placed by mistake",
+                "Item won't arrive on time",
+                "Changed my mind",
+                "Other"
+            ];
 
-    const optionsHtml = reasons.map(reason =>
-        `<option value="${reason}">${reason}</option>`
-    ).join("");
+            const optionsHtml = reasons.map(reason =>
+                `<option value="${reason}">${reason}</option>`
+            ).join("");
 
-    Swal.fire({
-        title: 'Return Product',
-        html: `
+            Swal.fire({
+                title: 'Return Product',
+                html: `
             <label for="returnReason">Select a reason:</label>
             <select id="returnReason" class="swal2-input">
                 <option value="" disabled selected>Select reason</option>
                 ${optionsHtml}
             </select>
         `,
-        showCancelButton: true,
-        confirmButtonText: 'Submit',
-        preConfirm: () => {
-            const selectedReason = document.getElementById('returnReason').value;
-            if (!selectedReason) {
-                Swal.showValidationMessage('Please select a return reason');
-            }
-            return selectedReason;
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            axios.patch('/orders/return', {
-                orderId,
-                productId,
-                reason: result.value
-            })
-            .then(response => {
-                if (response.data.success) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Return Requested!",
-                        text: "Your return request has been submitted.",
-                        showConfirmButton: false,
-                        timer: 1500
-                    }).then(() => location.reload());
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops!",
-                        text: response.data.message || "Return request failed."
-                    });
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                preConfirm: () => {
+                    const selectedReason = document.getElementById('returnReason').value;
+                    if (!selectedReason) {
+                        Swal.showValidationMessage('Please select a return reason');
+                    }
+                    return selectedReason;
                 }
-            })
-            .catch(error => {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops!",
-                    text: "Something went wrong while submitting return request."
-                });
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.patch('/orders/single-Product-Return', {
+                        orderId,
+                        productId,
+                        reason: result.value
+                    })
+                        .then(response => {
+                            if (response.data.success) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Product Return Requested!",
+                                    text: "Your return request has been submitted.",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => location.reload());
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Oops!",
+                                    text: response.data.message || "Return request failed."
+                                })
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops!",
+                                text: "Something went wrong while submitting return request."
+                            });
+                        });
+                }
             });
         }
-    });
-}
 
 
         function showDownloadOptions() {
@@ -473,40 +478,40 @@
         XLSX.write(wb, 'Order_<%= order.orderId %>.xlsx');
   }
 
-       function downloadPDF() {
-    console.log("Generating PDF");
+        function downloadPDF() {
+            console.log("Generating PDF");
 
-    const element = document.getElementById('product-detail-section');
-    html2canvas(element, { scale: 2 }).then(canvas => {
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const element = document.getElementById('product-detail-section');
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
 
-        const imgProps = {
-            width: canvas.width,
-            height: canvas.height
-        };
-        const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
-        const imgWidth = imgProps.width * ratio;
-        const imgHeight = imgProps.height * ratio;
+                const imgProps = {
+                    width: canvas.width,
+                    height: canvas.height
+                };
+                const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+                const imgWidth = imgProps.width * ratio;
+                const imgHeight = imgProps.height * ratio;
 
-        const x = (pdfWidth - imgWidth) / 2;
-        const y = 10; 
+                const x = (pdfWidth - imgWidth) / 2;
+                const y = 10;
 
-        pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
-        pdf.save('Order_<%= order.orderId %>.pdf');
-    }).catch(error => {
-        showSwal({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Something went wrong while generating the PDF!'
-        });
-        console.error("PDF generation error:", error);
-    });
-}
+                pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+                pdf.save('Order_<%= order.orderId %>.pdf');
+            }).catch(error => {
+                showSwal({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong while generating the PDF!'
+                });
+                console.error("PDF generation error:", error);
+            });
+        }
 
     </script>
 

@@ -16,7 +16,7 @@ const upload = require("../helpers/multer")
 
 
 router.get("/pageNotFound",userController.pageNotFound)
-router.get("/",userAuth,userController.loadHomePage)
+router.get("/",userController.loadHomePage)
 router.get("/signup",userAuthCheck,userController.loadSignup)
 router.post("/signup",userController.postSignup)
 router.post("/verify-otp",userController.verifyOtp)
@@ -45,8 +45,8 @@ router.post("/send-otp",profileController.resendOtp)
 router.get("/reset-password",userAuthCheck,profileController.loadResetPassword)
 router.post("/reset-password",profileController.confirmPassword)
 
-router.get("/shop",userAuth,productController.loadShop)
-router.get("/product-details/:id",userAuth,productController.loadProductDetails)
+router.get("/shop",productController.loadShop)
+router.get("/product-details/:id",productController.loadProductDetails)
 
 router.get ("/profile",userAuth,profileController.loadProfile)
 router.get ("/profile/edit",userAuth,profileController.loadEditProfile)
@@ -96,8 +96,10 @@ router.get('/order/details/:id',userAuth, orderController.viewOrderDetails);
 router.post('/orders/cancel-item',orderController.cancelSingleProduct) 
 router.post('/orders/cancel',orderController.cancelOrders)
 router.patch('/orders/return',orderController.returnOrder)
+router.patch('/orders/single-Product-Return',orderController.singleProductReturn)
 router.post('/create-razorpay-order',orderController.razorpay)
 router.get('/orderFailure',orderController.loadFailure)
+router.get('/downloadInvoice',orderController.generateInvoice)
 
 router.get('/wallet',userAuth,walletController.loadWallet)
 router.post('/wallet/add',walletController.addAmountToWallet)

@@ -197,7 +197,7 @@
           <p class="mb-4">
             <%= product.description %>
           </p>
-          
+
           <h6 class="fw-bold mb-2">Size</h6>
           <select class="form-select mb-3" style="width: 200px;" name="size" id="size" onchange="updateQuantity()">
             <% product.variant.forEach(variant=> { %>
@@ -205,9 +205,21 @@
                 <%= variant.size %>
               </option>
               <% }) %>
-            </select>
-            <strike style="color: #bbb;"><p class="price-tag   mb-3">₹<%= product.salePrice %></strike><p id="variant-price" class="price-tag fw-bold mb-3">₹ 
+          </select> 
+          <div class="d-flex align-items-center">
+            <strike style="color: #bbb;">
+              <p class="price-tag   mb-3">₹<%= product.regularPrice %>
+              </p>
+            </strike>
+            <p id="variant-price" class="price-tag fw-bold mb-3">₹
             </p>
+          </div>
+
+
+          <p id="low-stock-warning" class="text-danger fw-bold mb-2" style="display: none;">Few quantity left</p>
+          <p id="no-stock-warning" class="text-danger fw-bold mb-2" style="display: none;">currently no stock
+            available</p>
+
 
           <h6 class="fw-bold mb-2" id="size-quantity">Quantity:</h6>
           <input type="number" id="quantityInput" value="1" class="form-control mb-3" style="width: 100px;" min="1"
@@ -216,7 +228,8 @@
           <% if (product.quantity===0) { %>
             <p class="text-danger fw-bold mb-3">Out of Stock</p>
             <% } %>
-              <p id="stock-warning" class="text-danger fw-bold mb-0" style="display: none;">Only 5 limited quantity of
+              <p id="stock-warning" class="text-danger fw-bold mb-0" style="display: none;">Only 5 limited quantity
+                of
                 product can be added</p>
 
 
@@ -236,7 +249,7 @@
                 <h6>
                   <%= recommended.productName %>
                 </h6>
-                <p class="price-tag">₹<%= recommended.salePrice || recommended.regularPrice %>
+                <p class="price-tag">₹<%= recommended.variant[0].salePrice || recommended.regularPrice %>
                 </p>
                 <a href="/product-details/<%= recommended._id %>" class="btn-view w-100 text-center">View</a>
               </div>
@@ -344,22 +357,49 @@
 
     function updateQuantity() {
       const selectedSize = document.getElementById("size").value;
-    const availableStock = sizeQuantityMap[selectedSize] || 0;
-    const variantPrice = sizePriceMap[selectedSize] || 0;
+      const availableStock = sizeQuantityMap[selectedSize] || 0;
+      const variantPrice = sizePriceMap[selectedSize] || 0;
 
-    const quantityInput = document.querySelector('input[name="quantity"]');
-    const warning = document.getElementById("stock-warning");
-    const addToCartBtn = document.querySelector('.action-btn[onclick^="addToCart"]');
+      const quantityInput = document.querySelector('input[name="quantity"]');
+      const warning = document.getElementById("stock-warning");
+      const addToCartBtn = document.querySelector('.action-btn[onclick^="addToCart"]');
+      const lowStockWarning = document.getElementById("low-stock-warning");
+      const noStockWarning = document.getElementById("no-stock-warning");
 
-    const limit = Math.min(5, availableStock);
 
-    // Update UI
-    document.getElementById("size-quantity").textContent = `Quantity: ${availableStock}`;
-document.getElementById("variant-price").textContent = `₹${variantPrice}`;
-    quantityInput.max = limit;
-    quantityInput.value = 1;
-    warning.style.display = 'none';
-    addToCartBtn.disabled = availableStock === 0;
+      const limit = Math.min(5, availableStock);
+      if (limit == 0) {
+        quantityInput.style.display = "none"
+      } else {
+        quantityInput.style.display = "block"
+      }
+
+
+
+
+
+
+      // Update UI
+      document.getElementById("size-quantity").textContent = `Quantity: ${availableStock}`;
+      document.getElementById("variant-price").textContent = `₹${variantPrice}`;
+      quantityInput.max = limit;
+      quantityInput.value = 1;
+      warning.style.display = 'none';
+      addToCartBtn.disabled = availableStock === 0;
+
+
+
+      if (availableStock > 0 && availableStock <= 2) {
+        lowStockWarning.style.display = 'block';
+      } else {
+        lowStockWarning.style.display = 'none';
+      }
+      if (availableStock == 0) {
+        noStockWarning.style.display = 'block';
+        quantityInput.value = 0
+      } else {
+        noStockWarning.style.display = 'none';
+      }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -376,6 +416,7 @@ document.getElementById("variant-price").textContent = `₹${variantPrice}`;
         } else {
           warning.style.display = "none";
         }
+
       });
     });
 

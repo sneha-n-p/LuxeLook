@@ -100,7 +100,8 @@
                         <th>NAME</th>
                         <th>DESCRIPTION</th>
                         <th>CATEGORY</th>
-                        <th>AMOUNT</th>
+                        <th>REGULAR(₹)</th>
+                        <th>SALE(₹)</th>
                         <th>OFFER</th>
                         <th>STOCK</th>
                         <th>ACTION</th>
@@ -124,8 +125,15 @@
                             <td style="color: #000;">
                                 <%= product.category.name %>
                             </td>
-                            <td style="color: #000;">₹ 
-                              <%= product.salePrice || product.regularPrice %>
+                            <td style="color: #000000;">₹ 
+                              <%=product.regularPrice %>
+                            </td>
+                            <td style="color: #000000;"> 
+                              <select>
+                                <%for(let i=0;i<product.variant.length;i++){%>
+                                  <option><%= product.variant[i].size%>:₹<%= product.variant[i].salePrice%></option>
+                                  <%}%>
+                              </select>
                             </td>
                             
                             <td class="text-start" style="color: #000;">

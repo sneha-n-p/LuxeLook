@@ -1,4 +1,9 @@
 <%-include("../../views/partials/adminPartial/header")%>
+ <!-- <head>
+  <title>Add Category</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head> -->
+
   <style>
     body {
       background-color: #0f172a;
@@ -52,11 +57,11 @@
     .btn-add:hover {
       background-color: #06b6d4;
     }
-    .categories-errors{
+
+    .categories-errors {
       color: red;
     }
   </style>
-  </head>
 
   <body>
 
@@ -68,24 +73,25 @@
           <div class="mb-3">
             <label for="categoryName" class="form-label">Category Name:</label>
             <p class="categories-errors" id="Category-name-error"></p>
-            <input type="text" class="form-control" id="categoryName" name="name"  placeholder="category Name">
+            <input type="text" class="form-control" id="categoryName" name="name" placeholder="category Name">
           </div>
 
           <div class="mb-3">
             <label for="categoryDescription" class="form-label">Description:</label>
-             <p class="categories-errors" id="Category-Description-error"></p>
-            <textarea class="form-control" id="categoryDescription" name="description" rows="3"  placeholder="Description"></textarea>
+            <p class="categories-errors" id="Category-Description-error"></p>
+            <textarea class="form-control" id="categoryDescription" name="description" rows="3"
+              placeholder="Description"></textarea>
           </div>
 
           <div class="mb-3">
             <label for="categoryOffer" class="form-label">Offer (%):</label>
-             <p class="categories-errors" id="Category-Offer-error"></p>
+            <p class="categories-errors" id="Category-Offer-error"></p>
             <input type="number" class="form-control" id="categoryOffer" placeholder="offer in percent">
           </div>
 
           <div class="mb-3">
             <label for="status" class="form-label">Status:</label>
-            <select class="form-select" id="status" name="status" >
+            <select class="form-select" id="status" name="status">
               <option value="" selected disabled>Select status</option>
               <option value="Listed">Listed</option>
               <option value="Unlisted">Unlisted</option>
@@ -99,90 +105,96 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <script>
+  alert("🔥 Hello from inside the <body>!");
+</script> -->
+
 
     <script>
-      const form = document.getElementById('addCategoryForm');
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('addCategoryForm');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
 
-    document.getElementById("Category-name-error").textContent = "";
-    document.getElementById("Category-Description-error").textContent = "";
-    document.getElementById("Category-Offer-error").textContent = "";
+          document.getElementById("Category-name-error").textContent = "";
+          document.getElementById("Category-Description-error").textContent = "";
+          document.getElementById("Category-Offer-error").textContent = "";
 
-    const name = document.getElementById('categoryName').value.trim();
-    const description = document.getElementById('categoryDescription').value.trim();
-    const offer = document.getElementById('categoryOffer').value.trim();
-    const status = document.getElementById('status').value;
+          const name = document.getElementById('categoryName').value.trim();
+          const description = document.getElementById('categoryDescription').value.trim();
+          const offer = document.getElementById('categoryOffer').value.trim();
+          const status = document.getElementById('status').value;
 
-    let isValid = true;
+          let isValid = true;
 
-    if (!name || !/^[A-Za-z ]+$/.test(name) || name.replace(/\s/g, "") === "") {
-      document.getElementById("Category-name-error").textContent = "Name must contain only letters and spaces, and cannot be empty or just spaces.";
-      isValid = false;
-    }
+          if (!name || !/^[A-Za-z ,.-]+$/.test(name) || name.replace(/\s/g, "") === "") {
+            document.getElementById("Category-name-error").textContent = "Name must contain only letters and spaces, and cannot be empty or just spaces.";
+            isValid = false;
+          }
 
-    if (!description || !/^[A-Za-z ]+$/.test(description) || description.replace(/\s/g, "") === "") {
-      document.getElementById("Category-Description-error").textContent = "Description must contain only letters and spaces, and cannot be empty or just spaces.";
-      isValid = false;
-    }
+          if (!description || !/^[A-Za-z ,.-]+$/.test(description) || description.replace(/\s/g, "") === "") {
+            document.getElementById("Category-Description-error").textContent = "Description must contain only letters and spaces, and cannot be empty or just spaces.";
+            isValid = false;
+          }
 
-    if (offer) {
-      const offerValue = parseFloat(offer);
-      if (isNaN(offerValue) || offerValue <= 0 || offerValue >= 100){
-        document.getElementById("Category-Offer-error").textContent = "Offer must be a number between 1 and 99.";
-        isValid = false;
-      }
-    }
+          if (offer) {
+            const offerValue = parseFloat(offer);
+            if (isNaN(offerValue) || offerValue <= 0 || offerValue >= 100) {
+              document.getElementById("Category-Offer-error").textContent = "Offer must be a number between 1 and 99.";
+              isValid = false;
+            }
+          }
 
-    if (!status) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Status Required',
-        text: 'Please select a status.',
-        confirmButtonColor: '#ef4444'
-      });
-      isValid = false;
-    }
+          if (!status) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Status Required',
+              text: 'Please select a status.',
+              confirmButtonColor: '#ef4444'
+            });
+            isValid = false;
+          }
 
-    if (!isValid) return;
+          if (!isValid) return;
 
-    try {
-      const response = await axios.post('/admin/add-category', {
-        name,
-        description,
-        offer,
-        status
-      });
+          try {
+            const response = await axios.post('/admin/add-category', {
+              name,
+              description,
+              offer,
+              status
+            });
 
-      if (response.data.success) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Category Added!',
-          text: response.data.message,
-          confirmButtonColor: '#22c55e'
-        }).then(() => {
-          window.location.href = '/admin/categories';
+            if (response.data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Category Added!',
+                text: response.data.message,
+                confirmButtonColor: '#22c55e'
+              }).then(() => {
+                window.location.href = '/admin/categories';
+              });
+              form.reset();
+            }
+          } catch (error) {
+            const msg = error.response?.data?.error;
+            console.log('kick',error)
+            if (msg === "Category already exists") {
+              document.getElementById("Category-name-error").textContent = "This category name already exists.";
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: msg || 'Something went wrong!',
+                confirmButtonColor: '#ef4444'
+              });
+            }
+          }
         });
-        form.reset();
-      }
-    } catch (error) {
-      const msg = error.response?.data?.error;
-
-      if (msg === "Category already exists") {
-        document.getElementById("Category-name-error").textContent = "This category name already exists.";
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: msg || 'Something went wrong!',
-          confirmButtonColor: '#ef4444'
-        });
-      }
-    }
-  });
+      });
     </script>
 
   </body>

@@ -1,299 +1,353 @@
 <%-include("../../views/partials/userPartial/header")%>
 
-<style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f8f8f8;
-  }
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f8f8;
+    }
 
-  .wishlist-symbol {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    color: #cc0000;
-    font-size: 20px;
-    cursor: pointer;
-  }
+    .wishlist-symbol {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      color: #cc0000;
+      font-size: 20px;
+      cursor: pointer;
+    }
 
-  .wishlist-symbol:focus {
-    outline: none;
-    box-shadow: none;
-  }
+    .wishlist-symbol:focus {
+      outline: none;
+      box-shadow: none;
+    }
 
-  .card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border: none;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease-in-out;
-  }
+    .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: none;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease-in-out;
+    }
 
-  .card:hover {
-    transform: scale(1.02);
-  }
+    .card:hover {
+      transform: scale(1.02);
+    }
 
-  .card-img-top {
-    height: 320px;
-    object-fit: cover;
-    border-radius: 15px 15px 0 0;
-  }
+    .card-img-top {
+      height: 320px;
+      object-fit: cover;
+      border-radius: 15px 15px 0 0;
+    }
 
-  .card-body {
-    padding: 1rem;
-    text-align: center;
-    background-color: #F2E8DC;
-  }
+    .card-body {
+      padding: 1rem;
+      text-align: center;
+      background-color: #F2E8DC;
+    }
 
-  .card-title {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-    min-height: 48px;
-  }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+      min-height: 48px;
+    }
 
-  .card-text {
-    font-size: 1rem;
-    color: #444;
-    margin-bottom: 10px;
-  }
+    .card-text {
+      font-size: 1rem;
+      color: #444;
+      margin-bottom: 10px;
+    }
 
-  .btn-outline-dark {
-    border-radius: 50px;
-    padding: 6px 18px;
-    font-size: 0.9rem;
- background: linear-gradient(90deg, #B5654B  , #D17C63 );
-    border: none;
-  }
+    .btn-outline-dark {
+      border-radius: 50px;
+      padding: 6px 18px;
+      font-size: 0.9rem;
+      background: linear-gradient(90deg, #B5654B, #D17C63);
+      border: none;
+    }
 
-  .btn-outline-dark:hover {
-    background-color: #333;
-  }
+    .btn-outline-dark:hover {
+      background-color: #333;
+    }
 
-  .search-bar {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
-  }
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
 
-  #searchInput {
-    max-width: 300px;
-    border-radius: 30px;
-    padding: 10px 20px;
-  }
+    #searchInput {
+      max-width: 300px;
+      border-radius: 30px;
+      padding: 10px 20px;
+    }
 
-  .pagination .page-item .page-link {
-    border-radius: 50%;
-    color: #000;
-  }
+    .pagination .page-item .page-link {
+      border-radius: 50%;
+      color: #000;
+    }
 
-  .pagination .page-item.active .page-link {
-    background-color: #000;
-    color: #F2E8DC;
-    border: none;
-  }
+    .pagination .page-item.active .page-link {
+      background-color: #000;
+      color: #F2E8DC;
+      border: none;
+    }
 
-  .page-heading {
-    background-image: url('/images/banner_image1.webp.jpg');
-    background-size: cover;
-    background-position: center;
-    height: 688px;
-    position: relative;
-    border-radius: 0 0 30px 30px;
-  }
+    .page-heading {
+      background-image: url('/images/banner_image1.webp.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 688px;
+      position: relative;
+      border-radius: 0 0 30px 30px;
+    }
 
-  .page-heading h1 {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-weight: 700;
-    font-size: 3.5rem;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
-  }
-  .sticky-pagination {
-  position: sticky;
-  bottom: 0;
-  background-color: #F2E8DC;
-  padding: 15px 10px;
-  z-index: 999;
-  border-top: 1px solid #ddd;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
-}
-footer {
-  width: 100%;
-  background-color: #000; /* or any theme color */
-  color: #fff;
-  padding: 20px 0;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
+    .page-heading h1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: 700;
+      font-size: 3.5rem;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+    }
 
-</style>
+    .sticky-pagination {
+      position: sticky;
+      bottom: 0;
+      background-color: #F2E8DC;
+      padding: 15px 10px;
+      z-index: 999;
+      border-top: 1px solid #ddd;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    }
 
-<!-- Banner Section -->
- <section class="hero text-center bg-light p-0 mb-4">
-          <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
-              style="height: 600px; object-fit: cover;">
-<h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg" style="text-shadow: 2px 2px 8px black;">SHOP</h1>
-        
+    footer {
+      width: 100%;
+      background-color: #000;
+      /* or any theme color */
+      color: #fff;
+      padding: 20px 0;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+
+  <!-- Banner Section -->
+  <section class="hero text-center bg-light p-0 mb-4">
+    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100" style="height: 600px; object-fit: cover;">
+    <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg"
+      style="text-shadow: 2px 2px 8px black;">SHOP</h1>
+
   </section>
 
-<!-- Shop Section -->
-<div class="container mt-5">
-  <!-- Search -->
-  <div class="search-bar">
-    <input id="searchInput" type="text" class="form-control me-2" value="<%= search %>" placeholder="Search products...">
-    <div id="productCard"></div>
-    <button class="btn btn-dark ms-2" onclick="searchProducts()">Search</button>
-  </div>
+  <body>
+    <!-- Shop Section -->
+    <div class="container mt-5">
+      <!-- Search -->
+      <div class="search-bar d-flex align-items-center">
+  <input id="searchInput" type="text" class="form-control me-2" value="<%= search %>" placeholder="Search products...">
 
-  <!-- Products -->
-  <div class="row">
-    <% for(let i=0; i<products.length; i++) { %>
-      <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex">
-        <div class="card w-100">
-          <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
-          <div class="card-body">
-            <h5 class="card-title"><%= products[i].productName %></h5>
-<% if (products[i].bestOffer > 0) { %>
-  <p class="card-text mb-1">
-    <strick class="text-muted">₹<%= products[i].regularPrice %></strick>
-    <span class="text-success ms-2">-<%= products[i].bestOffer %>%</span>
-  </p>
-  <p class="card-text fw-bold text-dark">₹<%= products[i].salePrice %></p>
-    <h3><%= products[i].regularPrice %></h3>
+  <!-- Sort Dropdown -->
+<select id="sortSelect" class="form-select me-2" style="width: auto;">
+  <option value="">Sort By</option>
+  <option value="price-asc" <%= sort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
+  <option value="price-desc" <%= sort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
+  <option value="name-asc" <%= sort === 'name-asc' ? 'selected' : '' %>>Name: A to Z</option>
+  <option value="name-desc" <%= sort === 'name-desc' ? 'selected' : '' %>>Name: Z to A</option>
+</select>
 
-<% } else { %>
-  <p class="card-text fw-bold text-dark">₹<%= products[i].salePrice %></p>
-<% } %>
+  <select id="selectCat" class="form-select me-2" style="width: auto;">
+    <option value="">All Category</option>
+    <%for(let i=0;i<categories.length;i++) {%>
+    <option value="<%= categories[i].name %>" <%= selectCategory === categories[i].name ? 'selected' : '' %>>
+  <%= categories[i].name %>
+</option>
+    <%}%>
+  </select>
+  <select id="priceFilter" class="form-select me-2" style="width: auto;">
+  <option value="">All Prices</option>
+  <option value="lt-500" <%= priceFilter === 'lt-500' ? 'selected' : '' %>>Less than ₹500</option>
+  <option value="lt-1000" <%= priceFilter === 'lt-1000' ? 'selected' : '' %>>Less than ₹1000</option>
+  <option value="gt-1000" <%= priceFilter === 'gt-1000' ? 'selected' : '' %>>Greater than ₹1000</option>
+</select>
 
-
-            <div>
-              <a href="/product-details/<%= products[i]._id %>">
-                <button class="btn btn-outline-dark btn-sm">View Details</button>
-              </a>
-            </div>
-            <% if (products[i].quatity > 0) { %>
-              <div class="mt-2">
-                <button class="wishlist-symbol" onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
-              </div>
-              <% } else { %>
-              <div class="text-danger mt-2"><strong>Out of Stock</strong></div>
-            <% } %>
-          </div>
-        </div>
-      </div>
-    <% } %>
-  </div>
-
-  <!-- Pagination -->
-<div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
-  <div>Showing 1 of <%= totalPages %></div>
-  <nav>
-    <ul class="pagination mb-0">
-      <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-        <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-      </li>
-
-      <% for (let i=1; i <=totalPages; i++) { %>
-        <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-          <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
-            <%= i %>
-          </a>
-        </li>
-      <% } %>
-
-      <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-        <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-      </li>
-    </ul>
-  </nav>
+<button class="btn btn-dark ms-2" onclick="searchProducts()">Search</button>
+<a href="/shop"><button class="btn btn-dark ms-2">clear</button></a>
 </div>
 
-
-<script>
-  function addToWishlist(productId) {
-    axios.post("/addToWishlist", { productId })
-      .then(function (responce) {
-        Swal.fire({
-          title: responce.data.success ? "Added to Wishlist" : "Error",
-          icon: responce.data.success ? 'success' : 'error',
-          text: responce.data.message || '',
-          showConfirmButton: false,
-          timer: 1500
-        });
-      }).catch(() => {
-        Swal.fire({
-          title: "Error Occured",
-          icon: "error",
-          showConfirmButton: false,
-          text :'Already exist in wishlist',
-          timer: 1500
-        });
-      });
-  }
-
-  // function addToCart(productId) {
-  //   axios.post("/addToCart", { productId })
-  //     .then(function (responce) {
-  //       Swal.fire({
-  //         title: responce.data.success ? "Added to Cart" : "Error",
-  //         icon: responce.data.success ? 'success' : 'error',
-  //         text: responce.data.message || '',
-  //         showConfirmButton: false,
-  //         timer: 1500
-  //       });
-  //     }).catch(() => {
-  //       Swal.fire({
-  //         title: "Server Error",
-  //         icon: "error",
-  //         showConfirmButton: false,
-  //         timer: 1500
-  //       });
-  //     });
-  // }
+<div id="productCard"></div>
 
 
-  
-//     const input = document.getElementById("searchInput")
-// let debounceTimeout;
+      <!-- Products -->
+      <div class="row">
+        <% for(let i=0; i<products.length; i++) { %>
+          <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex">
+            <div class="card w-100">
+              <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <%= products[i].productName %>
+                </h5><p><%=products[i].description%></p>
+                <% if (products[i].bestOffer> 0) { %>
+                  <p class="card-text mb-1">
+                    <strick class="text-muted">₹<%= products[i].regularPrice %>
+                    </strick>
+                    <span class="text-success ms-2">-<%= products[i].bestOffer %>%</span>
+                  </p>
+                  <p>hello</p>
+                  <p class="card-text fw-bold text-dark">₹<%= products[i].variant[0].salePrice  %>
+                  </p>
+                  <h3>
+                    <%= products[i].regularPrice %>
+                  </h3>
 
-// input.addEventListener('input', (event) => {
-//   clearTimeout(debounceTimeout);
-//   debounceTimeout = setTimeout(async () => {
-//     const search = event.target.value;
-//     console.log("Search:", search);
-
-//     try {
-//       const res = await axios.get(`/shop?search=${search}&&page=1`, {
-//         headers: { "X-Requested-With": "XMLHttpRequest" }
-//       });
-//       if (res.status === 200) {
-//         document.getElementById('productCard').innerHTML = res.data;
-//       }
-//     } catch (err) {
-//       console.error("Search request failed:", err);
-//     }
-//   }, 300);
-// });
+                  <% } else { %>
+                    <p class="card-text fw-bold text-dark">₹<%= products[i].variant[0].salePrice %>
+                    </p>
+                    <% } %>
 
 
+                      <div>
+                        <a href="/product-details/<%= products[i]._id %>">
+                          <button class="btn btn-outline-dark btn-sm">View Details</button>
+                        </a>
+                      </div>
+                      <% if (products[i].quatity> 0) { %>
+                        <div class="mt-2">
+                          <button class="wishlist-symbol"
+                            onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
+                        </div>
+                        <% } else { %>
+                          <div class="text-danger mt-2"><strong>Out of Stock</strong></div>
+                          <% } %>
+              </div>
+            </div>
+          </div>
+          <% } %>
+      </div>
 
-  function searchProducts() {
+      <!-- Pagination -->
+      <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
+        <div>Showing 1 of <%= totalPages %>
+        </div>
+        <nav>
+          <ul class="pagination mb-0">
+            <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+            </li>
+
+            <% for (let i=1; i <=totalPages; i++) { %>
+              <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                  <%= i %>
+                </a>
+              </li>
+              <% } %>
+
+                <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                  <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+                </li>
+          </ul>
+        </nav>
+      </div>
+
+
+      <script>
+        function addToWishlist(productId) {
+          axios.post("/addToWishlist", { productId })
+            .then(function (responce) {
+              Swal.fire({
+                title: responce.data.success ? "Added to Wishlist" : "Error",
+                icon: responce.data.success ? 'success' : 'error',
+                text: responce.data.message || '',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }).catch(() => {
+              Swal.fire({
+                title: "Error Occured",
+                icon: "error",
+                showConfirmButton: false,
+                text: 'Already exist in wishlist',
+                timer: 1500
+              });
+            });
+        }
+
+        // function addToCart(productId) {
+        //   axios.post("/addToCart", { productId })
+        //     .then(function (responce) {
+        //       Swal.fire({
+        //         title: responce.data.success ? "Added to Cart" : "Error",
+        //         icon: responce.data.success ? 'success' : 'error',
+        //         text: responce.data.message || '',
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //       });
+        //     }).catch(() => {
+        //       Swal.fire({
+        //         title: "Server Error",
+        //         icon: "error",
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //       });
+        //     });
+        // }
+
+
+
+        //     const input = document.getElementById("searchInput")
+        // let debounceTimeout;
+
+        // input.addEventListener('input', (event) => {
+        //   clearTimeout(debounceTimeout);
+        //   debounceTimeout = setTimeout(async () => {
+        //     const search = event.target.value;
+        //     console.log("Search:", search);
+
+        //     try {
+        //       const res = await axios.get(`/shop?search=${search}&&page=1`, {
+        //         headers: { "X-Requested-With": "XMLHttpRequest" }
+        //       });
+        //       if (res.status === 200) {
+        //         document.getElementById('productCard').innerHTML = res.data;
+        //       }
+        //     } catch (err) {
+        //       console.error("Search request failed:", err);
+        //     }
+        //   }, 300);
+        // });
+
+
+
+         function searchProducts() {
     const query = document.getElementById("searchInput").value.trim();
-    const url = new URL(window.location.href);
+    const sort = document.getElementById('sortSelect').value;
+    const selectCategory = document.getElementById('selectCat').value.trim()  
+    const priceFilter = document.getElementById('priceFilter').value;
+
+    const url = new URL(window.location.origin + "/shop");
     url.searchParams.set("search", query);
-    url.searchParams.set("page", 1);
+    url.searchParams.set("sort", sort);
+    url.searchParams.set("page", 1); 
+    url.searchParams.set('selectCategory',selectCategory)
+    url.searchParams.set("priceFilter", priceFilter);
     window.location.href = url.toString();
   }
-</script>
 
-<%-include("../../views/partials/userPartial/footer")%>
+      </script>
+    </div>
+  </div>
+
+</body>
+<footer>
+  <%-include("../../views/partials/userPartial/footer")%>
+</footer>

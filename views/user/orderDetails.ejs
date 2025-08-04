@@ -1,4 +1,3 @@
-
 <%- include("../partials/userPartial/header") %>
 
 <style>
@@ -214,6 +213,7 @@
             <th>Product Name</th>
             <th>Price</th>
             <th>Ordered Date</th>
+            <th>Payment</th>
             <th>Status</th>
             <th>Action</th>
             <th>Image</th>
@@ -229,206 +229,206 @@
                 </td>
                 <td>₹<%= order.finalAmount %></td>
                 <td>
-                  <%= order.createdOn.toDateString()  %>
+                  <%= order.createdOn.toDateString() %>
+                </td>
+                <td>
+                  <p><%= order.paymentMethod %></p>
                 </td>
                 <td>
                   <% if (order.status.trim() === 'Delivered') { %>
                     <span class="status-delivered">DELIVERED</span>
-                    <% } else if (order.status.trim() === 'Pending') { %>
-                      <span class="status-pending">PENDING</span>
-                      <% } else { %>
-                        <span class="status-other"><%= order.status.toUpperCase() %></span>
-                        <% } %>
-                      </td>
-                      <td>
-                        <% if (order.status.trim() === 'Delivered') { %>
-                          <div style="margin-bottom: 5px;">
-                            <button class="action-btn btn-return" onclick="returnOrder('<%= order._id %>')">
-                              RETURN
-                            </button>
-                          </div>
-                          <% } else if (['Pending', 'Shipped', 'Out For Delivery'].includes(order.status.trim())) { %>
-                            <button class="action-btn btn-cancel" onclick="fullCancellation('<%= order._id %>')">
-                              CANCEL
-                            </button>
-                            <% } %>
-                            <a href="/order/details/<%= order._id %>" class="action-btn btn-view">VIEW</a>
-                          </td>
-                          <td style="display: flex; gap: 5px; justify-content: center;">
-                            <% order.orderedItems.slice(0, 2).forEach(item => { %>
-                              <% if (item.product && item.product.productImage && item.product.productImage.length > 0) { %>
-                                <img src="<%= item.product.productImage[0] %>" alt="Product Image" style="width:50px; height:65px; object-fit:cover;">
-                                <% } else { %>
-                                  <img src="/images/no-image.png" alt="No Image" style="width:50px; height:65px; object-fit:cover;">
-                                  <% } %>
-                                  <% }) %>
-                                  
-                                </td>
-                              </tr>
-                              <% }) %>
-                            </tbody>
-                          </table>
-                          <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
-                            <div>Showing 1 of <%= totalPages %></div>
-                            <nav>
-                              <ul class="pagination mb-0">
-                                <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-                                  <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-      </li>
-      
-      <% for (let i=1; i <=totalPages; i++) { %>
-        <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-          <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
-            <%= i %>
-          </a>
-        </li>
-        <% } %>
-        
-        <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-          <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-        </li>
-      </ul>
-    </nav>
+                  <% } else if (order.status.trim() === 'Pending') { %>
+                    <span class="status-pending">PENDING</span>
+                  <% } else if (order.status.trim() === 'Return Request') { %>
+                    <span class="status-other">REQUESTED</span>
+                  <% } else { %>
+                    <span class="status-other"><%= order.status.toUpperCase() %></span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (order.status.trim() === 'Delivered') { %>
+                    <div style="margin-bottom: 5px;">
+                      <button class="action-btn btn-return" onclick="returnOrder('<%= order._id %>')">
+                        RETURN
+                      </button>
+                    </div>
+                  <% } else if (['Pending', 'Shipped', 'Out For Delivery'].includes(order.status.trim())) { %>
+                    <button class="action-btn btn-cancel" onclick="fullCancellation('<%= order._id %>')">
+                      CANCEL
+                    </button>
+                  <% } %>
+                  <a href="/order/details/<%= order._id %>" class="action-btn btn-view">VIEW</a>
+                </td>
+                <td style="display: flex; gap: 5px; justify-content: center;">
+                  <% order.orderedItems.slice(0, 2).forEach(item => { %>
+                    <% if (item.product && item.product.productImage && item.product.productImage.length > 0) { %>
+                      <img src="<%= item.product.productImage[0] %>" alt="Product Image" style="width:50px; height:65px; object-fit:cover;">
+                    <% } else { %>
+                      <img src="/images/no-image.png" alt="No Image" style="width:50px; height:65px; object-fit:cover;">
+                    <% } %>
+                  <% }) %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
+          <div>Showing 1 of <%= totalPages %></div>
+          <nav>
+            <ul class="pagination mb-0">
+              <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+              </li>
+              <% for (let i=1; i <=totalPages; i++) { %>
+                <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                    <%= i %>
+                  </a>
+                </li>
+              <% } %>
+              <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      <% } else { %>
+        <div class="Empty-Orders">
+          <span>Your Orders Are Empty</span><br><br>
+          <a href="/shop"><button>Discover Now</button></a>
+        </div>
+      <% } %>
+    </div>
   </div>
-</div>
-<% }  else { %>
-<div class="Empty-Orders">
-<span>Your Orders Are Empty</span><br><br>
-<a href="/shop"><button>Discover Now</button></a>
-</div>
-<% } %>
-</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   function fullCancellation(orderId) {
-  const reasons = [
-    "Found a better price elsewhere",
-    "Order placed by mistake",
-    "Item won't arrive on time",
-    "Changed my mind",
-    "Other"
-  ];
+    const reasons = [
+      "Found a better price elsewhere",
+      "Order placed by mistake",
+      "Item won't arrive on time",
+      "Changed my mind",
+      "Other"
+    ];
 
-  const optionsHtml = reasons.map(reason =>
-    `<option value="${reason}">${reason}</option>`
-  ).join("");
+    const optionsHtml = reasons.map(reason =>
+      `<option value="${reason}">${reason}</option>`
+    ).join("");
 
-  Swal.fire({
-    title: "Cancel Order",
-    html: `
-      <p>Are you sure you want to cancel the full order?</p>
-      <select id="cancel-reason" class="swal2-input">
-        <option value="" disabled selected>Select a reason</option>
-        ${optionsHtml}
-      </select>
-    `,
-    showCancelButton: true,
-    confirmButtonColor: "#B5654B",
-    cancelButtonColor: "#6B4C3B",
-    confirmButtonText: "Yes, Cancel it!",
-    preConfirm: () => {
-      const selectedReason = document.getElementById("cancel-reason").value;
-      if (!selectedReason) {
-        Swal.showValidationMessage("Please select a reason.");
-        return false;
-      }
-      return selectedReason;
-    }
-  }).then((result) => {
-    if (result.isConfirmed) {
-      axios.post('/orders/cancel', {
-        orderId,
-        reason: result.value
-      }).then(response => {
-        if (response.data.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Cancelled!",
-            text: "Order cancelled successfully.",
-            showConfirmButton: false,
-            timer: 1200
-          }).then(() => location.reload());
-        } else {
-          Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
+    Swal.fire({
+      title: "Cancel Order",
+      html: `
+        <p>Are you sure you want to cancel the full order?</p>
+        <select id="cancel-reason" class="swal2-input">
+          <option value="" disabled selected>Select a reason</option>
+          ${optionsHtml}
+        </select>
+      `,
+      showCancelButton: true,
+      confirmButtonColor: "#B5654B",
+      cancelButtonColor: "#6B4C3B",
+      confirmButtonText: "Yes, Cancel it!",
+      preConfirm: () => {
+        const selectedReason = document.getElementById("cancel-reason").value;
+        if (!selectedReason) {
+          Swal.showValidationMessage("Please select a reason.");
+          return false;
         }
-      }).catch(() => {
-        Swal.fire("Oops...", "Something went wrong while cancelling the order!", "error");
-      });
-    }
-  });
-}
+        return selectedReason;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.post('/orders/cancel', {
+          orderId,
+          reason: result.value
+        }).then(response => {
+          if (response.data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Cancelled!",
+              text: "Order cancelled successfully.",
+              showConfirmButton: false,
+              timer: 1200
+            }).then(() => location.reload());
+          } else {
+            Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
+          }
+        }).catch(() => {
+          Swal.fire("Oops...", "Something went wrong while cancelling the order!", "error");
+        });
+      }
+    });
+  }
 
   function returnOrder(orderId) {
-  const reasons = [
-    "Found a better price elsewhere",
-    "Order placed by mistake",
-    "Item won't arrive on time",
-    "Changed my mind",
-    "Other"
-  ];
+    const reasons = [
+      "Found a better price elsewhere",
+      "Order placed by mistake",
+      "Item won't arrive on time",
+      "Changed my mind",
+      "Other"
+    ];
 
-  let optionsHtml = reasons.map(reason =>
-    `<option value="${reason}">${reason}</option>`
-  ).join("");
+    let optionsHtml = reasons.map(reason =>
+      `<option value="${reason}">${reason}</option>`
+    ).join("");
 
-  Swal.fire({
-    title: 'Return Order',
-    html: `
-      <select id="returnReasonSelect" class="swal2-select" style="width:45%;padding:8px;">
-        <option value="">Select a reason</option>
-        ${optionsHtml}
-      </select>
-    `,
-    preConfirm: () => {
-      const selectedReason = document.getElementById('returnReasonSelect').value;
-      if (!selectedReason) {
-        Swal.showValidationMessage('Please select a reason');
-        return false;
-      }
-      return selectedReason;
-    },
-    showCancelButton: true,
-    confirmButtonText: 'Submit',
-    confirmButtonColor: "#B5654B",
-    cancelButtonColor: "#6B4C3B",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      axios.patch('/orders/return', {
-        orderId,
-        reason: result.value
-      }).then(response => {
-        if (response.data.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Return Requested!",
-            text: "Refund credited to your wallet.",
-            showConfirmButton: false,
-            timer: 2000
-          }).then(() => {
-            location.reload();
-            console.log('return....')
-          });
-        } else {
+    Swal.fire({
+      title: 'Return Order',
+      html: `
+        <select id="returnReasonSelect" class="swal2-select" style="width:45%;padding:8px;">
+          <option value="" disabled selected>Select a reason</option>
+          ${optionsHtml}
+        </select>
+      `,
+      preConfirm: () => {
+        const selectedReason = document.getElementById('returnReasonSelect').value;
+        if (!selectedReason) {
+          Swal.showValidationMessage('Please select a reason');
+          return false;
+        }
+        return selectedReason;
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Submit',
+      confirmButtonColor: "#B5654B",
+      cancelButtonColor: "#6B4C3B",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.patch('/orders/return', {
+          orderId,
+          reason: result.value
+        }).then(response => {
+          if (response.data.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Return Requested!",
+              text: "Return request submitted successfully.",
+              showConfirmButton: false,
+              timer: 2000
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops!",
+              text: response.data.message || "Return request failed.",
+            });
+          }
+        }).catch(() => {
           Swal.fire({
             icon: "error",
             title: "Oops!",
-            text: response.data.message || "Return request failed.",
+            text: "Something went wrong while submitting return request.",
           });
-        }
-      }).catch(() => {
-        Swal.fire({
-          icon: "error",
-          title: "Oops!",
-          text: "Something went wrong while submitting return request.",
         });
-      });
-    }
-  });
-}
-
+      }
+    });
+  }
 </script>
 
 <%- include("../partials/userPartial/footer") %>

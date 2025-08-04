@@ -86,14 +86,14 @@
           <div class="mb-3">
             <label class="form-label">Product Name:</label>
             <div id="name-error" class="error-message"></div>
-            <input type="text" class="form-control" id="name" name="ProductName" required pattern="^[A-Za-z ]+$"
+            <input type="text" class="form-control" id="name" name="ProductName" required pattern="/^[A-Za-z ,.-]+$/"
               title="Only alphabets and spaces allowed." />
           </div>
 
           <div class="mb-3">
             <label class="form-label">Product Description:</label>
             <div id="description-error" class="error-message"></div>
-            <textarea class="form-control" id="description" name="description" rows="3" required pattern="^[A-Za-z ]+$"
+            <textarea class="form-control" id="description" name="description" rows="3" required pattern="/^[A-Za-z ,.-]+$/"
               title="Only alphabets and spaces allowed."></textarea>
           </div>
 
@@ -120,15 +120,15 @@
             <label class="form-label">Price</label>
             <div id="price-error" class="error-message"></div>
             <input type="number" class="form-control" id="price" name="price" min="0"
-              placeholder="Greater than SalesPrice" required />
+              placeholder="Greater than SalesPrice" required /> 
           </div>
 
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label class="form-label">Sales Price</label>
             <div id="salesPrice-error" class="error-message"></div>
             <input type="number" class="form-control" id="salesPrice" name="salesPrice" min="0"
               placeholder="Less than Price" required />
-          </div>
+          </div> -->
 
           <div class="mb-3" id="variant-section">
             <label class="form-label">Product Variants:</label>
@@ -158,7 +158,7 @@
       </div>
 
       <!-- Image Upload Section -->
-      <div class="image-upload-container">
+      <div class="image-upload-container mb-4 ">
         <% for (let i=1; i <=4; i++) { %>
           <div class="image-upload-group" id="images">
             <label for="image<%= i %>">Image <%= i %></label>
@@ -211,9 +211,9 @@
       const category = document.getElementById("category").value;
       const offer = document.getElementById("offer").value.trim();
       const price = document.getElementById("price").value.trim();
-      const salesPrice = document.getElementById("salesPrice").value.trim();
+      // const salesPrice = document.getElementById("salesPrice").value.trim();
 
-      const namePattern = /^[A-Za-z ]+$/;
+      const namePattern = /^[A-Za-z ,.-]+$/;
       const numberPattern = /^\d+(\.\d{1,2})?$/;
 
       if (!name) {
@@ -251,18 +251,18 @@
         isValid = false;
       }
 
-      if (!salesPrice) {
-        displayErrorMessage("salesPrice-error", "Sales price is required");
-        isValid = false;
-      } else if (!numberPattern.test(salesPrice) || parseFloat(salesPrice) <= 0) {
-        displayErrorMessage("salesPrice-error", "Enter a valid sales price greater than 0");
-        isValid = false;
-      }
+      // if (!salesPrice) {
+      //   displayErrorMessage("salesPrice-error", "Sales price is required");
+      //   isValid = false;
+      // } else if (!numberPattern.test(salesPrice) || parseFloat(salesPrice) <= 0) {
+      //   displayErrorMessage("salesPrice-error", "Enter a valid sales price greater than 0");
+      //   isValid = false;
+      // }
 
-      if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
-        displayErrorMessage("salesPrice-error", "Price must be greater than sales price");
-        isValid = false;
-      }
+      // if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
+      //   displayErrorMessage("salesPrice-error", "Price must be greater than sales price");
+      //   isValid = false;
+      // }
 
       // Variant validations
       const variantSizes = document.getElementsByName("variantSize[]");
@@ -409,10 +409,9 @@
               if (croppers[index]) {
                 croppers[index].destroy();
               }
-
               croppers[index] = new Cropper(preview, {
                 aspectRatio: 1,
-                viewMode: 1,
+                viewMode:1 ,
                 autoCropArea: 0.8,
                 movable: true,
                 zoomable: true,
@@ -445,8 +444,8 @@
 
       try {
         const canvas = croppers[index].getCroppedCanvas({
-          width: 200,
-          height: 200,
+          width: 600,
+          height: 600,
           imageSmoothingEnabled: true,
           imageSmoothingQuality: "high",
         });

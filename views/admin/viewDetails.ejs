@@ -1,4 +1,3 @@
-
 <%- include("../../views/partials/adminPartial/header") %>
 
 <style>
@@ -89,8 +88,8 @@
         transition: background 0.3s ease;
     }
     .address-details:hover {
-    background: #3a3a3a;
-}
+        background: #3a3a3a;
+    }
     .status-timeline {
         margin-top: 25px;
         padding: 15px;
@@ -153,6 +152,12 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 183, 235, 0.3);
     }
+    .accept-return {
+        background: linear-gradient(90deg, #28a745, #34c759);
+    }
+    .reject-return {
+        background: linear-gradient(90deg, #dc3545, #e4606d);
+    }
     @media (max-width: 768px) {
         .sidebar {
             width: 80px;
@@ -180,8 +185,22 @@
             <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
                 <img src="<%= item.productImage %>" alt="<%= item.productName %>">
                 <div>
-                    <h2><%= item.productName%></h2>
+                    <h2><%= item.productName %></h2>
                     <p><strong>Qty:</strong> <%= item.quantity %></p>
+                    <p><strong>Size:</strong> <%= item.size %></p>
+                    <p><strong>Price:</strong> ₹<%= item.price.toLocaleString() %></p>
+                    <p><strong>Status:</strong> <%= item.status %></p>
+                    <%if(item.status == "Return Request" ){%>
+                        <p><strong>Return Reason:</strong> <%= item.returnReason %></p>
+                        <div style="margin-top: 20px;">
+                             <button class="update-status accept-return"
+                                    onclick="acceptSingle('<%= item.product %>','<%= order._id %>')">Accept Return</button>
+                            <button class="update-status reject-return"
+                                    onclick="rejectSingle('<%= item.product %>','<%= order._id %>')">Reject Return</button>
+                        </div>
+                        <%} else if( item.status == 'Cancelled'){%>
+                            <p><strong>Cancel Reason:</strong> <%= item.cancelReason %></p>
+                            <%}%>
                 </div>
             </div>
             <hr>
@@ -198,11 +217,13 @@
         <div class="status-timeline">
             <% 
                 const statusTimeline = [
-                    { title: 'Order Placed', date: new Date(order.createdOn).toLocaleDateString(), time: new Date(order.createdOn).toLocaleTimeString(), description: 'Your Order has been placed.', completed: ['Pending', 'Shipped', 'Out For Delivery', 'Delivered'].includes(order.status) },
-                    { title: 'Shipped', date: '', time: '', description: 'Item has been dispatched.', completed: ['Shipped', 'Out For Delivery', 'Delivered'].includes(order.status) },
-                    { title: 'Out For Delivery', date: '', time: '', description: 'Out for delivery.', completed: ['Out For Delivery', 'Delivered'].includes(order.status) },
-                    { title: 'Delivered', date: '', time: '', description: 'Delivered to the customer.', completed: order.status === 'Delivered' }
-                    ];
+                    { title: 'Order Placed', date: new Date(order.createdOn).toLocaleDateString(), time: new Date(order.createdOn).toLocaleTimeString(), description: 'Your Order has been placed.', completed: ['Pending', 'Shipped', 'Out For Delivery', 'Delivered', 'Return Request', 'Returned'].includes(order.status) },
+                    { title: 'Shipped', date: '', time: '', description: 'Item has been dispatched.', completed: ['Shipped', 'Out For Delivery', 'Delivered', 'Return Request', 'Returned'].includes(order.status) },
+                    { title: 'Out For Delivery', date: '', time: '', description: 'Out for delivery.', completed: ['Out For Delivery', 'Delivered', 'Return Request', 'Returned'].includes(order.status) },
+                    { title: 'Delivered', date: '', time: '', description: 'Delivered to the customer.', completed: ['Delivered', 'Return Request', 'Returned'].includes(order.status) },
+                    { title: 'Return Request', date: '', time: '', description: 'Return requested by customer.', completed: ['Return Request', 'Returned'].includes(order.status) },
+                    { title: 'Returned', date: '', time: '', description: 'Order returned.', completed: order.status === 'Returned' }
+                ];
             %>
             <% statusTimeline.forEach(status => { %>
                 <div class="status">
@@ -223,144 +244,202 @@
             <p><strong>Total: ₹<%= order.finalAmount.toLocaleString() %></strong></p>
         </div>
 
-        <% order.orderedItems.forEach(item => { %>
-            <% if (item.status === 'Return Request') { %>
-                <div style="margin-top: 20px;">
-                    <p style="color: #ffb347;"><strong>Return Requested Reason:</strong> <%= item.returnReason %>  <%=order.returnReason%></p>
-        
-                    <button class="update-status accept-return" onclick="accept('<%= order._id %>','<%= item.product %>')">Accept Return</button>
-                    <button class="update-status reject-return" onclick="reject('<%= order._id %>','<%= item.product %>')" style="background: #c0392b;">Reject Return</button>
-                </div>
-            <% } else if (order.status !== 'Cancelled') { %>
-                <% } else { %>
-                    <button class="update-status" disabled style="opacity: 0.5; background-color: rgb(131, 48, 48);">Cancelled</button>
-                    <% } %>
-                    <% }) %>
-                    <% if (order.status !== 'Return Request' && order.status !== 'Return' && order.status !== 'Cancelled'&& order.status !== 'Delivered' && order.status !== 'Returned'  ) { %>
-                        <button class="update-status" id="updateStatus" data-id="<%= order._id %>">Update Status</button>
-                        <input type="text" id="hiddenOID" value="<%= order._id %>" hidden>
-                    <% } %>
-        
-          </div>
+        <% if (order.status === 'Return Request') { %>
+            <div style="margin-top: 20px;">
+                <p style="color: #ffb347;"><strong>Return Requested Reason:</strong> <%= order.returnReason %></p>
+                <button class="update-status accept-return" onclick="accept('<%= order._id %>')">Accept Return</button>
+                <button class="update-status reject-return" onclick="reject('<%= order._id %>')">Reject Return</button>
+            </div>
+        <% } else if (order.status === 'Cancelled') { %>
+            <button class="update-status" disabled style="opacity: 0.5; background-color: rgb(131, 48, 48);">Cancelled</button>
+        <% } else if (!['Delivered', 'Returned'].includes(order.status)) { %>
+            <button class="update-status" id="updateStatus" data-id="<%= order._id %>">Update Status</button>
+            <input type="text" id="hiddenOID" value="<%= order._id %>" hidden>
+        <% } %>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     const button = document.getElementById('updateStatus')
-    button.addEventListener('click', async () => {
-        const orderId = document.getElementById('hiddenOID').value
+    if (button) {
+        button.addEventListener('click', async () => {
+            const orderId = document.getElementById('hiddenOID').value
 
-        if ("<%= order.status %>" === "Delivered") {
-            Swal.fire('Not Allowed', 'Delivered orders cannot be updated.', 'warning');
-            return;
-        }
-
-        const { value: status } = await Swal.fire({
-            title: 'Update Order Status',
-            input: 'select',
-            inputOptions: {
-                'Pending': 'Pending',
-                'Shipped': 'Shipped',
-                'Out For Delivery': 'Out For Delivery',
-                'Delivered': 'Delivered',
-            },
-            inputPlaceholder: 'Select a status',
-            showCancelButton: true
-        });
-
-        if (status) {
-            try {
-                const response = await fetch('/admin/update-order-status', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId, newStatus: status })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    Swal.fire('Success', result.message, 'success').then(() => location.reload());
-                } else {
-                    Swal.fire('Error', result.message, 'error');
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                Swal.fire('Error', 'Something went wrong!', 'error');
+            if ("<%= order.status %>" === "Delivered") {
+                Swal.fire('Not Allowed', 'Delivered orders cannot be updated.', 'warning');
+                return;
             }
-        }
-    });
 
-
- 
-
-function accept(orderId, productId) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to accept the return request?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, accept it!",
-        cancelButtonText: "No, cancel",
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            axios.patch('/admin/verify-return', {
-                orderId: orderId,
-                productId: productId,
-                action: 'Returned'
-            })
-            .then(response => {
-                if (response.data.success) {
-                    Swal.fire("Accepted!", response.data.message, "success").then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire("Error", response.data.message, "error");
-                }
-            })
-            .catch(error => {
-                console.error("AXIOS ERROR:", error.response?.data || error.message);
-                Swal.fire("Error", "Something went wrong.", "error");
+            const { value: status } = await Swal.fire({
+                title: 'Update Order Status',
+                input: 'select',
+                inputOptions: {
+                    'Pending': 'Pending',
+                    'Shipped': 'Shipped',
+                    'Out For Delivery': 'Out For Delivery',
+                    'Delivered': 'Delivered',
+                },
+                inputPlaceholder: 'Select a status',
+                showCancelButton: true
             });
-        }
-    });
-}
 
-
-function reject(orderId, productId) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to reject the return request?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, reject it!",
-        cancelButtonText: "No, cancel",
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            axios.patch('/admin/verify-return', {
-                orderId,
-                productId,
-                action: 'Delivered'
-            })
-            .then(response => {
-                if (response.data.success) {
-                    Swal.fire("Accepted!", response.data.message, "success").then(() => {
-                        location.reload();
+            if (status) {
+                try {
+                    const response = await fetch('/admin/update-order-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ orderId, newStatus: status })
                     });
-                } else {
-                    Swal.fire("Error", response.data.message, "error");
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                Swal.fire("Error", "Something went wong.", "error");
-            });
-        } else {
-            Swal.fire("Cancelled", "Return request was not accepted.", "info");
-        }
-    });
-}
 
+                    const result = await response.json();
+                    if (result.success) {
+                        Swal.fire('Success', result.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', result.message, 'error');
+                    }
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    Swal.fire('Error', 'Something went wrong!', 'error');
+                }
+            }
+        });
+    }
+
+    function accept(orderId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to accept the return request?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, accept it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.patch('/admin/verify-return', {
+                    orderId,
+                    action: 'Returned'
+                })
+                .then(response => {
+                    if (response.data.success) {
+                        Swal.fire("Accepted!", response.data.message, "success").then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire("Error", response.data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("AXIOS ERROR:", error.response?.data || error.message);
+                    Swal.fire("Error", "Something went wrong.", "error");
+                });
+            }
+        });
+    }
+
+    function reject(orderId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to reject the return request?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, reject it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.patch('/admin/verify-return', {
+                    orderId,
+                    action: 'Delivered'
+                })
+                .then(response => {
+                    if (response.data.success) {
+                        Swal.fire("Rejected!", response.data.message, "success").then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire("Error", response.data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire("Error", "Something went wrong.", "error");
+                });
+            } else {
+                Swal.fire("Cancelled", "Return request was not rejected.", "info");
+            }
+        });
+    }
+
+    function acceptSingle(productId,orderId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to accept the return request?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, accept it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.patch('/admin/verify-single-return', {
+                    productId,
+                    orderId,
+                    action: 'Returned'
+                })
+                .then(response => {
+                    if (response.data.success) {
+                        Swal.fire("Accepted!", response.data.message, "success").then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire("Error", response.data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("AXIOS ERROR:", error.response?.data || error.message);
+                    Swal.fire("Error", "Something went wrong.", "error");
+                });
+            }
+        });
+    }
+
+    function rejectSingle(productId,orderId) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to reject the return request?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, reject it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.patch('/admin/verify-single-return', {
+                    productId,
+                    orderId,
+                    action: 'Delivered'
+                })
+                .then(response => {
+                    if (response.data.success) {
+                        Swal.fire("Rejected!", response.data.message, "success").then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire("Error", response.data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Swal.fire("Error", "Something went wrong.", "error");
+                });
+            } else {
+                Swal.fire("Cancelled", "Return request was not rejected.", "info");
+            }
+        });
+    }
 </script>
 </body>
 </html>

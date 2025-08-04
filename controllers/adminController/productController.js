@@ -59,7 +59,7 @@ const addproduct = async (req, res) => {
       category,
       offer,
       price,
-      salesPrice,
+      // salesPrice,
       variantSize,
       variantSalePrice,
       variantQuantity
@@ -83,13 +83,13 @@ const addproduct = async (req, res) => {
       errors.price = "Enter a valid price greater than 0";
     }
 
-    if (!salesPrice || isNaN(salesPrice) || Number(salesPrice) <= 0) {
-      errors.salesPrice = "Enter a valid sales price greater than 0";
-    }
+    // if (!salesPrice || isNaN(salesPrice) || Number(salesPrice) <= 0) {
+    //   errors.salesPrice = "Enter a valid sales price greater than 0";
+    // }
 
-    if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
-      errors.price = "Regular price must be greater than sales price";
-    }
+    // if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
+    //   errors.price = "Regular price must be greater than sales price";
+    // }
 
     let stock  =0
     let variants = [];
@@ -203,7 +203,7 @@ const addproduct = async (req, res) => {
       category: categoryDoc._id,
       offer: parseFloat(offer) || 0,
       regularPrice: parseFloat(price),
-      salePrice: parseFloat(salesPrice),
+      // salePrice: parseFloat(salesPrice),
       productImage: imagesPaths,
       variant: variants
     });
@@ -278,7 +278,6 @@ const postEditProduct = async (req, res) => {
       category,
       offer,
       price,
-      salesPrice,
       variantSize,
       variantPrice,
       variantQuantity,
@@ -336,7 +335,7 @@ const postEditProduct = async (req, res) => {
         category,
         offer: offer ? parseFloat(offer) : 0,
         regularPrice: parseFloat(price),
-        salePrice: salesPrice ? parseFloat(salesPrice) : parseFloat(price),
+        // salePrice: salesPrice ? parseFloat(salesPrice) : parseFloat(price),
         size: variantSize,
         variant : variant,
         quatity: stock,
@@ -431,7 +430,7 @@ const addProductOffer = async (req, res) => {
     const discount = product.regularPrice * (finalOffer / 100);
     const newSalePrice = Math.round(product.regularPrice - discount);
     product.offer = finalOffer;
-    product.salePrice = newSalePrice;
+    product.regularPrice = newSalePrice;
 
     product.variant = product.variant.map(variant => {
       const variantDiscount = variant.salePrice * (finalOffer / 100);
@@ -506,13 +505,23 @@ const removeProductOffer = async (req, res) => {
 
     const category = await Category.findById(product.category)
 
-    let appliedOffer = 0;
+    let appliedOffer = product.offer;
     let salePrice = product.regularPrice;
 
     await Product.findByIdAndUpdate(productId, {
-      offer: appliedOffer,
-      salePrice: appliedOffer > 0 ? salePrice : product.regularPrice,
+      offer: 0,
+      regularPrice:salePrice / (1 - (appliedOffer / 100)),
     });
+
+    product.variant = product.variant.map(variant => {
+  const originalPrice = Math.round(variant.salePrice / (1 - (appliedOffer / 100)));
+  return {
+    ...variant,
+    salePrice: originalPrice
+  };
+});
+
+product.save()
 
     res.status(StatusCode.OK).json({ success: true, message: 'Product offer removed', finalOffer: appliedOffer, salePrice });
   } catch (error) {

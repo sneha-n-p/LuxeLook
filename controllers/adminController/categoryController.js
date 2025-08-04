@@ -39,6 +39,7 @@ const categoryInfo = async (req, res) => {
 const loadAddCategory = async (req, res) => {
   try {
     const categories = await category.find().sort({ createdAt: -1 });
+    console.log('f')
     res.render("addCategory", { categories });
   } catch (error) {
     console.error(error);
@@ -49,9 +50,9 @@ const loadAddCategory = async (req, res) => {
 
 
 const addCategory = async (req, res) => {
-  const { name, description, offer, status } = req.body;
-
   try {
+    const { name, description, offer, status } = req.body;
+    console.log('just do it')
     console.log(req.body);
     const Tname = name.trim()
 const existingCategory = await category.findOne({ name: { $regex: new RegExp(`^${Tname}$`, 'i') } });
@@ -118,7 +119,7 @@ const loadEditCategory = async (req, res) => {
     const id = req.params.id
     const mongooseId = new mongoose.Types.ObjectId(id)
     const Category = await category.findById(mongooseId)
-    console.log(Category)
+    console.log('CategoryL')
     res.render("edit-category", { Category: Category })
   } catch (error) {
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
@@ -127,6 +128,7 @@ const loadEditCategory = async (req, res) => {
 
 const editCategory = async (req, res) => {
   try {
+    console.log('updated:',req.body)
     const id = req.params.id
     const { name, description, offer, status } = req.body
     const existingCategory = await category.findById(id);
@@ -150,7 +152,6 @@ const editCategory = async (req, res) => {
       offer: offer || null,
       status
     }, { new: true });
-
     if (updateCategory) {
       return res.status(StatusCode.OK).json({ success: true, message: "Category updated successfully" });
     } else {
@@ -165,14 +166,14 @@ const editCategory = async (req, res) => {
 const addCategoryOffer = async (req, res) => {
   try {
     const { id, offer } = req.body;
-
+    offer = offer > 0 ? offer : 0
     const updatedCategory = await category.findByIdAndUpdate(id, { offer }, { new: true });
     if (!updatedCategory) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
 
     const products = await Product.find({ category: id });
 
     for (const product of products) {
-      const effectiveOffer = Math.max(product.offer || 0, offer);
+      const effectiveOffer = Math.max(product.offer ||  offer);
       const salePrice = Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100);
       product.salePrice = salePrice;
       await product.save();

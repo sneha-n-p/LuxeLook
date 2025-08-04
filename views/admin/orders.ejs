@@ -131,7 +131,7 @@
         <thead>
           <tr>
             <th>USER NAME</th>
-            <th>ORDER ID</th>
+            <th>ORDER</th>
             <th>ORDERED ITEMS</th>
             <th>AMOUNT</th>
             <th>ORDER DATE</th>
@@ -143,7 +143,10 @@
           <% orders.forEach(order => { %>
             <tr>
               <td style="color: black;"><%= order.userId.name %></td>
-              <td style="color: black;"><%= order.orderId %></td>
+              <td style="color: black;"><%= order.orderId %><br><%for(let i =0;i<order.orderedItems.length;i++){%>
+                <img src="<%= order.orderedItems[i].productImage %>" alt="<%=  order.orderedItems.productName %>" style="width:77px;" >
+                <%}%>
+              </td>
               <td style="color: black;">NO: <%= order.orderedItems.length %></td>
               <td style="color: black;">₹ <%= order.finalAmount %></td>
               <td style="color: black;"><%= order.createdOn.toDateString() %></td>
