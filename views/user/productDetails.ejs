@@ -214,6 +214,9 @@
             <p id="variant-price" class="price-tag fw-bold mb-3">₹
             </p>
           </div>
+          <%if(product.offer>0){%>
+            <span class="text-danger ms-2">-<%= product.offer %>%  offer added</span>
+            <%}%> <br><br>
 
 
           <p id="low-stock-warning" class="text-danger fw-bold mb-2" style="display: none;">Few quantity left</p>

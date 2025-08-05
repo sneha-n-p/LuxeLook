@@ -196,19 +196,14 @@
                 <h5 class="card-title">
                   <%= products[i].productName %>
                 </h5><p><%=products[i].description%></p>
-                <% if (products[i].bestOffer> 0) { %>
+                <% if (products[i].offer> 0) { %>
                   <p class="card-text mb-1">
-                    <strick class="text-muted">₹<%= products[i].regularPrice %>
-                    </strick>
-                    <span class="text-success ms-2">-<%= products[i].bestOffer %>%</span>
+                    <s class="text-muted">₹<%= products[i].regularPrice %>
+                    </s>
+                    <span class="text-danger ms-2">-<%= products[i].offer %>%</span>
                   </p>
-                  <p>hello</p>
                   <p class="card-text fw-bold text-dark">₹<%= products[i].variant[0].salePrice  %>
                   </p>
-                  <h3>
-                    <%= products[i].regularPrice %>
-                  </h3>
-
                   <% } else { %>
                     <p class="card-text fw-bold text-dark">₹<%= products[i].variant[0].salePrice %>
                     </p>

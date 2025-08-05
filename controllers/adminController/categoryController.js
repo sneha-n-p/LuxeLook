@@ -55,7 +55,7 @@ const addCategory = async (req, res) => {
     console.log('just do it')
     console.log(req.body);
     const Tname = name.trim()
-const existingCategory = await category.findOne({ name: { $regex: new RegExp(`^${Tname}$`, 'i') } });
+    const existingCategory = await category.findOne({ name: { $regex: new RegExp(`^${Tname}$`, 'i') } });
     if (existingCategory) {
       return res.status(StatusCode.BAD_REQUEST).json({ error: "Category already exists" });
     }
@@ -128,7 +128,7 @@ const loadEditCategory = async (req, res) => {
 
 const editCategory = async (req, res) => {
   try {
-    console.log('updated:',req.body)
+    console.log('updated:', req.body)
     const id = req.params.id
     const { name, description, offer, status } = req.body
     const existingCategory = await category.findById(id);
@@ -165,26 +165,57 @@ const editCategory = async (req, res) => {
 
 const addCategoryOffer = async (req, res) => {
   try {
-    const { id, offer } = req.body;
-    offer = offer > 0 ? offer : 0
+    let { id, offer } = req.body;
+    offer = offer > 0 ? offer : 0;
+
     const updatedCategory = await category.findByIdAndUpdate(id, { offer }, { new: true });
-    if (!updatedCategory) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
+
+    if (!updatedCategory) {
+      return res.status(StatusCode.NOT_FOUND).json({
+        success: false,
+        message: 'Category not found'
+      });
+    }
 
     const products = await Product.find({ category: id });
 
     for (const product of products) {
-      const effectiveOffer = Math.max(product.offer ||  offer);
-      const salePrice = Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100);
-      product.salePrice = salePrice;
+      const productOffer = product.offer || 0;
+      const bestOffer = Math.max(productOffer, offer);
+
+      // const regularPrice = product.regularPrice || 0;
+      // const salePrice = Math.round(regularPrice - (regularPrice * bestOffer) / 100);
+      // product.regularPrice = salePrice;
+
+      if (Array.isArray(product.variant)) {
+        product.variant = product.variant.map(variants => {
+          const variantPrice = variants.salePrice || 0;
+          const variantSalePrice = Math.round(variantPrice - (variantPrice * bestOffer / 100));
+          return {
+            ...variants.toObject(),
+            salePrice: variantSalePrice,
+          };
+        });
+      }
+      product.offer = bestOffer;
+
       await product.save();
     }
 
-    res.json({ success: true, message: "Category offer applied and products updated" });
+    res.json({
+      success: true,
+      message: "Category offer applied. Products and variants updated."
+    });
+
   } catch (err) {
     console.error('Error in addCategoryOffer:', err);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error'
+    });
   }
 };
+
 
 
 const removeCategoryOffer = async (req, res) => {
@@ -192,23 +223,58 @@ const removeCategoryOffer = async (req, res) => {
     const { id } = req.body;
 
     const Category = await category.findById(id);
-    if (!Category) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
+    if (!Category) {
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Category not found' });
+    }
 
-    Category.offer = 0;
-    await Category.save();
+    const categoryOffer = Category.offer || 0;
 
     const products = await Product.find({ category: id });
 
     for (const product of products) {
-      const productOffer = product.offer || 0;
-      const salePrice = productOffer > 0
-        ? Math.round(product.regularPrice - (product.regularPrice * productOffer) / 100)
-        : product.regularPrice;
-      product.salePrice = salePrice;
-      await product.save();
+      const productOffer = product.productOffer || 0;
+      const categoryWasUsed = categoryOffer > productOffer;
+
+     
+      if (Array.isArray(product.variant)) {
+        const updatedVariants = product.variant.map((variant, i) => {
+          const currentPrice = variant.salePrice || 0;
+          let originalPrice = currentPrice;
+          let finalSalePrice = currentPrice;
+
+          if (categoryWasUsed && categoryOffer > 0) {
+            originalPrice = Math.round(currentPrice / (1 - categoryOffer / 100));
+            finalSalePrice = productOffer > 0
+              ? Math.round(originalPrice - (originalPrice * productOffer / 100))
+              : originalPrice;
+
+            
+          } else {
+            finalSalePrice = productOffer > 0
+              ? Math.round(product.regularPrice - (product.regularPrice * productOffer / 100))
+              : product.regularPrice;
+          }
+
+          return {
+            ...variant.toObject(),
+            salePrice: finalSalePrice,
+          };
+        });
+
+        product.variant = updatedVariants;
+        product.markModified("variant");
+        product.offer = product.productOffer || 0
+        await product.save();
+      }
     }
 
-    res.json({ success: true, message: "Category offer removed and products updated" });
+    Category.offer = 0;
+    await Category.save();
+
+    res.json({
+      success: true,
+      message: 'Category offer removed and variants updated correctly.',
+    });
   } catch (error) {
     console.error('Error removing category offer:', error);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });

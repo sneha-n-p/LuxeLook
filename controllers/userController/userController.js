@@ -22,21 +22,35 @@ const loadHomePage = async (req, res) => {
     const products = await Product.find({ isBlocked: false }).populate('category');
     const categorys = await Category.find({ status: "Listed" });
 
+    
     const processedProducts = products.map(product => {
-      const productOffer = product.offer || 0;
-      const categoryOffer = product.category?.offer || 0;
-      const bestOffer = Math.max(productOffer, categoryOffer);
+        const productOffer = product.offer || 0;
+        const categoryOffer = product.category?.offer || 0;
+        const bestOffer = Math.max(productOffer, categoryOffer);
+        
+        const updatedVariants = product.variant?.map(v => {
+    const variantPrice = v.salePrice || 0;
+    const salePrice = Math.round(variantPrice - (variantPrice * bestOffer / 100));
+    return {
+      ...v,
+      regularPrice: variantPrice,
+      salePrice,
+      bestOffer
+    };
+  });
 
-      const regularPrice = product.regularPrice;
-      const salePrice = Math.round(regularPrice - (regularPrice * bestOffer / 100));
+  const regularPrice = product.regularPrice || 0;
+  const salePrice = Math.round(regularPrice - (regularPrice * bestOffer / 100));
 
-      return {
-        ...product._doc,
-        bestOffer,
-        salePrice,
-        regularPrice,
-      };
-    });
+  return {
+    ...product._doc,
+    bestOffer,
+    salePrice,
+    regularPrice,
+    variants: updatedVariants
+  };
+});
+
 
     if (user) {
       const userData = await User.findById(user);
@@ -47,7 +61,7 @@ const loadHomePage = async (req, res) => {
 
   } catch (error) {
     console.log("homePage not found", error);
-    res.status(500).send("Server error");
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Server error");
   }
 };
 

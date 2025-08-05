@@ -969,15 +969,15 @@ const returnOrder = async (req, res) => {
 
     const order = await Order.findById(orderId).populate('orderedItems.product');
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Order not found' });
     }
 
     if (order.userId.toString() !== userId.toString()) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+      return res.status(StatusCode.UNAUTHORIZED).json({ success: false, message: 'Unauthorized' });
     }
 
     if (order.status !== 'Delivered') {
-      return res.status(400).json({ success: false, message: 'Only delivered orders can be returned' });
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Only delivered orders can be returned' });
     }
 
     order.status = 'Return Request';
@@ -992,10 +992,10 @@ const returnOrder = async (req, res) => {
 
     await order.save();
 
-    res.status(200).json({ success: true, message: 'Return request submitted successfully' });
+    res.status(StatusCode.CREATED).json({ success: true, message: 'Return request submitted successfully' });
   } catch (error) {
     console.error('Return request error:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
   }
 };
 
@@ -1058,11 +1058,11 @@ const generateInvoice = async (req, res) => {
 
     const order = await Order.findOne({ orderId: orderId, userId });
     if (!order) {
-      return res.status(404).send("Order not found");
+      return res.status(StatusCode.BAD_REQUEST).send("Order not found");
     }
 
     if (order.status !== "Delivered") {
-      return res.status(400).send("Invoice is only available for delivered orders");
+      return res.status(StatusCode.BAD_REQUEST).send("Invoice is only available for delivered orders");
     }
 
     if (!order.invoiceDate) {
@@ -1103,12 +1103,12 @@ const generateInvoice = async (req, res) => {
     res.download(filePath, fileName, (err) => {
       if (err) {
         console.error("Error sending file:", err);
-        res.status(500).send("Error generating invoice");
+        res.status(StatusCode.BAD_REQUEST).send("Error generating invoice");
       }
     });
   } catch (error) {
     console.error("Error generating invoice:", error);
-    res.status(500).send("Error generating invoice");
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Error generating invoice");
   }
 };
 
@@ -1119,9 +1119,9 @@ module.exports = {
   viewOrderDetails,
   cancelSingleProduct,
   cancelOrders,
+  singleProductReturn,
   returnOrder,
   razorpay,
   loadFailure,
-  generateInvoice,
-  singleProductReturn
+  generateInvoice
 };
