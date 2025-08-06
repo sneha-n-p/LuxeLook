@@ -430,7 +430,7 @@ const addProductOffer = async (req, res) => {
     const discount = product.regularPrice * (finalOffer / 100);
     const newSalePrice = Math.round(product.regularPrice - discount);
     product.offer = finalOffer;
-    // product.regularPrice = newSalePrice;
+    product.productOffer = offer;
 
     product.variant = product.variant.map(variant => {
       const variantDiscount = variant.salePrice * (finalOffer / 100);
@@ -466,69 +466,106 @@ const getProductEdit = async (req, res) => {
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Server error' });
   }
 }
+
 const editProductOffer = async (req, res) => {
   try {
     const { id, offer: newOffer } = req.body;
 
-    const product = await Product.findById(id).populate('category')
-
+    const product = await Product.findById(id).populate('category');
     if (!product) {
-      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
+      return res.status(404).json({ success: false, message: "Product not found" });
     }
 
+    const previousOffer = product.productOffer || 0;
     const categoryOffer = product.category.offer || 0;
-    const effectiveOffer = Math.max(categoryOffer, newOffer);
-    const salePrice = Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100);
 
-    product.offer = newOffer;
-    product.salePrice = salePrice;
+    // Restore original price from old offer
+    const restoreOffer = Math.max(categoryOffer, previousOffer);
+    product.variant = product.variant.map(item => {
+      const originalPrice = item.salePrice / (1 - (restoreOffer / 100));
+      return { ...item, salePrice: originalPrice };
+    });
+
+    // Apply new best offer
+    const bestOffer = Math.max(categoryOffer, newOffer);
+    product.variant = product.variant.map(item => {
+      const newSalePrice = item.salePrice * (1 - (bestOffer / 100));
+      return { ...item, salePrice: newSalePrice };
+    });
+
+    product.offer = bestOffer;
+    product.productOffer = newOffer;
 
     await product.save();
 
     res.json({
       success: true,
-      finalOffer: effectiveOffer,
-      salePrice: salePrice,
+      finalOffer: bestOffer,
       message: 'Offer updated successfully'
     });
 
   } catch (error) {
     console.error("Offer update error:", error);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
+};
+
 const removeProductOffer = async (req, res) => {
   try {
     const productId = req.body.id;
     const product = await Product.findById(productId);
-    if (!product) return res.json({ success: false, message: 'Product not found' });
+    if (!product) {
+      return res.json({ success: false, message: 'Product not found' });
+    }
 
-    const category = await Category.findById(product.category)
+    const category = await Category.findById(product.category);
+    const productOffer = product.productOffer || 0;
+    const categoryOffer = category?.offer || 0;
+    const bestOffer = categoryOffer; 
 
-    let appliedOffer = product.offer;
-    let salePrice = product.regularPrice;
+    let appliedOffer = 0;
 
-    await Product.findByIdAndUpdate(productId, {
-      offer: 0,
-      regularPrice:salePrice / (1 - (appliedOffer / 100)),
+    if (productOffer > categoryOffer) {
+      appliedOffer = productOffer;
+
+      product.variant = product.variant.map(variant => {
+        const originalPrice = Math.round(variant.salePrice / (1 - (appliedOffer / 100)));
+        return {
+          ...variant,
+          salePrice: originalPrice
+        };
+      });
+
+      if (categoryOffer > 0) {
+        product.variant = product.variant.map(variant => {
+          const discounted = Math.round(variant.salePrice * (1 - (categoryOffer / 100)));
+          return {
+            ...variant,
+            salePrice: discounted
+          };
+        });
+      }
+    }
+
+    product.offer = bestOffer;
+    product.productOffer = 0;
+
+    await product.save();
+
+    res.status(StatusCode.OK).json({
+      success: true,
+      message: 'Product offer removed',
+      finalOffer: bestOffer
     });
-
-    product.variant = product.variant.map(variant => {
-  const originalPrice = Math.round(variant.salePrice / (1 - (appliedOffer / 100)));
-  return {
-    ...variant,
-    salePrice: originalPrice
-  };
-});
-
-product.save()
-
-    res.status(StatusCode.OK).json({ success: true, message: 'Product offer removed', finalOffer: appliedOffer, salePrice });
   } catch (error) {
     console.error('Error removing product offer:', error);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error'
+    });
   }
-}
+};
+
 
 module.exports = {
   productInfo,
