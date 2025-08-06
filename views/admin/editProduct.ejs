@@ -68,13 +68,13 @@
             <div class="mb-3">
                 <label class="form-label">Product Name:</label>
                 <p id="name-error"></p>
-                <input type="text" class="form-control" id="name" name="name" value="<%=product.productName%>" required pattern="^[A-Za-z ]+$" title="Only alphabets and spaces allowed." />
+                <input type="text" class="form-control" id="name" name="name" value="<%=product.productName%>" required pattern="^[A-Za-z ]+$" title="Only alphabets and spaces allowed." maxlength="25" />
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Product Description:</label>
                 <p id="description-error"></p>
-                <textarea class="form-control" id="description" name="description" rows="3" required pattern="^[A-Za-z]+$" title="Only alphabets allowed, no spaces or numbers.">
+                <textarea class="form-control" id="description" name="description" rows="3" required pattern="^[A-Za-z]+$" title="Only alphabets allowed, no spaces or numbers." maxlength="100">
                     <%= product.description %>
                 </textarea>
             </div>

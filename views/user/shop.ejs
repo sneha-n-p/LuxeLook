@@ -265,7 +265,7 @@
                 text: responce.data.message || '',
                 showConfirmButton: false,
                 timer: 1500
-              });
+              }).then(()=>location.reload())
             }).catch(() => {
               Swal.fire({
                 title: "Error Occured",

@@ -430,7 +430,7 @@ const addProductOffer = async (req, res) => {
     const discount = product.regularPrice * (finalOffer / 100);
     const newSalePrice = Math.round(product.regularPrice - discount);
     product.offer = finalOffer;
-    product.regularPrice = newSalePrice;
+    // product.regularPrice = newSalePrice;
 
     product.variant = product.variant.map(variant => {
       const variantDiscount = variant.salePrice * (finalOffer / 100);

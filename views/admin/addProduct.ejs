@@ -86,7 +86,7 @@
           <div class="mb-3">
             <label class="form-label">Product Name:</label>
             <div id="name-error" class="error-message"></div>
-            <input type="text" class="form-control" id="name" name="ProductName" required pattern="/^[A-Za-z ,.-]+$/"
+            <input type="text" class="form-control" id="name" name="ProductName" required pattern="/^[A-Za-z ,.-]+$/" maxlength="25"
               title="Only alphabets and spaces allowed." />
           </div>
 
@@ -94,7 +94,7 @@
             <label class="form-label">Product Description:</label>
             <div id="description-error" class="error-message"></div>
             <textarea class="form-control" id="description" name="description" rows="3" required pattern="/^[A-Za-z ,.-]+$/"
-              title="Only alphabets and spaces allowed."></textarea>
+              title="Only alphabets and spaces allowed." maxlength="100"></textarea>
           </div>
 
           <div class="mb-3">

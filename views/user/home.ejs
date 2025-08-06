@@ -212,9 +212,9 @@
             <div class="card w-100">
               <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
               <div class="card-body text-center">
-                <h5 class="card-title"><%= products[i].productName %></h5><p><%=products[i].description%></p>
-
-                <% if (products[i].bestOffer > 0) { %>
+               <div> <h5 class="card-title"><%= products[i].productName %></h5><p><%=products[i].description%></p></div>
+               <div>
+               <% if (products[i].bestOffer > 0) { %>
                   <p class="card-text mb-1">
                     <s class="text-muted">₹<%= products[i].regularPrice %></s>
                     <span class="text-danger ms-2">-<%= products[i].bestOffer %>%</span>
@@ -222,7 +222,8 @@
                   <p class="card-text"><strong>₹<%= products[i].variant[0].salePrice  %></strong></p>
                 <% } else { %>
                   <p class="card-text"><strong>₹<%= products[i].variant[0].salePrice %></strong></p>
-                <% } %>
+                  <% } %>
+                </div>
 
                 <div>
                   <a href="/product-details/<%= products[i]._id %>">
@@ -259,7 +260,7 @@
               icon: 'success',
               showConfirmButton: false,
               timer: 1500
-            })
+            }).then(()=>location.reload())
           } else {
             Swal.fire({
               title: "Error Occured",
