@@ -59,7 +59,6 @@ const addproduct = async (req, res) => {
       category,
       offer,
       price,
-      // salesPrice,
       variantSize,
       variantSalePrice,
       variantQuantity
@@ -83,13 +82,6 @@ const addproduct = async (req, res) => {
       errors.price = "Enter a valid price greater than 0";
     }
 
-    // if (!salesPrice || isNaN(salesPrice) || Number(salesPrice) <= 0) {
-    //   errors.salesPrice = "Enter a valid sales price greater than 0";
-    // }
-
-    // if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
-    //   errors.price = "Regular price must be greater than sales price";
-    // }
 
     let stock  =0
     let variants = [];
@@ -139,8 +131,20 @@ const addproduct = async (req, res) => {
         formData: req.body
       });
     }
-
+    
     const categoryDoc = await Category.findOne({ name: category });
+
+    let bestOffer = Math.max(categoryDoc.offer,offer)
+    if(Array.isArray(variants)){
+      variants = variants.map(item=>{
+        let varinatAppliedDiscount = Math.round(item.salePrice - (item.salePrice  * (bestOffer / 100)))
+        return{
+          ...item,
+          salePrice:varinatAppliedDiscount
+        }
+      })
+    }
+
     if (!categoryDoc || !mongoose.Types.ObjectId.isValid(categoryDoc._id)) {
       console.log('Error in category')
       errors.category = "Invalid category";
@@ -198,12 +202,12 @@ const addproduct = async (req, res) => {
     const newProduct = new Product({
       productName: ProductName,
       description,
+      productOffer:offer,
       quatity: stock,
       size: variants.map(v => v.size),
       category: categoryDoc._id,
-      offer: parseFloat(offer) || 0,
+      offer: parseFloat(bestOffer) || 0,
       regularPrice: parseFloat(price),
-      // salePrice: parseFloat(salesPrice),
       productImage: imagesPaths,
       variant: variants
     });
@@ -286,6 +290,8 @@ const postEditProduct = async (req, res) => {
       existingImage3,
       existingImage4
     } = req.body;
+    
+    const  findCategory = await Category.find({name:category})
 
     if (!name || !description || !category || !price || !variantSize || !variantQuantity) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'All required fields must be provided' });
@@ -323,6 +329,13 @@ const postEditProduct = async (req, res) => {
     }
     addVariant()
 
+    let bestOffer = Math.max(offer,findCategory.offer)
+    if(Array.isArray(variant)){
+      variant = variant.map(item=>{
+        const previousOffer = 
+      })
+    }
+
     if (filteredImages.length === 0) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'At least one image is required' });
     }
@@ -333,7 +346,8 @@ const postEditProduct = async (req, res) => {
         productName: name,
         description,
         category,
-        offer: offer ? parseFloat(offer) : 0,
+        productOffer: offer ? parseFloat(offer) : 0,
+        offer : bestOffer,
         regularPrice: parseFloat(price),
         // salePrice: salesPrice ? parseFloat(salesPrice) : parseFloat(price),
         size: variantSize,
@@ -423,32 +437,31 @@ const addProductOffer = async (req, res) => {
     }
 
     const category = await Category.findById(product.category);
-    const categoryOffer = category?.offer || 0;
+    const categoryOffer = category.offer
 
     const finalOffer = Math.max(offer, categoryOffer);
-
-    const discount = product.regularPrice * (finalOffer / 100);
-    const newSalePrice = Math.round(product.regularPrice - discount);
     product.offer = finalOffer;
+
     product.productOffer = offer;
 
-    product.variant = product.variant.map(variant => {
-      const variantDiscount = variant.salePrice * (finalOffer / 100);
-      const updatedSalePrice = Math.round(variant.salePrice - variantDiscount);
-      return {
-        ...variant,
-        salePrice: updatedSalePrice
-      };
-    });
+    if(categoryOffer<offer){
+      product.variant = product.variant.map(variant => {
+        const restoreAmount =  Math.round(variant.salePrice / (1 - categoryOffer / 100))
+        const variantDiscount = restoreAmount - (restoreAmount * (offer / 100));
+        return {
+          ...variant,
+          salePrice: variantDiscount
+        };
+      });
+    }
 
     await product.save();
 
     res.status(StatusCode.CREATED).json({
       success: true,
-      finalOffer,
-      salePrice: newSalePrice,
-      message: 'Offer applied successfully to product and variants'
+      message: "Product offer applied."
     });
+
 
   } catch (err) {
     console.error('Error in addProductOffer:', err);
@@ -479,17 +492,15 @@ const editProductOffer = async (req, res) => {
     const previousOffer = product.productOffer || 0;
     const categoryOffer = product.category.offer || 0;
 
-    // Restore original price from old offer
     const restoreOffer = Math.max(categoryOffer, previousOffer);
     product.variant = product.variant.map(item => {
       const originalPrice = item.salePrice / (1 - (restoreOffer / 100));
       return { ...item, salePrice: originalPrice };
     });
 
-    // Apply new best offer
     const bestOffer = Math.max(categoryOffer, newOffer);
     product.variant = product.variant.map(item => {
-      const newSalePrice = item.salePrice * (1 - (bestOffer / 100));
+      const newSalePrice =  Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)));
       return { ...item, salePrice: newSalePrice };
     });
 
