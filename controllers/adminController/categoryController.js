@@ -52,7 +52,6 @@ const loadAddCategory = async (req, res) => {
 const addCategory = async (req, res) => {
   try {
     const { name, description, offer, status } = req.body;
-    console.log('just do it')
     console.log(req.body);
     const Tname = name.trim()
     const existingCategory = await category.findOne({ name: { $regex: new RegExp(`^${Tname}$`, 'i') } });
@@ -132,6 +131,7 @@ const editCategory = async (req, res) => {
     const id = req.params.id
     const { name, description, offer, status } = req.body
     const existingCategory = await category.findById(id);
+    const products = await Product.find({category:id})
     if (!existingCategory) {
       return res.status(StatusCode.BAD_REQUEST).json({ error: "Category does not exist" });
     }
@@ -145,7 +145,28 @@ const editCategory = async (req, res) => {
     if (duplicate) {
       return res.status(StatusCode.BAD_REQUEST).json({ error: "Category name already exists" });
     }
+    
+    let newCategoryOffer =  Number(offer)
+      let previousCategoryOffer = existingCategory.offer||0
+      for(let product of products){
+        let availableProductOffer  = product.productOffer || 0
+        let PreviousAddedOffer = Math.max(previousCategoryOffer,availableProductOffer)
 
+        product.variant = product.variant.map(item=>{
+          const restoreAmount = (item.salePrice /(1-(PreviousAddedOffer/100)))
+          const roundAmount = Math.round(restoreAmount)
+          return {...item,salePrice:roundAmount}
+        })
+
+        let bestOffer = Math.max(availableProductOffer,newCategoryOffer)
+        product.variant = product.variant.map(item=>{
+          const appliedAmound = item.salePrice - (item.salePrice*bestOffer/100)
+          const roundAmound = Math.round(appliedAmound)
+          return {...item,salePrice:roundAmound}
+        })
+        product.offer = bestOffer 
+        await product.save()
+      }
     const updateCategory = await category.findByIdAndUpdate(id, {
       name: name.trim(),
       description: description.trim(),

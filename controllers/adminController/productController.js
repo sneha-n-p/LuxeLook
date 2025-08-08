@@ -6,6 +6,7 @@ const path = require("path")
 const sharp = require("sharp")
 const mongoose = require("mongoose")
 const StatusCode = require("../../statusCode")
+const multer = require('multer')
 
 
 const productInfo = async (req, res) => {
@@ -291,7 +292,9 @@ const postEditProduct = async (req, res) => {
       existingImage4
     } = req.body;
     
-    const  findCategory = await Category.find({name:category})
+    const product = await Product.findById(productId)
+    const  findCategory = await Category.findById(category)
+    console.log('findCategory:',findCategory)
 
     if (!name || !description || !category || !price || !variantSize || !variantQuantity) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'All required fields must be provided' });
@@ -314,7 +317,7 @@ const postEditProduct = async (req, res) => {
 
     const filteredImages = images.filter(img => img !== null);
 
-    const variant = []
+    let variant = []
     let stock = 0
     const addVariant = async()=>{
       for(i=0;i<variantSize.length;i++){
@@ -329,12 +332,28 @@ const postEditProduct = async (req, res) => {
     }
     addVariant()
 
-    let bestOffer = Math.max(offer,findCategory.offer)
+    let pareseOffer = Number(offer)
+    let parseCAtegoryOffer = Number(findCategory.offer)||0
+    let previousProductOffer = product.productOffer || 0
+    let previousBestOffer = Math.max(previousProductOffer,parseCAtegoryOffer)
     if(Array.isArray(variant)){
       variant = variant.map(item=>{
-        const previousOffer = 
+        const originalPrice = item.salePrice / (1 - (previousBestOffer / 100))
+        console.log("originalPrice:",originalPrice)
+        const RoundtheOgPrice =  Math.round(originalPrice)
+        return {...item,salePrice:RoundtheOgPrice}
       })
     }
+
+    let bestOffer = Math.max(pareseOffer,parseCAtegoryOffer)
+    if(Array.isArray(variant)){
+      variant = variant.map(item=>{
+        const offerAppliedPrice = item.salePrice - (item.salePrice*bestOffer/100)
+        const RoundThePrice = Math.round(offerAppliedPrice) 
+        return {...item,salePrice:RoundThePrice}
+      })
+    }
+
 
     if (filteredImages.length === 0) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'At least one image is required' });
@@ -347,9 +366,8 @@ const postEditProduct = async (req, res) => {
         description,
         category,
         productOffer: offer ? parseFloat(offer) : 0,
-        offer : bestOffer,
+        offer : parseFloat(bestOffer) || 0,
         regularPrice: parseFloat(price),
-        // salePrice: salesPrice ? parseFloat(salesPrice) : parseFloat(price),
         size: variantSize,
         variant : variant,
         quatity: stock,
@@ -495,7 +513,8 @@ const editProductOffer = async (req, res) => {
     const restoreOffer = Math.max(categoryOffer, previousOffer);
     product.variant = product.variant.map(item => {
       const originalPrice = item.salePrice / (1 - (restoreOffer / 100));
-      return { ...item, salePrice: originalPrice };
+      const roundPrice = Math.round(originalPrice)
+      return { ...item, salePrice: roundPrice };
     });
 
     const bestOffer = Math.max(categoryOffer, newOffer);
