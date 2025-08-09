@@ -325,7 +325,7 @@
               icon: 'success',
               showConfirmButton: false,
               timer: 1500
-            });
+            }).then(()=>location.reload())
           } else {
             Swal.fire({
               title: "Error Occurred",
@@ -376,12 +376,6 @@
       } else {
         quantityInput.style.display = "block"
       }
-
-
-
-
-
-
       // Update UI
       document.getElementById("size-quantity").textContent = `Quantity: ${availableStock}`;
       document.getElementById("variant-price").textContent = `₹${variantPrice}`;

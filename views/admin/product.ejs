@@ -138,9 +138,9 @@
                             
                             <td class="text-start" style="color: #000;">
                                 <div>
-                                  <span><%= product.offer ? product.offer + '%' : '0%' %></span>
+                                  <span><%= product.productOffer ? product.productOffer + '%' : '0%' %></span>
                                   <div class="mt-2">
-                                    <% if (product.offer && product.offer > 0) { %>
+                                    <% if (product.productOffer && product.productOffer > 0) { %>
                                       <button class="btn btn-sm btn-warning me-1" onclick="editOffer('<%= product._id %>')">Edit Offer</button>
                                       <button class="btn btn-sm btn-danger" onclick="removeOffer('<%= product._id %>')">Remove Offer</button>
                                     <% } else { %>

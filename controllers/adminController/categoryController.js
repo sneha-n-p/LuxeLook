@@ -52,7 +52,6 @@ const loadAddCategory = async (req, res) => {
 const addCategory = async (req, res) => {
   try {
     const { name, description, offer, status } = req.body;
-    console.log('just do it')
     console.log(req.body);
     const Tname = name.trim()
     const existingCategory = await category.findOne({ name: { $regex: new RegExp(`^${Tname}$`, 'i') } });
@@ -132,6 +131,7 @@ const editCategory = async (req, res) => {
     const id = req.params.id
     const { name, description, offer, status } = req.body
     const existingCategory = await category.findById(id);
+    const products = await Product.find({category:id})
     if (!existingCategory) {
       return res.status(StatusCode.BAD_REQUEST).json({ error: "Category does not exist" });
     }
@@ -145,7 +145,28 @@ const editCategory = async (req, res) => {
     if (duplicate) {
       return res.status(StatusCode.BAD_REQUEST).json({ error: "Category name already exists" });
     }
+    
+    let newCategoryOffer =  Number(offer)
+      let previousCategoryOffer = existingCategory.offer||0
+      for(let product of products){
+        let availableProductOffer  = product.productOffer || 0
+        let PreviousAddedOffer = Math.max(previousCategoryOffer,availableProductOffer)
 
+        product.variant = product.variant.map(item=>{
+          const restoreAmount = (item.salePrice /(1-(PreviousAddedOffer/100)))
+          const roundAmount = Math.round(restoreAmount)
+          return {...item,salePrice:roundAmount}
+        })
+
+        let bestOffer = Math.max(availableProductOffer,newCategoryOffer)
+        product.variant = product.variant.map(item=>{
+          const appliedAmound = item.salePrice - (item.salePrice*bestOffer/100)
+          const roundAmound = Math.round(appliedAmound)
+          return {...item,salePrice:roundAmound}
+        })
+        product.offer = bestOffer 
+        await product.save()
+      }
     const updateCategory = await category.findByIdAndUpdate(id, {
       name: name.trim(),
       description: description.trim(),
@@ -180,25 +201,24 @@ const addCategoryOffer = async (req, res) => {
     const products = await Product.find({ category: id });
 
     for (const product of products) {
-      const productOffer = product.offer || 0;
-      const bestOffer = Math.max(productOffer, offer);
-
-      // const regularPrice = product.regularPrice || 0;
-      // const salePrice = Math.round(regularPrice - (regularPrice * bestOffer) / 100);
-      // product.regularPrice = salePrice;
-
-      if (Array.isArray(product.variant)) {
-        product.variant = product.variant.map(variants => {
-          const variantPrice = variants.salePrice || 0;
-          const variantSalePrice = Math.round(variantPrice - (variantPrice * bestOffer / 100));
-          return {
-            ...variants.toObject(),
-            salePrice: variantSalePrice,
-          };
-        });
-      }
+      const productOffer = product.productOffer || 0;
+      let bestOffer = Math.max(productOffer, offer);
       product.offer = bestOffer;
+      console.log('bestOffer:',bestOffer)
 
+    
+      if(productOffer<offer){
+        if (Array.isArray(product.variant)) {
+          product.variant = product.variant.map(variants => {
+            const restoreAmount = Math.round(variants.salePrice / (1 - productOffer / 100));
+            const variantDiscount = Math.round( restoreAmount - (restoreAmount * (offer / 100)));
+            return {
+              ...variants.toObject(),
+              salePrice: variantDiscount,
+            };
+          });
+        }
+      }
       await product.save();
     }
 
@@ -215,8 +235,6 @@ const addCategoryOffer = async (req, res) => {
     });
   }
 };
-
-
 
 const removeCategoryOffer = async (req, res) => {
   try {
@@ -235,7 +253,7 @@ const removeCategoryOffer = async (req, res) => {
       const productOffer = product.productOffer || 0;
       const categoryWasUsed = categoryOffer > productOffer;
 
-     
+
       if (Array.isArray(product.variant)) {
         const updatedVariants = product.variant.map((variant, i) => {
           const currentPrice = variant.salePrice || 0;
@@ -248,7 +266,7 @@ const removeCategoryOffer = async (req, res) => {
               ? Math.round(originalPrice - (originalPrice * productOffer / 100))
               : originalPrice;
 
-            
+
           } else {
             finalSalePrice = productOffer > 0
               ? Math.round(product.regularPrice - (product.regularPrice * productOffer / 100))
@@ -285,18 +303,43 @@ const removeCategoryOffer = async (req, res) => {
 const editCategoryOffer = async (req, res) => {
   try {
     const { id, offer } = req.body;
+    console.log('req.body:', req.body)
 
-    const updatedCategory = await category.findByIdAndUpdate(id, { offer }, { new: true });
-    if (!updatedCategory) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
+    // const updatedCategory = await category.findByIdAndUpdate(id, { offer }, { new: true });
+    // if (!updatedCategory) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
+
+    const Category = await category.findById(id)
+    if (!Category) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
+
 
     const products = await Product.find({ category: id });
 
+    let previousCategoryOffer = Category.offer || 0
+    console.log('previousactegoryOffer:', previousCategoryOffer)
+
     for (const product of products) {
-      const effectiveOffer = Math.max(product.offer || 0, offer);
-      const salePrice = Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100);
-      product.salePrice = salePrice;
+      let productOffer = product.productOffer || 0
+
+      let restoreOffer = Math.max(previousCategoryOffer, productOffer)
+      product.variant = product.variant.map(item => {
+        const originalPrice = (item.salePrice / (1 - (restoreOffer / 100)));
+        return { ...item, salePrice: originalPrice }
+      })
+
+      let bestOffer = Math.max(productOffer, offer)
+      product.variant = product.variant.map(item => {
+        console.log('item.salePrice:',item.salePrice)
+        const newSalePrice = Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)));
+        console.log('newSalePrice:',newSalePrice)
+        return { ...item, salePrice: newSalePrice }
+      })
+      product.offer = bestOffer
       await product.save();
+
     }
+
+    Category.offer = offer
+    await Category.save()
 
     res.json({ success: true, message: "Category offer updated and products refreshed" });
   } catch (err) {

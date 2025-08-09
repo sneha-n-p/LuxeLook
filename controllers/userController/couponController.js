@@ -14,6 +14,7 @@ const applyCoupon = async (req, res) => {
     const userId = req.session.user;
 
     const validCoupon = await Coupon.findOne({ name: coupon, islist: true });
+    console.log(validCoupon)
 
     if (!validCoupon) {
       return res.status(400).json({ success: false, message: 'Invalid coupon' });

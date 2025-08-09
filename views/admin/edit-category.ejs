@@ -69,14 +69,14 @@
           <div class="mb-3">
             <label for="categoryName" class="form-label">Category Name:</label>
             <p class="edit-category-errors" id="category-name-Error"></p>
-            <input type="text" class="form-control" id="categoryName" value="<%= Category.name %>" name="name" required
+            <input type="text" class="form-control" id="categoryName" value="<%= Category.name %>" name="name" required maxlength="25"
               pattern="/^[A-Za-z0-9 .,- ]+$/" title="Only alphabets allowed, no spaces or numbers.">
           </div>
 
           <div class="mb-3">
             <label for="categoryDescription" class="form-label">Description:</label>
             <p class="edit-category-errors" id="category-Description-Error"></p>
-            <textarea class="form-control" id="categoryDescription" name="description" rows="3" required
+            <textarea class="form-control" id="categoryDescription" name="description" rows="3" required maxlength="100"
               pattern="/^[A-Za-z0-9 .,-]+$/"
               title="Only alphabets allowed, no spaces or numbers."><%= Category.description %></textarea>
           </div>

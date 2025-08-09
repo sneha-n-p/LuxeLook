@@ -6,6 +6,7 @@ const path = require("path")
 const sharp = require("sharp")
 const mongoose = require("mongoose")
 const StatusCode = require("../../statusCode")
+const multer = require('multer')
 
 
 const productInfo = async (req, res) => {
@@ -59,7 +60,6 @@ const addproduct = async (req, res) => {
       category,
       offer,
       price,
-      // salesPrice,
       variantSize,
       variantSalePrice,
       variantQuantity
@@ -83,13 +83,6 @@ const addproduct = async (req, res) => {
       errors.price = "Enter a valid price greater than 0";
     }
 
-    // if (!salesPrice || isNaN(salesPrice) || Number(salesPrice) <= 0) {
-    //   errors.salesPrice = "Enter a valid sales price greater than 0";
-    // }
-
-    // if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
-    //   errors.price = "Regular price must be greater than sales price";
-    // }
 
     let stock  =0
     let variants = [];
@@ -139,8 +132,20 @@ const addproduct = async (req, res) => {
         formData: req.body
       });
     }
-
+    
     const categoryDoc = await Category.findOne({ name: category });
+
+    let bestOffer = Math.max(categoryDoc.offer,offer)
+    if(Array.isArray(variants)){
+      variants = variants.map(item=>{
+        let varinatAppliedDiscount = Math.round(item.salePrice - (item.salePrice  * (bestOffer / 100)))
+        return{
+          ...item,
+          salePrice:varinatAppliedDiscount
+        }
+      })
+    }
+
     if (!categoryDoc || !mongoose.Types.ObjectId.isValid(categoryDoc._id)) {
       console.log('Error in category')
       errors.category = "Invalid category";
@@ -198,12 +203,12 @@ const addproduct = async (req, res) => {
     const newProduct = new Product({
       productName: ProductName,
       description,
+      productOffer:offer,
       quatity: stock,
       size: variants.map(v => v.size),
       category: categoryDoc._id,
-      offer: parseFloat(offer) || 0,
+      offer: parseFloat(bestOffer) || 0,
       regularPrice: parseFloat(price),
-      // salePrice: parseFloat(salesPrice),
       productImage: imagesPaths,
       variant: variants
     });
@@ -286,6 +291,10 @@ const postEditProduct = async (req, res) => {
       existingImage3,
       existingImage4
     } = req.body;
+    
+    const product = await Product.findById(productId)
+    const  findCategory = await Category.findById(category)
+    console.log('findCategory:',findCategory)
 
     if (!name || !description || !category || !price || !variantSize || !variantQuantity) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'All required fields must be provided' });
@@ -308,7 +317,7 @@ const postEditProduct = async (req, res) => {
 
     const filteredImages = images.filter(img => img !== null);
 
-    const variant = []
+    let variant = []
     let stock = 0
     const addVariant = async()=>{
       for(i=0;i<variantSize.length;i++){
@@ -323,6 +332,29 @@ const postEditProduct = async (req, res) => {
     }
     addVariant()
 
+    let pareseOffer = Number(offer)
+    let parseCAtegoryOffer = Number(findCategory.offer)||0
+    let previousProductOffer = product.productOffer || 0
+    let previousBestOffer = Math.max(previousProductOffer,parseCAtegoryOffer)
+    if(Array.isArray(variant)){
+      variant = variant.map(item=>{
+        const originalPrice = item.salePrice / (1 - (previousBestOffer / 100))
+        console.log("originalPrice:",originalPrice)
+        const RoundtheOgPrice =  Math.round(originalPrice)
+        return {...item,salePrice:RoundtheOgPrice}
+      })
+    }
+
+    let bestOffer = Math.max(pareseOffer,parseCAtegoryOffer)
+    if(Array.isArray(variant)){
+      variant = variant.map(item=>{
+        const offerAppliedPrice = item.salePrice - (item.salePrice*bestOffer/100)
+        const RoundThePrice = Math.round(offerAppliedPrice) 
+        return {...item,salePrice:RoundThePrice}
+      })
+    }
+
+
     if (filteredImages.length === 0) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'At least one image is required' });
     }
@@ -333,9 +365,9 @@ const postEditProduct = async (req, res) => {
         productName: name,
         description,
         category,
-        offer: offer ? parseFloat(offer) : 0,
+        productOffer: offer ? parseFloat(offer) : 0,
+        offer : parseFloat(bestOffer) || 0,
         regularPrice: parseFloat(price),
-        // salePrice: salesPrice ? parseFloat(salesPrice) : parseFloat(price),
         size: variantSize,
         variant : variant,
         quatity: stock,
@@ -423,32 +455,31 @@ const addProductOffer = async (req, res) => {
     }
 
     const category = await Category.findById(product.category);
-    const categoryOffer = category?.offer || 0;
+    const categoryOffer = category.offer
 
     const finalOffer = Math.max(offer, categoryOffer);
-
-    const discount = product.regularPrice * (finalOffer / 100);
-    const newSalePrice = Math.round(product.regularPrice - discount);
     product.offer = finalOffer;
-    product.regularPrice = newSalePrice;
 
-    product.variant = product.variant.map(variant => {
-      const variantDiscount = variant.salePrice * (finalOffer / 100);
-      const updatedSalePrice = Math.round(variant.salePrice - variantDiscount);
-      return {
-        ...variant,
-        salePrice: updatedSalePrice
-      };
-    });
+    product.productOffer = offer;
+
+    if(categoryOffer<offer){
+      product.variant = product.variant.map(variant => {
+        const restoreAmount =  Math.round(variant.salePrice / (1 - categoryOffer / 100))
+        const variantDiscount = restoreAmount - (restoreAmount * (offer / 100));
+        return {
+          ...variant,
+          salePrice: variantDiscount
+        };
+      });
+    }
 
     await product.save();
 
     res.status(StatusCode.CREATED).json({
       success: true,
-      finalOffer,
-      salePrice: newSalePrice,
-      message: 'Offer applied successfully to product and variants'
+      message: "Product offer applied."
     });
+
 
   } catch (err) {
     console.error('Error in addProductOffer:', err);
@@ -466,69 +497,105 @@ const getProductEdit = async (req, res) => {
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Server error' });
   }
 }
+
 const editProductOffer = async (req, res) => {
   try {
     const { id, offer: newOffer } = req.body;
 
-    const product = await Product.findById(id).populate('category')
-
+    const product = await Product.findById(id).populate('category');
     if (!product) {
-      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
+      return res.status(404).json({ success: false, message: "Product not found" });
     }
 
+    const previousOffer = product.productOffer || 0;
     const categoryOffer = product.category.offer || 0;
-    const effectiveOffer = Math.max(categoryOffer, newOffer);
-    const salePrice = Math.round(product.regularPrice - (product.regularPrice * effectiveOffer) / 100);
 
-    product.offer = newOffer;
-    product.salePrice = salePrice;
+    const restoreOffer = Math.max(categoryOffer, previousOffer);
+    product.variant = product.variant.map(item => {
+      const originalPrice = item.salePrice / (1 - (restoreOffer / 100));
+      const roundPrice = Math.round(originalPrice)
+      return { ...item, salePrice: roundPrice };
+    });
+
+    const bestOffer = Math.max(categoryOffer, newOffer);
+    product.variant = product.variant.map(item => {
+      const newSalePrice =  Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)));
+      return { ...item, salePrice: newSalePrice };
+    });
+
+    product.offer = bestOffer;
+    product.productOffer = newOffer;
 
     await product.save();
 
     res.json({
       success: true,
-      finalOffer: effectiveOffer,
-      salePrice: salePrice,
+      finalOffer: bestOffer,
       message: 'Offer updated successfully'
     });
 
   } catch (error) {
     console.error("Offer update error:", error);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
+};
+
 const removeProductOffer = async (req, res) => {
   try {
     const productId = req.body.id;
     const product = await Product.findById(productId);
-    if (!product) return res.json({ success: false, message: 'Product not found' });
+    if (!product) {
+      return res.json({ success: false, message: 'Product not found' });
+    }
 
-    const category = await Category.findById(product.category)
+    const category = await Category.findById(product.category);
+    const productOffer = product.productOffer || 0;
+    const categoryOffer = category?.offer || 0;
+    const bestOffer = categoryOffer; 
 
-    let appliedOffer = product.offer;
-    let salePrice = product.regularPrice;
+    let appliedOffer = 0;
 
-    await Product.findByIdAndUpdate(productId, {
-      offer: 0,
-      regularPrice:salePrice / (1 - (appliedOffer / 100)),
+    if (productOffer > categoryOffer) {
+      appliedOffer = productOffer;
+
+      product.variant = product.variant.map(variant => {
+        const originalPrice = Math.round(variant.salePrice / (1 - (appliedOffer / 100)));
+        return {
+          ...variant,
+          salePrice: originalPrice
+        };
+      });
+
+      if (categoryOffer > 0) {
+        product.variant = product.variant.map(variant => {
+          const discounted = Math.round(variant.salePrice * (1 - (categoryOffer / 100)));
+          return {
+            ...variant,
+            salePrice: discounted
+          };
+        });
+      }
+    }
+
+    product.offer = bestOffer;
+    product.productOffer = 0;
+
+    await product.save();
+
+    res.status(StatusCode.OK).json({
+      success: true,
+      message: 'Product offer removed',
+      finalOffer: bestOffer
     });
-
-    product.variant = product.variant.map(variant => {
-  const originalPrice = Math.round(variant.salePrice / (1 - (appliedOffer / 100)));
-  return {
-    ...variant,
-    salePrice: originalPrice
-  };
-});
-
-product.save()
-
-    res.status(StatusCode.OK).json({ success: true, message: 'Product offer removed', finalOffer: appliedOffer, salePrice });
   } catch (error) {
     console.error('Error removing product offer:', error);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error'
+    });
   }
-}
+};
+
 
 module.exports = {
   productInfo,
