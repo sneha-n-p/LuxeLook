@@ -99,6 +99,8 @@ router.patch('/orders/return',orderController.returnOrder)
 router.patch('/orders/single-Product-Return',orderController.singleProductReturn)
 router.post('/create-razorpay-order',orderController.razorpay)
 router.get('/orderFailure',orderController.loadFailure)
+router.get('/retry-Checkout',orderController.loadRetryCheckout)
+router.post('/retry-PlaceOrder',orderController.loadRetryPlaceOrder)
 router.get('/downloadInvoice',orderController.generateInvoice)
 
 router.get('/wallet',userAuth,walletController.loadWallet)

@@ -51,6 +51,10 @@ const userSchema = new Schema({
   type: String,
   default: null
 },
+referralCoupon:[{
+    type:Array
+}],
+
     cart:[{
         type:Schema.Types.ObjectId,
         ref:"Cart",       

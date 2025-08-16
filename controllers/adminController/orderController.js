@@ -86,7 +86,7 @@ const updateOrderStatus = async (req, res) => {
 const verifyRequest = async (req, res) => {
     try {
         const { orderId, action } = req.body;
-
+        console.log('action:',action)
         const order = await Order.findById(orderId).populate('orderedItems.product');
         if (!order) {
             return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Order not found' });
@@ -95,18 +95,18 @@ const verifyRequest = async (req, res) => {
         if (!['Returned', 'Delivered'].includes(action)) {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid action' });
         }
-
-        // Update all items' status
+        console.log('order:',order)
+           
         order.orderedItems.forEach(item => {
             if (item.status !== 'Cancelled') {
                 item.status = action;
+                 order.status = action
+
             }
         });
 
-        order.status = action;
-
+        
         if (action === 'Returned') {
-            // Update product stock and process refund
             let totalRefund = 0;
             for (const item of order.orderedItems) {
                 if (item.status === 'Returned') {
@@ -114,17 +114,18 @@ const verifyRequest = async (req, res) => {
                     if (product) {
                         const variant = product.variant.find(v => v.size === item.size);
                         if (variant) {
-                            variant.quantity += item.quantity;
+                            variant.quantity += item.quantity
+                            product.quatity += item.quantity
                             await product.save();
                         }
                         totalRefund += item.price * item.quantity;
                     }
                 }
             }
-
+            
             const userId = order.userId;
             let wallet = await Wallet.findOne({ userId });
-
+            
             const transaction = {
                 type: 'credit',
                 amount: order.finalAmount,
@@ -144,10 +145,11 @@ const verifyRequest = async (req, res) => {
                 wallet.balance += order.finalAmount;
                 wallet.transactions.push(transaction);
             }
-
+            
             await wallet.save();
         }
-
+        
+        order.status = action;
         await order.save();
         return res.status(StatusCode.OK).json({ success: true, message: `Return request ${action === 'Returned' ? 'accepted' : 'rejected'} successfully.` });
     } catch (error) {
@@ -158,7 +160,7 @@ const verifyRequest = async (req, res) => {
 
 const verifySingleRequest = async(req,res)=>{
     try {
-        const {orderId,productId,action} = req.body
+        const {orderId,productId,action,size} = req.body
         const order = await Order.findById(orderId)
         const product = await Product.findById(productId)
         let itemTotal = 0
@@ -168,14 +170,18 @@ const verifySingleRequest = async(req,res)=>{
         order.orderedItems.forEach(items=>{
             if(items.product.toString()===productId){
                 if(action==='Delivered'){
-                    items.status = action
-                    delete items.returnReason
+                    if(items.status==='Return Request') {
+                        items.status = action
+                        delete items.returnReason
+                    }
+                    order.status = action
                 }else{
                     items.status = action
                     refundAmount = items.price
                     product.variant.forEach(item=>{
                         if(item.size === items.size){
-                            item.quantity+=items.quantity
+                            item.quantity += items.quantity
+                            product.quatity += items.quantity
                             itemTotal = items.quantity * items.price
                         }
                     })

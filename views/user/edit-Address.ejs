@@ -209,6 +209,31 @@
 
 <script>
   const editAddressForm = document.getElementById('editAddressForm');
+  const phoneInput = document.getElementById('phone')
+const altPhoneInput = document.getElementById('altPhone')
+
+phoneInput.value = "+91 ";
+      
+      phoneInput.addEventListener("input", function () {
+        if (!this.value.startsWith("+91 ")) {
+          this.value = "+91 " + this.value.replace(/[^0-9]/g, "");
+        } else {
+          let digits = this.value.slice(4).replace(/[^0-9]/g, "");
+          if (digits.length > 10) digits = digits.slice(0, 10);
+          this.value = "+91 " + digits;
+        }
+      })
+      
+      altPhoneInput.value = "+91 ";
+altPhoneInput.addEventListener("input", function () {
+  if (!this.value.startsWith("+91 ")) {
+    this.value = "+91 " + this.value.replace(/[^0-9]/g, "");
+  } else {
+    let digits = this.value.slice(4).replace(/[^0-9]/g, "");
+    if (digits.length > 10) digits = digits.slice(0, 10);
+    this.value = "+91 " + digits;
+  }
+})
 
   const showError = (elementId, message) => {
     const errorElement = document.getElementById(elementId);
@@ -228,8 +253,8 @@
     let isValid = true;
 
     const name = document.getElementById('name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const altPhone = document.getElementById('altPhone').value.trim();
+    const phone = document.getElementById('phone').value.trim().replace('+91 ', '')
+    const altPhone = document.getElementById('altPhone').value.trim().replace('+91 ', '')
     const streetAddress = document.getElementById('streetAddress').value.trim();
     const apartment = document.getElementById('apartment').value.trim();
     const city = document.getElementById('city').value.trim();

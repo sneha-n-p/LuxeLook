@@ -229,18 +229,25 @@
                             <td>₹<%= price %>
                             </td>
                             <td>
+                                <!-- <input data-size="<%= product.size %>" hidden> -->
                                 <%= product.size %>
                             </td>
                             <td>
-                                <% if (available <=0) { %>
-                                    <input type="number" value="0" class="quantity-input"
-                                        data-id="<%= product.productId._id %>" disabled>
-                                    <div class="text-danger small mt-1">Out of stock! Max available: 0</div>
-                                    <% } else { %>
-                                        <input type="number" value="<%= quantity %>" min="1" max="<%= available %>"
-                                            class="quantity-input" data-id="<%= product.productId._id %>"
-                                            data-price="<%= price %>" data-max="<%= available %>">
-                                        <% } %>
+                                <% if (available <= 0) { %>
+    <input type="number" value="0" class="quantity-input"
+        data-id="<%= product.productId._id %>" disabled>
+    <div class="text-danger small mt-1">Out of stock! Max available: 0</div>
+<% } else { %>
+    <input type="number" value="<%= quantity %>" 
+        min="1" 
+        max="<%= available %>" 
+        class="quantity-input no-typing"
+        data-id="<%= product.productId._id %>"
+        data-price="<%= price %>" 
+        data-size="<%= product.size %>"
+        data-max="5">
+<% } %>
+
                             </td>
                             <td class="product-total">
                                 ₹<span class="price-text">
@@ -334,6 +341,7 @@
         }
 
         document.querySelectorAll(".quantity-input").forEach(input => {
+            input.addEventListener('keydown', e => e.preventDefault());
             input.addEventListener("input", function () {
                 const row = this.closest("tr");
                 const price = parseInt(this.getAttribute('data-price'));
@@ -387,43 +395,50 @@
         }
 
         document.getElementById("proceedCheckout")?.addEventListener("click", function () {
-            const cartItems = [];
-            document.querySelectorAll(".quantity-input").forEach(input => {
-                if (!input.disabled) {
-                    cartItems.push({
-                        productId: input.getAttribute("data-id"),
-                        quantity: parseInt(input.value),
-                        price: parseInt(input.getAttribute("data-price"))
-                    });
-                } else {
-                    cartItems.push({
-                        productId: input.getAttribute("data-id"),
-                        quantity: parseInt(input.value),
-                        price: parseInt(input.getAttribute("data-price"))
-                    });
-                }
-            });
+    const cartItems = [];
 
-            axios.post('/cart', { cartItems })
-                .then(response => {
-                    if (response.data.success) {
-                        window.location.href = "/checkout";
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Error!",
-                            text: response.data.message
-                        });
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "Something went wrong!"
-                    });
+    for (let input of document.querySelectorAll(".quantity-input")) {
+        if (input.disabled) continue; 
+
+        const productId = input.getAttribute("data-id");
+        const quantity = parseInt(input.value);
+        const price = parseInt(input.getAttribute("data-price"));
+        const size = input.getAttribute("data-size")
+        const maxAvailable = parseInt(input.getAttribute("data-max")); 
+
+        if (quantity > maxAvailable) {
+            Swal.fire({
+                icon: "warning",
+                title: "Stock limit reached!",
+                text: `Only ${maxAvailable} item available for this size.`,
+            })
+            return; 
+        }
+
+        cartItems.push({ productId, quantity, price, size });
+    }
+
+    axios.post('/cart', { cartItems })
+        .then(response => {
+            if (response.data.success) {
+                window.location.href = "/checkout";
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Info!",
+                    text: response.data.message
                 });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!"
+            });
         });
+});
+
     </script>
 
     <%-include("../../views/partials/userPartial/footer")%>

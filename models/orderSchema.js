@@ -4,20 +4,12 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const { v4: uuidv4 } = require("uuid");
 
-function generateOrderId() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  const uuid = uuidv4();
-  return `ORD-${year}-${month}-${day}-${uuid}`;
-}
 
 const orderSchema = new Schema({
   orderId: {
     type: String,
-    default: generateOrderId,
     unique: true,
+    required:true
   },
   userId: {
     type: Schema.Types.ObjectId,
@@ -119,6 +111,7 @@ const orderSchema = new Schema({
       "Delivered",
       "Confirmed",
       "Cancelled",
+      'payment Failed',
       "Out For Delivery",
       "Return Request",
       "Returned",

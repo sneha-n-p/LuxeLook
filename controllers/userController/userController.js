@@ -229,6 +229,7 @@ const verifyOtp = async (req, res) => {
                         offerPrice: 100,
                         minimumPrice: 500,
                         restricted: true,
+                        userId:referrer._id,
                         expiredOn: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
                         isList: false,
                     });
@@ -237,20 +238,20 @@ const verifyOtp = async (req, res) => {
                     if (!referrer.availableCoupons) referrer.availableCoupons = [];
                     if (!referrer.redeemedUsers) referrer.redeemedUsers = [];
                     referrer.availableCoupons.push(referrerCoupon._id);
-                    referrer.redeemedUsers.push(saveUserData._id);
+                    // referrer.redeemedUsers.push(saveUserData._id);
                     await referrer.save();
 
-                    const refereeCoupon = new Coupon({
-                        name: "NEW" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                        offerPrice: 50,
-                        minimumPrice: 300,
-                        expiredOn: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-                        isList: false,
-                    });
-                    await refereeCoupon.save();
+                    // const refereeCoupon = new Coupon({
+                    //     name: "NEW" + Math.random().toString(36).substr(2, 8).toUpperCase(),
+                    //     offerPrice: 50,
+                    //     minimumPrice: 300,
+                    //     expiredOn: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+                    //     isList: false,
+                    // });
+                    // await refereeCoupon.save();
 
-                    saveUserData.availableCoupons = [refereeCoupon._id];
-                    await saveUserData.save();
+                    // saveUserData.availableCoupons = [refereeCoupon._id];
+                    // await saveUserData.save();
                 }
             }
 
