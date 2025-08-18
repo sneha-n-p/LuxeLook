@@ -236,7 +236,8 @@
                                                             <h6 class="fw-bold">
                                                                 <%= item.product.productName %>
                                                             </h6>
-                                                            <p>Quantity: <%= item.quantity %> | Price: ₹<%= item.quantity*item.price %> | Status: <%=
+                                                            <p>Quantity: <%= item.quantity %> | Price: ₹<%=
+                                                                        item.quantity*item.price %> | Status: <%=
                                                                             item.status %> | size : <%=item.size%>
                                                             </p>
                                                         </div>
@@ -244,15 +245,17 @@
                                                     <div>
                                                         <% if (item.status.trim()==='Delivered' ) { %>
                                                             <button class="submit-btn btn-return"
-                                                                onclick="singleReturned('<%= order._id %>', '<%= item.product._id %>')">RETURN</button>
+                                                                onclick="singleReturned('<%= order._id %>', '<%= item.product._id %>','<%=item.size%>')">RETURN</button>
                                                             <% } else if (item.status.trim()==='Ordered' ) { %>
                                                                 <button class="submit-btn btn-cancel"
-                                                                    onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>')">CANCEL</button>
-                                                                <% } else if(item.status.trim()==='Return Request') { %>
-                                                                    <button class="submit-btn ">RETURN REQUESTED</button>
-                                                                <% } else { %>
-                                                                    <span class="text-muted"></span>
-                                                                    <% } %>
+                                                                    onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>','<%= item.size%>')">CANCEL</button>
+                                                                <% } else if(item.status.trim()==='Return Request' ) {
+                                                                    %>
+                                                                    <button class="submit-btn ">RETURN
+                                                                        REQUESTED</button>
+                                                                    <% } else { %>
+                                                                        <span class="text-muted"></span>
+                                                                        <% } %>
                                                     </div>
                                                 </div>
                                                 <% }) %>
@@ -260,9 +263,12 @@
                                                         <a href="/orders" class="submit-btn">← Back to Orders</a>
 
                                                         <%if(order.status.trim()==='Delivered'){%>
-                                                            <a href="/downloadInvoice?orderId=<%= order.orderId %>"
-                                                                class="btn btn-primary mt-2">Download Invoice</a>
-                                                         <%}%>
+
+                                                            <button class="btn btn-success mt-2"
+                                                                onclick="showDownloadOptions('<%= order.orderId %>')">
+                                                                 Download Invoice
+                                                            </button>
+                                                             <%}%>
                                                     </div>
                                                     <% } %>
             </div>
@@ -284,7 +290,7 @@
             });
         };
 
-        function cancelSingleProduct(productId, orderId) {
+        function cancelSingleProduct(productId, orderId,size) {
             const reasons = [
                 "Found a better price elsewhere",
                 "Ordered by mistake",
@@ -305,16 +311,37 @@
         <option value="" disabled selected>Select a reason</option>
         ${optionsHtml}
       </select>
+            <textarea id="other-reason" class="swal2-textarea" placeholder="Please specify your reason" style="display:none;"></textarea>
     `,
                 showCancelButton: true,
                 confirmButtonText: "Yes, Cancel it!",
+
+                didOpen: () => {
+                    const otherReason = document.getElementById('other-reason')
+                    const selectReason = document.getElementById('cancel-reason')
+
+                    selectReason.addEventListener('change', function () {
+                        if (this.value === 'Other') {
+                            otherReason.style.display = 'block'
+                        } else {
+                            otherReason.style.display = 'none'
+                            otherReason.value = ''
+                        }
+                    })
+                },
+
                 preConfirm: () => {
+                    const otherReason = document.getElementById('other-reason').value.trim()
                     const selectedReason = document.getElementById("cancel-reason").value;
                     if (!selectedReason) {
                         Swal.showValidationMessage("Please select a reason.");
                         return false;
                     }
-                    return selectedReason;
+                    if (selectedReason === 'Other') {
+                        Swal.showValidationMessage(' Please Enter Custom Reason')
+                        return false
+                    }
+                    return selectedReason === "Other" ? otherReason : selectedReason
                 }
             }).then(async (result) => {
                 if (result.isConfirmed) {
@@ -322,6 +349,7 @@
                         const response = await axios.post('/orders/cancel-item', {
                             productId,
                             orderId,
+                            size,
                             reason: result.value
                         });
 
@@ -343,7 +371,7 @@
             });
         }
 
-        function singleReturned(orderId, productId) {
+        function singleReturned(orderId, productId,size) {
             const reasons = [
                 "Found a better price elsewhere",
                 "Order placed by mistake",
@@ -364,21 +392,45 @@
                 <option value="" disabled selected>Select reason</option>
                 ${optionsHtml}
             </select>
+                  <textarea id="other-reason" class="swal2-textarea" placeholder="Please specify your reason" style="display:none;"></textarea>
         `,
                 showCancelButton: true,
                 confirmButtonText: 'Submit',
+
+                didOpen: () => {
+                    const otherReason = document.getElementById('other-reason')
+                    const selectedReason = document.getElementById('returnReason')
+
+                    selectedReason.addEventListener('change', function () {
+                        if (this.value === 'Other') {
+                            otherReason.style.display = 'block'
+                        }
+                        else {
+                            otherReason.style.display = 'none'
+                            otherReason.value = ''
+                        }
+                    })
+                },
+
                 preConfirm: () => {
+                    const otherReason = document.getElementById('other-reason').value.trim()
                     const selectedReason = document.getElementById('returnReason').value;
                     if (!selectedReason) {
                         Swal.showValidationMessage('Please select a return reason');
+                        return false
                     }
-                    return selectedReason;
+                    // if (selectedReason === 'Other') {
+                    //     Swal.showValidationMessage('Please Enter Custom Reason')
+                    //     return false
+                    // }
+                    return selectedReason === 'Other' ? otherReason : selectedReason
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.patch('/orders/single-Product-Return', {
                         orderId,
                         productId,
+                        size,
                         reason: result.value
                     })
                         .then(response => {
@@ -410,57 +462,67 @@
         }
 
 
-        function showDownloadOptions() {
-            showSwal({
-                title: 'Download Invoice',
-                text: 'Choose the format to download the invoice:',
-                showCancelButton: true,
-                confirmButtonText: 'Excel',
-                cancelButtonText: 'PDF',
-                showDenyButton: true,
-                denyButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    downloadExcel();
-                } else if (result.isDismissed && result.dismiss === Swal.DismissReason.cancel) {
-                    downloadPDF();
-                }
-            });
+       function showDownloadOptions(orderId) {
+    Swal.fire({
+        title: 'Download Invoice',
+        text: 'Choose the format to download:',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Excel',
+        cancelButtonText: 'PDF',
+        showDenyButton: true,
+        denyButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Excel
+            downloadExcel(orderId);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // PDF
+            window.location.href = `/downloadInvoice?orderId=${orderId}`;
         }
+        // If denied, do nothing
+    });
+}
+
 
         function downloadExcel() {
             console.log("Generating Excel");
+
             const orderData = {
-                orderId: '<%= order.orderId %>',
-                status: '<%= order.status %>',
-                totalPrice: '₹<%= order.totalPrice.toFixed(2) %>',
-                finalAmount: '₹<%= order.finalAmount.toFixed(2) %>',
-                address: <% if(order.address && order.address.length > 0) { %> '<%= order.address[0].name %>, <%= order.address[0].streetAddress %><%= order.address[0].apartment ? ", " + order.address[0].apartment : "" %>, <%= order.address[0].city %>, <%= order.address[0].state %> - <%= order.address[0].pincode %>, Phone: <%= order.address[0].phone %><%= order.address[0].altPhone ? ", Alt Phone: " + order.address[0].altPhone : "" %>' <% } else { %> 'No address provided' <% } %>,
-                    couponApplied: '<%= order.couponApplied ? "Yes" : "No" %>',
-                        orderDate: '<%= order.createdOn.toDateString() %>',
-                            orderedItems: [
-        <% order.orderedItems.forEach((item, index) => { %>
-                            {
-                                productName: '<%= item.product.productName %>',
-                                quantity: <%= item.quantity %>,
-                                price: '₹<%= item.price.toFixed(2) %>',
-                                status: '<%= item.status %>'
-                            } <%= index < order.orderedItems.length - 1 ? ',' : '' %>
-        <% }) %>
-      ]
-    };
+                orderId: "<%= order.orderId %>",
+                status: "<%= order.status %>",
+                totalPrice: "₹<%= order.totalPrice.toFixed(2) %>",
+                finalAmount: "₹<%= order.finalAmount.toFixed(2) %>",
+                address: `<% if(order.address && order.address.length > 0) { %>
+            <%= order.address[0].name %>, <%= order.address[0].streetAddress %><%= order.address[0].apartment ? ", " + order.address[0].apartment : "" %>, <%= order.address[0].city %>, <%= order.address[0].state %> - <%= order.address[0].pincode %>, Phone: <%= order.address[0].phone %><%= order.address[0].altPhone ? ", Alt Phone: " + order.address[0].altPhone : "" %>
+        <% } else { %>
+            No address provided
+        <% } %>`,
+                couponApplied: "<%= order.couponApplied ? 'Yes' : 'No' %>",
+                orderDate: "<%= order.createdOn.toDateString() %>",
+                orderedItems: [
+            <% order.orderedItems.forEach(function (item, index) { %>
+                {
+                    productName: "<%= item.product.productName %>",
+                    quantity: <%= item.quantity %>,
+                    price: "₹<%= item.price.toFixed(2) %>",
+                    status: "<%= item.status %>"
+                } <%= index < order.orderedItems.length - 1 ? ',' : '' %>
+            <% }); %>
+        ]
+        };
 
         const worksheetData = [
-            ['Order ID', orderData.orderId],
-            ['Status', orderData.status],
-            ['Total Price', orderData.totalPrice],
-            ['Final Amount', orderData.finalAmount],
-            ['Address', orderData.address],
-            ['Coupon Applied', orderData.couponApplied],
-            ['Order Date', orderData.orderDate],
+            ["Order ID", orderData.orderId],
+            ["Status", orderData.status],
+            ["Total Price", orderData.totalPrice],
+            ["Final Amount", orderData.finalAmount],
+            ["Address", orderData.address],
+            ["Coupon Applied", orderData.couponApplied],
+            ["Order Date", orderData.orderDate],
             [],
-            ['Ordered Items'],
-            ['Product Name', 'Quantity', 'Price', 'Status']
+            ["Ordered Items"],
+            ["Product Name", "Quantity", "Price", "Status"]
         ];
 
         orderData.orderedItems.forEach(item => {
@@ -474,44 +536,47 @@
 
         const ws = XLSX.utils.aoa_to_sheet(worksheetData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Order Details');
-        XLSX.write(wb, 'Order_<%= order.orderId %>.xlsx');
-  }
+        XLSX.utils.book_append_sheet(wb, ws, "Order Details");
 
-        function downloadPDF() {
-            console.log("Generating PDF");
+        // Correct way to download
+        XLSX.writeFile(wb, `Order_${orderData.orderId}.xlsx`);
+}
 
-            const element = document.getElementById('product-detail-section');
-            html2canvas(element, { scale: 2 }).then(canvas => {
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
+        // function downloadPDF() {
+        //     console.log("Generating PDF");
 
-                const imgProps = {
-                    width: canvas.width,
-                    height: canvas.height
-                };
-                const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
-                const imgWidth = imgProps.width * ratio;
-                const imgHeight = imgProps.height * ratio;
+        //     const element = document.getElementById('product-detail-section');
+        //     html2canvas(element, { scale: 2 }).then(canvas => {
+        //         const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
-                const x = (pdfWidth - imgWidth) / 2;
-                const y = 10;
+        //         const { jsPDF } = window.jspdf;
+        //         const pdf = new jsPDF('p', 'mm', 'a4');
+        //         const pdfWidth = pdf.internal.pageSize.getWidth();
+        //         const pdfHeight = pdf.internal.pageSize.getHeight();
 
-                pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
-                pdf.save('Order_<%= order.orderId %>.pdf');
-            }).catch(error => {
-                showSwal({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Something went wrong while generating the PDF!'
-                });
-                console.error("PDF generation error:", error);
-            });
-        }
+        //         const imgProps = {
+        //             width: canvas.width,
+        //             height: canvas.height
+        //         };
+        //         const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+        //         const imgWidth = imgProps.width * ratio;
+        //         const imgHeight = imgProps.height * ratio;
+
+        //         const x = (pdfWidth - imgWidth) / 2;
+        //         const y = 10;
+
+        //         pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+        //         pdf.save('Order_<%= order.orderId %>.pdf');
+        //     }).catch(error => {
+        //         showSwal({
+        //             icon: 'error',
+        //             title: 'Oops...',
+        //             text: 'Something went wrong while generating the PDF!'
+        //         });
+        //         console.error("PDF generation error:", error);
+        //     });
+        // }
 
     </script>
 

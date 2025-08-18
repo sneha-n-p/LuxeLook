@@ -103,7 +103,7 @@ const loadSalesPage = async (req, res) => {
 
     console.log("query:", query);
 
-    const orders = await Order.find(query).sort({ createdOn: 1 });
+    let orders = await Order.find(query).sort({ createdOn: 1 });
     const totalSales = orders.length;
     const totalAmount = orders.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
     const totalDiscount = orders.reduce((sum, order) => sum + (order.discount || 0), 0);

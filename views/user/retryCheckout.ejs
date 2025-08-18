@@ -233,12 +233,12 @@
         <h5 class="fw-bold mb-4">Order Summary</h5>
         <% cartItems.forEach(item => { %>
           <div class="cart-item">
-            <img src="<%= item.product.imageUrl %>" alt="Product">
+            <img src="<%= item.productImage %>" alt="Product">
             <div>
-              <div class="fw-bold">Product Name:<%= item.product.name %></div>
+              <div class="fw-bold">Product Name:<%= item.productName %></div>
               <div class="text-muted">Size:<%= item.size %></div>
               <div class="text-muted">Qty: <%= item.quantity %></div>
-              <div class="fw-bold">₹<%= item.totalPrice %></div>
+              <div class="fw-bold">₹<%= item.price %></div>
             </div>
           </div>
         <% }) %>
@@ -377,8 +377,10 @@ if (!form) {
               formData.append('razorpay_order_id', response.razorpay_order_id);
               formData.append('razorpay_signature', response.razorpay_signature);
 
-              let plainObject = Object.fromEntries(formData)
-              const placeOrderRes = await fetch('/placeOrder', {
+
+
+              let plainObject = {...Object.fromEntries(formData),orderId:"<%= order._id %>"}
+              const placeOrderRes = await fetch('/retry-PlaceOrder', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -397,7 +399,7 @@ if (!form) {
                   timer: 2000,
                   showConfirmButton: false
                 }).then(() => {
-                  window.location.href = '/cart';
+                  window.location.href = '/checkout';
                 });
               }
             } catch (err) {
@@ -461,10 +463,12 @@ if (!form) {
     } else {
       // Handle COD
       try {
-        console.log('COD:',Object.fromEntries(formData))
-        let plainObject = Object.fromEntries(formData)
+        //   formData.append({orderId:`${order.order_id}`})
+        console.log("eeerrrrooooorrrrr")
+          console.log('COD:',Object.fromEntries(formData))
+        let plainObject = {...Object.fromEntries(formData),orderId: "<%= order._id %>"}
         console.log(plainObject)
-        const res = await fetch('/placeOrder', {
+        const res = await fetch('/retry-PlaceOrder', {
           method: 'POST',
           headers: {
     'Content-Type': 'application/json'
@@ -486,8 +490,9 @@ if (!form) {
               text: result.message || 'Failed to place order.',
               timer: 2000,
               showConfirmButton: false
-            }).then(() => {
-              window.location.href = '/cart';
+            })
+            .then(() => {
+              window.location.href = '/checkout';
             });
           }
         }
@@ -499,7 +504,8 @@ if (!form) {
           text: 'Something went wrong while placing the order.',
           timer: 2000,
           showConfirmButton: false
-        }).then(() => {
+        })
+        .then(() => {
           window.location.href = '/checkout';
         });
       }

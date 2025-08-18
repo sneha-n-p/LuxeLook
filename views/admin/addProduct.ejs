@@ -455,6 +455,7 @@
         }
 
         const croppedImageUrl = canvas.toDataURL("image/jpeg", 0.9);
+
         const croppedPreviewContainer = document.querySelector(`.croppedPreview${index}`);
 
         if (!croppedPreviewContainer) {
@@ -481,6 +482,9 @@
           document.forms["productForm"].appendChild(hiddenInput);
         }
         hiddenInput.value = croppedImageUrl;
+
+        croppers[index].destroy();
+        croppers[index] = null
 
         Swal.fire({
           title: "Success!",
