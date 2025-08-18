@@ -177,7 +177,6 @@ const loadProfile = async (req, res) => {
   }
 }
 
-
 const loadEditProfile = async (req, res) => {
   try {
     const userId = req.session.user
@@ -190,7 +189,6 @@ const loadEditProfile = async (req, res) => {
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
-
 
 const updateProfile = async (req, res) => {
   try {
@@ -252,7 +250,6 @@ const loadChangeEmail = async (req, res) => {
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
 };
-
 
 const changeEmailValidation = async (req, res) => {
   try {
@@ -364,7 +361,6 @@ const resetEmail = async (req, res) => {
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
   }
 };
-
 
 const changePassword = async (req, res) => {
   try {

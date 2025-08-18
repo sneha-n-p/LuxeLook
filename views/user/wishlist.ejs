@@ -176,7 +176,6 @@
   <%-include("../../views/partials/userPartial/header")%>
 
 
-    <!-- Banner -->
     <section class="hero text-center bg-light p-0 mb-4">
       <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
         style="height: 600px; object-fit: cover;">
@@ -185,7 +184,6 @@
       </h1>
     </section>
 
-    <!-- Wishlist Table -->
     <div class="container my-5">
       <%if(wishlist.length>0) { %>
         <table class="table wishlist-table text-center">
@@ -217,7 +215,7 @@
                     <p class="text-danger fw-bold">Out of Stock</p>
                     <% } %>
                 </td>
-                <td>₹<%= product.salePrice %>
+                <td>₹<%= product.regularPrice %>
                 </td>
 
                 <td>
@@ -233,30 +231,29 @@
               <%}%>
           </tbody>
         </table>
-        <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3 "
-          style="background-color:#F2E8DC ;">
-          <div>Showing 1 of <%= totalPages %>
-          </div>
-          <nav>
-            <ul class="pagination mb-0">
-              <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-              </li>
-
-              <% for (let i=1; i <=totalPages; i++) { %>
-                <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                  <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
-                    <%= i %>
-                  </a>
-                </li>
-                <% } %>
-
-                  <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-                    <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-                  </li>
-            </ul>
-          </nav>
+        <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
+        <div>Showing 1 of <%= totalPages %>
         </div>
+        <nav>
+          <ul class="pagination mb-0">
+            <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+            </li>
+
+            <% for (let i=1; i <=totalPages; i++) { %>
+              <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                  <%= i %>
+                </a>
+              </li>
+              <% } %>
+
+                <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                  <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+                </li>
+          </ul>
+        </nav>
+      </div>
         <% }else{ %>
           <div class="Empty-wishlist" style="background-color: #F2E8DC;">
             <span>Your Wishlist Is Empty</span>

@@ -205,7 +205,7 @@
                 <%= variant.size %>
               </option>
               <% }) %>
-          </select> 
+          </select>
           <div class="d-flex align-items-center">
             <strike style="color: #bbb;">
               <p class="price-tag   mb-3">₹<%= product.regularPrice %>
@@ -215,30 +215,30 @@
             </p>
           </div>
           <%if(product.offer>0){%>
-            <span class="text-danger ms-2">-<%= product.offer %>%  offer added</span>
+            <span class="text-danger ms-2">-<%= product.offer %>% offer added</span>
             <%}%> <br><br>
 
 
-          <p id="low-stock-warning" class="text-danger fw-bold mb-2" style="display: none;">Few quantity left</p>
-          <p id="no-stock-warning" class="text-danger fw-bold mb-2" style="display: none;">currently no stock
-            available</p>
+              <p id="low-stock-warning" class="text-danger fw-bold mb-2" style="display: none;">Few quantity left</p>
+              <p id="no-stock-warning" class="text-danger fw-bold mb-2" style="display: none;">currently no stock
+                available</p>
 
 
-          <h6 class="fw-bold mb-2" id="size-quantity">Quantity:</h6>
-          <input type="number" id="quantityInput" value="1" class="form-control mb-3" style="width: 100px;" min="1"
-            max="<%= Math.min(product.variant[0].quantity, 5) %>" name="quantity">
+              <h6 class="fw-bold mb-2" id="size-quantity">Quantity:</h6>
+              <input type="number" id="quantityInput" value="1" class="form-control mb-3" style="width: 100px;" min="1"
+                max="<%= Math.min(product.variant[0].quantity, 5) %>" name="quantity">
 
-          <% if (product.quantity===0) { %>
-            <p class="text-danger fw-bold mb-3">Out of Stock</p>
-            <% } %>
-              <p id="stock-warning" class="text-danger fw-bold mb-0" style="display: none;">Only 5 limited quantity
-                of
-                product can be added</p>
+              <% if (product.quantity===0) { %>
+                <p class="text-danger fw-bold mb-3">Out of Stock</p>
+                <% } %>
+                  <p id="stock-warning" class="text-danger fw-bold mb-0" style="display: none;">Only 5 limited quantity
+                    of
+                    product can be added</p>
 
 
-              <button class="action-btn" onclick="addToWishlist('<%= product._id %>')">Add to Wishlist</button>
-              <button class="action-btn" onclick="addToCart('<%= product._id %>')" <%=product.quantity===0 ? 'disabled'
-                : '' %>>Add to Cart</button>
+                  <button class="action-btn" onclick="addToWishlist('<%= product._id %>')">Add to Wishlist</button>
+                  <button class="action-btn" onclick="addToCart('<%= product._id %>')" <%=product.quantity===0
+                    ? 'disabled' : '' %>>Add to Cart</button>
         </div>
       </div>
 
@@ -284,68 +284,104 @@
     });
 
     function addToWishlist(productId) {
-      axios.post("/addToWishlist", { productId })
-        .then(function (response) {
-          if (response.data.success) {
-            Swal.fire({
-              title: "Added to Wishlist",
-              icon: 'success',
-              showConfirmButton: false,
-              timer: 1500
-            });
-          } else {
-            Swal.fire({
-              title: "Error Occurred",
-              icon: "error",
-              text: response.data.message,
-              showConfirmButton: false,
-              timer: 1500
-            });
-          }
-        })
-        .catch(() => {
-          Swal.fire({
-            title: "Error Occurred",
-            icon: "error",
-            text: "Already Exist In Wishlist",
-            showConfirmButton: false,
-            timer: 1500
-          });
+  const size = document.querySelector('select[name="size"]').value;
+
+  if (!size) {
+    Swal.fire({
+      title: "Select a Size",
+      icon: "warning",
+      showConfirmButton: true
+    });
+    return;
+  }
+
+  axios.post("/addToWishlist", { productId, size })
+    .then(function (response) {
+      if (response.data.success) {
+        Swal.fire({
+          title: "Added to Wishlist",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500
         });
-    }
+      } else if (response.data.redirect) {
+        window.location.href = response.data.redirect;
+      } else {
+        Swal.fire({
+          title: "Error Occurred",
+          icon: "error",
+          text: response.data.message || "Something went wrong",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    })
+    .catch(() => {
+      Swal.fire({
+        title: "Error Occurred",
+        icon: "error",
+        text: "Already Exist In Wishlist",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    });
+}
 
     function addToCart(productId) {
-      const quantity = document.querySelector('input[name="quantity"]').value;
-      const size = document.querySelector('select[name="size"]').value;
-      axios.post("/addToCart", { productId, quantity, size })
-        .then(function (response) {
-          if (response.data.success) {
-            Swal.fire({
-              title: "Added to Cart",
-              icon: 'success',
-              showConfirmButton: false,
-              timer: 1500
-            }).then(()=>location.reload())
-          } else {
-            Swal.fire({
-              title: "Error Occurred",
-              icon: "error",
-              text: response.data.message,
-              showConfirmButton: false,
-              timer: 1500
-            });
-          }
-        })
-        .catch(() => {
-          Swal.fire({
-            title: "Error Occurred",
-            icon: "error",
-            text: "Already Exist In Cart",
-            showConfirmButton: false,
-            timer: 1500
-          });
+  const quantity = document.querySelector('input[name="quantity"]').value;
+  const size = document.querySelector('select[name="size"]').value;
+
+  if (!size) {
+    Swal.fire({
+      title: "Select a Size",
+      icon: "warning",
+      showConfirmButton: true
+    });
+    return;
+  }
+
+  if (!quantity || quantity <= 0) {
+    Swal.fire({
+      title: "Invalid Quantity",
+      icon: "warning",
+      showConfirmButton: true
+    });
+    return;
+  }
+
+  axios.post("/addToCart", { productId, quantity, size })
+    .then(function (response) {
+      if (response.data.success) {
+        Swal.fire({
+          title: "Added to Cart",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          location.reload(); 
         });
-    }
+      } else if (response.data.redirect) {
+        window.location.href = response.data.redirect;
+      } else {
+        Swal.fire({
+          title: "Error Occurred",
+          icon: "error",
+          text: response.data.message || "Something went wrong",
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    })
+    .catch(() => {
+      Swal.fire({
+        title: "Error Occurred",
+        icon: "error",
+        text: "Already Exist In Cart",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    });
+}
 
     const sizeQuantityMap = {
     <% product.variant.forEach(variant => { %>

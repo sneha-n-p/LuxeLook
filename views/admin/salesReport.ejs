@@ -160,8 +160,7 @@
 
       <% if (salesData) { %>
         <div class="report-summary">
-          <p><strong>Overall Sales Count:</strong>
-            <%= salesData.totalSales %>
+          <p><strong>Overall Sales Count:</strong> <%= salesData.totalSales %>
           </p>
           <p><strong>Overall Order Amount:</strong> Rs.<%= salesData.totalAmount %>
           </p>
@@ -200,6 +199,34 @@
           </tbody>
         </table>
 
+        <div class="d-flex justify-content-between align-items-center mt-3">
+  <div style="color: #fff;">
+    Showing <%= currentPage %> of <%= totalPage %>
+  </div>
+
+  <nav>
+    <ul class="pagination mb-0">
+      <!-- Previous button -->
+      <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+        <a class="page-link" href="?page=<%= currentPage - 1 %>&<%= queryParams %>">‹</a>
+      </li>
+
+      <!-- Page numbers -->
+      <% for (let i = 1; i <= totalPage; i++) { %>
+        <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>&<%= queryParams %>"><%= i %></a>
+        </li>
+      <% } %>
+
+      <!-- Next button -->
+      <li class="page-item <%= currentPage == totalPage ? 'disabled' : '' %>">
+        <a class="page-link" href="?page=<%= currentPage + 1 %>&<%= queryParams %>">›</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+
         <div class="download-links">
           <button class="button"><a href="javascript:void(0)" onclick="downloadPDF()" style="color: #000;">Download
               PDF</a></button>
@@ -218,14 +245,11 @@
       const startDateInput = document.getElementById('start-date');
 const endDateInput = document.getElementById('end-date');
 
-// Today's date in YYYY-MM-DD
 const today = new Date().toISOString().split("T")[0];
 
-// Set max date to today for both
 startDateInput.max = today;
 endDateInput.max = today;
 
-// Restrict end date after selecting start date
 startDateInput.addEventListener('change', function () {
     const startDate = this.value;
     if (startDate) {

@@ -65,8 +65,6 @@ const loadHomePage = async (req, res) => {
   }
 };
 
-
-
 const loadSignup = async (req, res) => {
     try {
         return res.render("signup", { message: null })
@@ -80,6 +78,7 @@ const loadSignup = async (req, res) => {
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString()
 }
+
 async function sendVerificationEmail(email, otp) {
     try {
         const transporter = nodemailer.createTransport({
@@ -136,7 +135,6 @@ const postSignup = async (req, res) => {
     }
 }
 
-
 const loadShopping = async (req, res) => {
   try {
     const user = req.session.user;
@@ -188,10 +186,7 @@ const loadShopping = async (req, res) => {
     console.log('Shopping page not loading', error);
     res.status(500).send('Server Error');
   }
-};
-
-
-
+}
 
 const securePassword = async (password) => {
     try {
@@ -291,7 +286,6 @@ const resendOtp = async (req, res) => {
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error.please try again" })
     }
 }
-
 
 const loadLogin = async (req, res) => {
     try {

@@ -105,6 +105,10 @@ const procedToCheckOut = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
+        const userId = req.session.user;
+        if (!userId){
+            res.json({ success: false, redirect: "/login" });
+        }
         console.log("cart req.body:",req.body)
         const { productId, quantity, size } = req.body;
         const CarQquantity = parseInt(quantity);
@@ -116,19 +120,18 @@ const addToCart = async (req, res) => {
         if (!variant) {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid product variant" });
         }
-
+        
         const maxAllowed = stock <= 5 ? stock : 5;
 
         if (CarQquantity > maxAllowed) {
             return res.status(StatusCode.BAD_REQUEST).json({
                 success: false,
                 message: stock < 5
-                    ? `Only ${stock} item(s) available in stock.`
-                    : `Only 5 quantity of this product is allowed per order.`
+                ? `Only ${stock} item(s) available in stock.`
+                : `Only 5 quantity of this product is allowed per order.`
             });
         }
-
-        const userId = req.session.user;
+        
         const cart = await Cart.findOne({ userId });
 
         const user = await User.findById(userId);

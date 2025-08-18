@@ -30,8 +30,14 @@
     .sidebar a {
       color: #cbd5e1;
       text-decoration: none;
-      display: block;
+      display: flex;
+      align-items: center;
       margin: 15px 0;
+    }
+
+    .sidebar a i {
+      margin-right: 10px;
+      font-size: 1.2rem;
     }
 
     .sidebar a:hover {
@@ -47,19 +53,6 @@
       margin-left: 240px;
       padding: 20px;
     }
-
-    .card {
-      background-color: #1e293b;
-      border: none;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .card-title {
-      color: #f1f5f9;
-    }
-
     .badge {
       font-size: 0.75rem;
     }
@@ -96,30 +89,41 @@
       justify-content: center;
       color: #94a3b8;
     }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+        overflow: hidden;
+        transition: width 0.3s;
+      }
+      .sidebar:hover {
+        width: 220px;
+      }
+      .main-content {
+        margin-left: 80px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="sidebar">
+  <div class="sidebar" role="navigation" aria-label="Admin Navigation">
     <h5 class="text-white">LuxeLook</h5>
-    <a href="/admin" id="dashboard">Dashboard</a>
-    <a href="/admin/users">Users</a>
-    <a href="/admin/categories">Categories</a>
-    <a href="/admin/products">Product</a>
-    <a href="/admin/orders">Orders</a>
-    <a href="/admin/coupons">Coupons</a>
-    <a href="/admin/sales">Sales Report</a>
+    <a href="/admin" id="dashboard" aria-current="page"><i class="bi bi-house"></i> Dashboard</a>
+    <a href="/admin/users"><i class="bi bi-people"></i> Users</a>
+    <a href="/admin/categories"><i class="bi bi-tags"></i> Categories</a>
+    <a href="/admin/products"><i class="bi bi-box"></i> Products</a>
+    <a href="/admin/orders"><i class="bi bi-cart"></i> Orders</a>
+    <a href="/admin/coupons"><i class="bi bi-ticket"></i> Coupons</a>
+    <a href="/admin/sales"><i class="bi bi-graph-up"></i> Sales Report</a>
     <form id="logoutForm" action="/admin/logout" method="POST" style="display:inline;">
-      <button type="button" class="btn btn-link text-danger p-0" id="logoutBtn" style="text-decoration: none;">
-        Logout
-      </button>
+      <a href="#" class="text-danger" id="logoutBtn" aria-label="Logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </form>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ 
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script>
     // Logout confirmation
     document.getElementById('logoutBtn').addEventListener('click', function (e) {

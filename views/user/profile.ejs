@@ -1,43 +1,82 @@
+<%- include("../../views/partials/userPartial/header") %>
+
 <style>
   body {
     font-family: 'Poppins', sans-serif;
     background-color: #FFF8F3;
   }
 
+  .banner {
+    position: relative;
+  }
+
+  .banner img {
+    height: 577px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .banner h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 42px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px black;
+  }
+
   .sidebar {
-    background-color: #f5f5f5;
+    background-color: #F2E8DC;
     padding: 30px 20px;
-    height: 100%;
+    height: auto;
+    color: #6B4C3B;
+    border-radius: 8px;
   }
 
   .sidebar h5 {
     font-weight: bold;
     margin-bottom: 20px;
+    text-transform: uppercase;
   }
 
   .sidebar a {
-    display: block;
+    display: flex; /* Use flexbox for icon-text alignment */
+    align-items: center; /* Vertically center icon and text */
     color: #333;
     margin-bottom: 10px;
     text-decoration: none;
     font-weight: 500;
+    padding: 10px 15px; /* Consistent padding for alignment */
+    border-radius: 5px; /* Slight rounding for visual appeal */
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  .profile-header {
-    background-image: url('wallpaper/wall3.jpg');
-    background-size: cover;
-    padding: 60px 0 30px;
-    text-align: center;
-    height: 350px;
+  .sidebar a:hover {
+    color: #B5654B;
+    background-color: rgba(181, 101, 75, 0.1); /* Subtle hover background */
   }
 
-  .profile-header h2 {
-    font-size: 40px;
-    font-weight: bold;
+  /* Style for sidebar icons */
+  .sidebar a i {
+    margin-right: 10px;
+    font-size: 16px; /* Slightly larger for visibility */
+    width: 20px; /* Fixed width for consistent alignment */
+    text-align: center; /* Center icon within its space */
+    color: #333; /* Match link color */
+    transition: color 0.3s ease; /* Smooth hover transition */
+  }
+
+  .sidebar a:hover i {
+    color: #B5654B; /* Match link hover color */
   }
 
   .profile-container {
+    background-color: #FCF4ED;
     padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   }
 
   .profile-img {
@@ -45,45 +84,63 @@
     height: 120px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #ccc;
+    border: 3px solid #ddd;
     margin-bottom: 15px;
   }
 
-  .btn-custom {
-    background: linear-gradient(90deg, #B5654B  , #D17C63 );
-    color: white;
-    border-radius: 25px;
-    padding: 6px 20px;
-    margin-right: 10px;
-    text-decoration: none;
-  }
-
-  .order-box {
+  .user-info {
+    background: #fff;
     border: 1px solid #ddd;
-    padding: 20px;
-    padding-right: 10px;
     border-radius: 8px;
-    margin-top: 20px;
-    margin-right: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
-  .order-box h6 {
-    font-weight: 600;
-    margin-bottom: 10px;
+  .user-info:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-custom {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.3s ease, transform 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    margin-right: 10px;
+  }
+
+  .btn-custom:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
   }
 
   .referral-container {
-    background-color: #FCF4ED ;
-    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    margin-bottom: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
     gap: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .referral-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
 
   .referral-code {
-    background-color: #fff;
+    background-color: #f5f5f5;
     padding: 10px 15px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -92,169 +149,198 @@
   }
 
   .btn-copy {
-    background-color: #6B4C3B ;
+    background: linear-gradient(90deg, #6B4C3B, #8a2c3b);
     color: white;
     border: none;
     padding: 8px 15px;
-    border-radius: 5px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.3s ease, transform 0.2s ease;
     cursor: pointer;
   }
 
   .btn-copy:hover {
-    background-color: #5a6268;
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  .order-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-width: 200px;
+  }
+
+  .order-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .order-box h6 {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  h5.fw-bold {
+    color: #6B4C3B;
+    text-transform: uppercase;
   }
 </style>
-
 <body>
   <%-include("../../views/partials/userPartial/header")%>
 
   <section class="hero text-center bg-light p-0 mb-4">
     <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
          style="height: 700px; object-fit: cover;">
-<h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg" style="text-shadow: 2px 2px 8px black;">PROFILE</h1>
+    <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg" style="text-shadow: 2px 2px 8px black;">PROFILE</h1>
   </section>
 
   <div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-2 sidebar">
-      <h5>SETTINGS</h5>
-      <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">Orders</a>
-      <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">Personal Info</a>
-      <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">Addresses</a>
-      <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">Wallet</a>
-    </div>
-
-
-        <div class="col-md-10 profile-container d-flex flex-column align-items-center">
-  <!-- Centered Profile Image -->
-  <img src="<%= user.image[0] %>" 
-       alt="User Image" 
-       class="profile-img">
-       
-
-  <!-- Centered User Info -->
-  <div class="user-info text-center mt-3 mb-4">
-    <div><strong>Name:</strong> <%= user.name %></div>
-    <div>
-  <strong>Last Name:</strong>
-  <% if (user.lastName) { %>
-    <%= user.lastName %>
-  <% } else { %>
-    N/A
-  <% } %>
-</div>
-
-    <div><strong>Phone:</strong> <%= user.phone %></div>
-    <div><strong>Gender:</strong> 
-      <% if (user.gender) { %>
-    <%= user.gender %>
-  <% } else { %>
-    N/A
-  <% } %>
-    </div>
-    <div><strong>Email:</strong> <%= user.email %></div>
-  </div>
-
-  <!-- Centered Buttons -->
-  <div class="text-center mb-4">
-    <a href="/profile/edit" class="btn btn-custom">Edit Profile</a>
-    <a href="/profile/change-email" class="btn btn-custom">Change Email</a>
-    <a href="/profile/change-password" class="btn btn-custom">Change Password</a>
-    <a href="/add-address" class="btn btn-custom">Add Address</a>
-  </div>
-
-        
-        <div class="referral-container">
-   <span>Your Referral Code:</span>
-   <span class="referral-code" id="referralCode"><%= user.referalCode %></span>
-   <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
- </div>
-
- <!-- Referral Coupons Section -->
-<% if (user.availableCoupons && user.availableCoupons.length > 0) { %>
-  <h5 class="mt-4">Your Referral Coupons</h5>
-  <div class="row">
-    <% user.availableCoupons.forEach(coupon => { %>
-      <div class="col-md-4 mb-3">
-        <div class="referral-container">
-          <div>
-            <strong>Code:</strong> <span class="referral-code" id="coupon-<%= coupon._id %>"><%= coupon.name %></span><br>
-            <small>Offer: ₹<%= coupon.offerPrice %> off</small><br>
-            <small>Min Order: ₹<%= coupon.minimumPrice %></small><br>
-            <small>Expires on: <%= new Date(coupon.expiredOn).toLocaleDateString('en-IN') %></small>
-          </div>
-          <button class="btn-copy" onclick="copyCoupon('<%= coupon._id %>')">Copy</button>
-        </div>
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 sidebar">
+        <h5>SETTINGS</h5>
+        <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
+          <i class="fas fa-shopping-cart"></i> Orders
+        </a>
+        <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">
+          <i class="fas fa-user"></i> Personal Info
+        </a>
+        <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">
+          <i class="fas fa-map-marker-alt"></i> Addresses
+        </a>
+        <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">
+          <i class="fas fa-wallet"></i> Wallet
+        </a>
       </div>
-    <% }) %>
-  </div>
-<% } %>
+
+      <div class="col-md-10 profile-container d-flex flex-column align-items-center">
+        <!-- Centered Profile Image -->
+        <img src="<%= user.image[0] %>" 
+             alt="User Image" 
+             class="profile-img">
+        
+        <!-- Centered User Info -->
+        <div class="user-info text-center mt-3 mb-4">
+          <div><strong>Name:</strong> <%= user.name %></div>
+          <div>
+            <strong>Last Name:</strong>
+            <% if (user.lastName) { %>
+              <%= user.lastName %>
+            <% } else { %>
+              N/A
+            <% } %>
+          </div>
+          <div><strong>Phone:</strong> <%= user.phone %></div>
+          <div><strong>Gender:</strong> 
+            <% if (user.gender) { %>
+              <%= user.gender %>
+            <% } else { %>
+              N/A
+            <% } %>
+          </div>
+          <div><strong>Email:</strong> <%= user.email %></div>
+        </div>
+
+        <!-- Centered Buttons -->
+        <div class="text-center mb-4">
+          <a href="/profile/edit" class="btn btn-custom">Edit Profile</a>
+          <a href="/profile/change-email" class="btn btn-custom">Change Email</a>
+          <a href="/profile/change-password" class="btn btn-custom">Change Password</a>
+          <a href="/add-address" class="btn btn-custom">Add Address</a>
+        </div>
+
+        <div class="referral-container">
+          <span>Your Referral Code:</span>
+          <span class="referral-code" id="referralCode"><%= user.referalCode %></span>
+          <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
+        </div>
+
+        <!-- Referral Coupons Section -->
+        <% if (user.availableCoupons && user.availableCoupons.length > 0) { %>
+          <h5 class="mt-4">Your Referral Coupons</h5>
+          <div class="row">
+            <% user.availableCoupons.forEach(coupon => { %>
+              <div class="col-md-4 mb-3">
+                <div class="referral-container">
+                  <div>
+                    <strong>Code:</strong> <span class="referral-code" id="coupon-<%= coupon._id %>"><%= coupon.name %></span><br>
+                    <small>Offer: ₹<%= coupon.offerPrice %> off</small><br>
+                    <small>Min Order: ₹<%= coupon.minimumPrice %></small><br>
+                    <small>Expires on: <%= new Date(coupon.expiredOn).toLocaleDateString('en-IN') %></small>
+                  </div>
+                  <button class="btn-copy" onclick="copyCoupon('<%= coupon._id %>')">Copy</button>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
 
         <!-- Recent Orders -->
         <h5 class="text-center mb-3"><strong>Recent Orders</strong></h5>
         <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-  <% latestOrders.forEach(order => { %>
-    <div class="order-box p-3" style="background-color: #FCF4ED; min-width: 200px;">
-      <h6>Order ID: <%= order.orderId %></h6>
-      <p><strong>Date:</strong> <span class="order-date" data-date="<%= order.createdOn %>"></span></p>
-      <p><strong>Status:</strong> <%= order.status %></p>
-      <p><strong>Total:</strong> ₹<%= order.finalAmount %></p>
-    </div>
-  <% }) %>
-</div>
-
-
-
+          <% latestOrders.forEach(order => { %>
+            <div class="order-box p-3" style="background-color: #FCF4ED; min-width: 200px;">
+              <h6>Order ID: <%= order.orderId %></h6>
+              <p><strong>Date:</strong> <span class="order-date" data-date="<%= order.createdOn %>"></span></p>
+              <p><strong>Status:</strong> <%= order.status %></p>
+              <p><strong>Total:</strong> ₹<%= order.finalAmount %></p>
+            </div>
+          <% }) %>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-
-function copyCoupon(couponId) {
-    const couponCode = document.getElementById(`coupon-${couponId}`).innerText;
-    navigator.clipboard.writeText(couponCode).then(() => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Copied!',
-        text: 'Coupon code copied to clipboard.',
-        timer: 2000,
-        showConfirmButton: false
+    function copyCoupon(couponId) {
+      const couponCode = document.getElementById(`coupon-${couponId}`).innerText;
+      navigator.clipboard.writeText(couponCode).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Copied!',
+          text: 'Coupon code copied to clipboard.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }).catch(err => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to copy coupon code.',
+        });
       });
-    }).catch(err => {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to copy coupon code.',
-      });
-    });
-  }
+    }
 
     function copyReferralCode() {
-      console.log("hiiii")
-  const referralCode = document.getElementById('referralCode').innerText;
+      const referralCode = document.getElementById('referralCode').innerText;
+      navigator.clipboard.writeText(referralCode).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Copied!',
+          text: 'Referral code copied to clipboard.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }).catch(err => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to copy referral code.',
+        });
+      });
+    }
 
-  navigator.clipboard.writeText(referralCode).then(() => {
-    Swal.fire({
-      icon: 'success',
-      title: 'Copied!',
-      text: 'Referral code copied to clipboard.',
-      timer: 2000,
-      showConfirmButton: false
-    });
-  }).catch(err => {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Failed to copy referral code.',
-    });
-  });
-}
     document.querySelectorAll('.order-date').forEach(el => {
       const rawDate = el.getAttribute('data-date');
       const dateObj = new Date(rawDate);
-      const formattedDate = dateObj.toLocaleString('en-IN', {
+      const formattedDate = dateObj.toLocaleString('
+
+en-IN', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -264,10 +350,8 @@ function copyCoupon(couponId) {
       });
       el.textContent = formattedDate;
     });
-
-   
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-  <%-include("../../views/partials/userPartial/footer")%>
+  <%- include("../../views/partials/userPartial/footer") %>
 </body>

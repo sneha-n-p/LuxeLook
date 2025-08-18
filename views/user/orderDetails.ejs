@@ -28,31 +28,49 @@
     }
 
     .sidebar {
-      background-color: #F2E8DC;
-      padding: 30px 20px;
-      height: auto;
-      color: #6B4C3B;
-      border-radius: 8px;
-    }
+    background-color: #F2E8DC;
+    padding: 30px 20px;
+    height: auto;
+    color: #6B4C3B;
+    border-radius: 8px;
+  }
 
-    .sidebar h5 {
-      font-weight: bold;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-    }
+  .sidebar h5 {
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
 
-    .sidebar a {
-      display: block;
-      color: #333;
-      margin-bottom: 10px;
-      text-decoration: none;
-      font-weight: 500;
-    }
+  .sidebar a {
+    display: flex; /* Use flexbox for icon-text alignment */
+    align-items: center; /* Vertically center icon and text */
+    color: #333;
+    margin-bottom: 10px;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 10px 15px; /* Consistent padding for alignment */
+    border-radius: 5px; /* Slight rounding for visual appeal */
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 
-    .sidebar a:hover {
-      color: #B5654B;
-    }
+  .sidebar a:hover {
+    color: #B5654B;
+    background-color: rgba(181, 101, 75, 0.1); /* Subtle hover background */
+  }
 
+  /* Style for sidebar icons */
+  .sidebar a i {
+    margin-right: 10px;
+    font-size: 16px; /* Slightly larger for visibility */
+    width: 20px; /* Fixed width for consistent alignment */
+    text-align: center; /* Center icon within its space */
+    color: #333; /* Match link color */
+    transition: color 0.3s ease; /* Smooth hover transition */
+  }
+
+  .sidebar a:hover i {
+    color: #B5654B; /* Match link hover color */
+  }
     .orders-section {
       background-color: #FCF4ED;
       padding: 40px;
@@ -196,12 +214,20 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
-      <div class="col-md-2 sidebar">
+     <div class="col-md-2 sidebar">
         <h5>SETTINGS</h5>
-        <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">Orders</a>
-        <a href="/profile">Personal Info</a>
-        <a href="/addresses">Addresses</a>
-        <a href="/wallet">Wallet</a>
+        <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
+          <i class="fas fa-shopping-cart"></i> Orders
+        </a>
+        <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">
+          <i class="fas fa-user"></i> Personal Info
+        </a>
+        <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">
+          <i class="fas fa-map-marker-alt"></i> Addresses
+        </a>
+        <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">
+          <i class="fas fa-wallet"></i> Wallet
+        </a>
       </div>
 
       <!-- Orders Content -->

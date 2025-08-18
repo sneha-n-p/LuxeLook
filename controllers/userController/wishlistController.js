@@ -36,7 +36,7 @@ const loadwishlist = async (req, res) => {
                 { productName: { $regex: ".*" + search + ".*", $options: "i" } }
             ],
         }).countDocuments()
-        const totalPages = Math.ceil(count / limit);
+        const totalPages = Math.round(count / limit);
         if (req.session.user) {
             const id = req.session.user
             const user = await User.findById(id)
@@ -55,8 +55,13 @@ const loadwishlist = async (req, res) => {
 
 const addToWishlist = async (req, res) => {
     try {
+        console.log("add to whishlist is working ")
+
         const productId = req.body.productId
         const userId = req.session.user
+        if (!userId) {
+            res.json({ success: false, redirect: "/login" });
+        }
 
         const user = await User.findById(userId)
         if (user.wishlist.includes(productId)) {
@@ -86,8 +91,6 @@ const removeProduct = async (req, res) => {
         return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" })
     }
 }
-
-
 
 module.exports = {
     loadwishlist,

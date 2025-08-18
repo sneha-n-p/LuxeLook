@@ -58,7 +58,6 @@ const getFilteredSales = async (reportType, startDate, endDate) => {
 const loadSalesPage = async (req, res) => {
   try {
     const { reportType, startDate, endDate } = req.query;
-    console.log("req.query:", req.query);
     let query = { status: 'Delivered' };
 
     const now = new Date();
@@ -84,8 +83,8 @@ const loadSalesPage = async (req, res) => {
         break;
       case 'yearly':
         query.createdOn = {
-          $gte: new Date(now.getFullYear(), 1, 1),
-          $lte: new Date(now.getFullYear(), 12, 31, 23, 59, 59, 999),
+          $gte: new Date(now.getFullYear(), 0, 1),
+          $lte: new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999),
         };
         break;
       case 'custom':
@@ -101,12 +100,23 @@ const loadSalesPage = async (req, res) => {
         query.createdOn = { $exists: true };
     }
 
-    console.log("query:", query);
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const skip = (page - 1) * limit;
 
-    let orders = await Order.find(query).sort({ createdOn: 1 });
-    const totalSales = orders.length;
-    const totalAmount = orders.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
-    const totalDiscount = orders.reduce((sum, order) => sum + (order.discount || 0), 0);
+    const totalOrders = await Order.countDocuments(query);
+
+    const orders = await Order.find(query)
+      .sort({ createdOn: -1 }) 
+      .skip(skip)
+      .limit(limit);
+
+    let totalOrder = await Order.find(query)
+    const totalPage = Math.ceil(totalOrders / limit);
+
+    const totalSales = totalOrders;
+    const totalAmount = totalOrder.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
+    const totalDiscount = totalOrder.reduce((sum, order) => sum + (order.discount || 0), 0);
 
     const salesData = { totalSales, totalAmount, totalDiscount, orders };
     const queryParams = new URLSearchParams(req.query).toString();
@@ -115,6 +125,8 @@ const loadSalesPage = async (req, res) => {
       salesData,
       queryParams,
       reportType: reportType || 'daily',
+      currentPage: page,
+      totalPage,
     });
   } catch (error) {
     console.error('Error loading sales page:', error);
@@ -122,21 +134,74 @@ const loadSalesPage = async (req, res) => {
   }
 };
 
+
 const downloadPDF = async (req, res) => {
-  const { reportType, startDate, endDate } = req.query;
+  try {
+    console.log('orders.length:',orders)
+    const { reportType, startDate, endDate } = req.query;
+    let query = { status: "Delivered" };
 
-  const salesData = {
-    totalSales: orders.length,
-    totalAmount: orders.reduce((sum, o) => sum + o.amount, 0),
-    totalDiscount: orders.reduce((sum, o) => sum + o.discount, 0),
-    orders
-  };
+    const now = new Date();
+    switch (reportType) {
+      case "daily":
+        query.createdOn = {
+          $gte: new Date(now.setHours(0, 0, 0, 0)),
+          $lte: new Date(now.setHours(23, 59, 59, 999)),
+        };
+        break;
+      case "weekly":
+        const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+        query.createdOn = {
+          $gte: new Date(weekStart.setHours(0, 0, 0, 0)),
+          $lte: new Date(now.setHours(23, 59, 59, 999)),
+        };
+        break;
+      case "monthly":
+        query.createdOn = {
+          $gte: new Date(now.getFullYear(), now.getMonth(), 1),
+          $lte: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999),
+        };
+        break;
+      case "yearly":
+        query.createdOn = {
+          $gte: new Date(now.getFullYear(), 0, 1),
+          $lte: new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999),
+        };
+        break;
+      case "custom":
+        if (!startDate || !endDate || new Date(startDate) > new Date(endDate)) {
+          return res.status(400).send("Invalid date range");
+        }
+        query.createdOn = {
+          $gte: new Date(startDate),
+          $lte: new Date(new Date(endDate).setHours(23, 59, 59, 999)),
+        };
+        break;
+      default:
+        query.createdOn = { $exists: true };
+    }
 
-  const pdfBuffer = await PDFDocument(salesData);
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', 'attachment; filename="sales-report.pdf"');
-  res.send(pdfBuffer);
+    const orders = await Order.find(query).sort({ createdOn: -1 });
+
+    const salesData = {
+      totalSales: orders.length,
+      totalAmount: orders.reduce((sum, o) => sum + (o.finalAmount || 0), 0),
+      totalDiscount: orders.reduce((sum, o) => sum + (o.discount || 0), 0),
+      orders,
+    };
+
+    const pdfBuffer = await PDFDocument(salesData);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=sales-report.pdf");
+    res.send(pdfBuffer);
+
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    res.status(500).send("Error generating PDF");
+  }
 };
+
 
 const downloadExcel = async (req, res) => {
   const { reportType, startDate, endDate } = req.query;

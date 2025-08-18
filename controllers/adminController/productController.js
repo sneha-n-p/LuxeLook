@@ -21,9 +21,9 @@ const productInfo = async (req, res) => {
     const skip = (page - 1) * limit
 
     const Data = await Product.find({})
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit).populate('category')
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit).populate('category')
 
     const totalProducts = await Product.countDocuments()
     const totalPage = Math.ceil(totalProducts / limit)

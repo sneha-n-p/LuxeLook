@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Added Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -25,13 +27,12 @@
             padding: 4px 6px;
         }
 
-
         .dropdown-content {
             display: none;
             position: absolute;
             background-color: white;
             min-width: 160px;
-            box-shadow: 0px 8px 16px rgba(0, 0, 0, 02);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
             z-index: 1000;
             right: 0;
         }
@@ -52,13 +53,11 @@
             display: block;
         }
 
-
         .nav-link {
             font-size: 13px;
             padding-bottom: 13px;
             color: black;
             font-style: normal;
-
         }
 
         .top-nav {
@@ -85,7 +84,6 @@
             height: 114px;
             padding-left: 14px;
             padding-top: 1px;
-
         }
 
         .top-nav-left {
@@ -94,7 +92,13 @@
 
         .top-nav-right {
             flex: 1;
+        }
 
+        /* Added style for nav icons to align with text */
+        .nav-link i {
+            margin-right: 6px;
+            font-size: 13px;
+            vertical-align: middle;
         }
     </style>
 </head>
@@ -126,60 +130,75 @@
     <header class="header">
         <nav class="top-nav d-flex align-items-center justify-content-between">
             <div class="top-nav-left">
-                <img class="img-logo" src="images\logo_forWhite.png" alt="luxelook-logo">
+                <img class="img-logo" src="/images/logo_forWhite.png" alt="luxelook-logo">
             </div>
             <div class="top-nav-left">
                 <ul class="nav d-flex align-items-center justify-content-end">
                     <li class="nav-item">
-                        <a class="nav-link <%= activePage === 'home' ? 'fw-bold text-dark' : '' %>" href="/">Home</a>
+                        <a class="nav-link <%= activePage === 'home' ? 'fw-bold text-dark' : '' %>" href="/">
+                            <i class="fas fa-home"></i> Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link <%= activePage === 'shop' ? 'fw-bold text-dark' : '' %>"
-                            href="/shop">Shop</a>
+                        <a class="nav-link <%= activePage === 'shop' ? 'fw-bold text-dark' : '' %>" href="/shop">
+                            <i class="fas fa-shopping-bag"></i> Shop
+                        </a>
                     </li>
-
                     <li class="nav-item">
-
                         <a class="nav-link position-relative <%= activePage === 'cart' ? 'fw-bold text-dark' : '' %>"
                             href="/cart">
-                            Cart
-                            <% if (cartCount  && cartCount > 0) { %>
+                            <i class="fas fa-shopping-cart"></i> Cart
+                            <% if (cartCount && cartCount > 0) { %>
                                 <span
                                     class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    <%= cartCount  %>
+                                    <%= cartCount %>
                                 </span>
-                                <% } %>
+                            <% } %>
                         </a>
-
                     </li>
                     <li class="nav-item">
                         <a class="nav-link <%= activePage === 'wishlist' ? 'fw-bold text-dark' : '' %>"
-                            href="/wishlist">Wishlist</a>
+                            href="/wishlist">
+                            <i class="fas fa-heart"></i> Wishlist
+                        </a>
                     </li>
                     <% if (user) { %>
                         <div class="dropdown">
                             <li class="nav-item">
                                 <a class="nav-link <%= activePage === 'profile' ? 'fw-bold text-dark' : '' %>" href="#">
-                                    <%= user.name %>
+                                    <i class="fas fa-user"></i> <%= user.name %>
                                 </a>
                             </li>
                             <div class="dropdown-content">
-                                <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
-                                <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/profile">
+                                        <i class="fas fa-user-circle"></i> Profile
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/logout">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </a>
+                                </li>
                             </div>
                         </div>
-                        <% } else { %>
-                            <li class="nav-item"><a
-                                    class="nav-link <%= activePage === 'login' ? 'fw-bold text-dark' : '' %>"
-                                    href="/login">Login</a></li>
-                            <li class="nav-item"><a
-                                    class="nav-link <%= activePage === 'signup' ? 'fw-bold text-dark' : '' %>"
-                                    href="/signup">SignUp</a></li>
-                            <% } %>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link <%= activePage === 'login' ? 'fw-bold text-dark' : '' %>"
+                                href="/login">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <%= activePage === 'signup' ? 'fw-bold text-dark' : '' %>"
+                                href="/signup">
+                                <i class="fas fa-user-plus"></i> SignUp
+                            </a>
+                        </li>
+                    <% } %>
                 </ul>
-
             </div>
         </nav>
     </header>
-
 </body>
+</html>
