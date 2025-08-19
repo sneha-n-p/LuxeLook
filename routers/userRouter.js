@@ -15,6 +15,8 @@ const upload = require("../helpers/multer")
 
 
 
+//user Controller//
+
 router.get("/pageNotFound",userController.pageNotFound)
 router.get("/",userController.loadHomePage)
 router.get("/signup",userAuthCheck,userController.loadSignup)
@@ -22,6 +24,12 @@ router.post("/signup",userController.postSignup)
 router.post("/verify-otp",userController.verifyOtp)
 router.post("/resend-otp",userController.resendOtp)
 router.post("/sample",userController.sample)
+router.get('/login',userAuthCheck,userController.loadLogin)
+router.post('/login',userController.postLogin)
+router.get('/logout',userAuth,userController.logout)
+
+
+//google Auth//
 
 router.get("/auth/google",passport.authenticate('google',{scope:['profile','email']}))
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), async (req, res) => {
@@ -34,20 +42,14 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
     }
 });
 
-router.get('/login',userAuthCheck,userController.loadLogin)
-router.post('/login',userController.postLogin)
+//profile Controller//
 
 router.get("/forgot-password",userAuthCheck,profileController.loadForgotPassword)
 router.post("/forgot-password",profileController.forgotEmailValid)
 router.post("/verifying-forgetpass-otp",profileController.verifyOtp)
 router.post("/send-otp",profileController.resendOtp)
-
 router.get("/reset-password",userAuthCheck,profileController.loadResetPassword)
 router.post("/reset-password",profileController.confirmPassword)
-
-router.get("/shop",productController.loadShop)
-router.get("/product-details/:id",productController.loadProductDetails)
-
 router.get ("/profile",userAuth,profileController.loadProfile)
 router.get ("/profile/edit",userAuth,profileController.loadEditProfile)
 router.post ("/profile/edit",upload.single('profileImage'),profileController.updateProfile)
@@ -67,6 +69,12 @@ router.get("/profile/reset-password",userAuth,profileController.loadresetPasswor
 router.post("/profile/reset-password",userAuth,profileController.resetPassword) 
 router.post('/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
 
+//product Controller//
+
+router.get("/shop",productController.loadShop)
+router.get("/product-details/:id",productController.loadProductDetails)
+
+//address Controller//
 
 router.get("/addresses",userAuth,addressController.loadAddress)
 router.get('/add-address',userAuth,addressController.loadAddAddress)
@@ -77,9 +85,13 @@ router.post("/delete-address",addressController.deleteAddress)
 router.get("/cart-add-address",userAuth,addressController.loadcartAddAddress)
 router.post("/cart-add-address",userAuth,addressController.cartAddAddress)
 
+//wishlist Controller//
+
 router.get("/wishlist",userAuth,wishlistController.loadwishlist)
 router.post("/addToWishlist",wishlistController.addToWishlist)
 router.post("/removeFromWishlist",wishlistController.removeProduct)
+
+//cart Controller//
 
 router.get("/cart",userAuth,cartController.loadcart)
 router.post("/cart",cartController.procedToCheckOut)
@@ -87,7 +99,10 @@ router.post("/addToCart",cartController.addToCart)
 router.post("/removeFromCart",cartController.removeProductCart)
 router.get("/checkout",userAuth,cartController.loadCheckOut)
 
+//coupon Controller//
 router.post("/apply-coupon",couponController.applyCoupon)
+
+//order Controller//
 
 router.post('/placeOrder',orderController.placeOrder)
 router.get("/orderSuccess",userAuth,orderController.loadOrderSuccess)
@@ -103,11 +118,12 @@ router.get('/retry-Checkout',orderController.loadRetryCheckout)
 router.post('/retry-PlaceOrder',orderController.loadRetryPlaceOrder)
 router.get('/downloadInvoice',orderController.generateInvoice)
 
+//wallet Controller//
+
 router.get('/wallet',userAuth,walletController.loadWallet)
 router.post('/wallet/add',walletController.addAmountToWallet)
 router.post("/wallet/create-order",userAuth,walletController.createRazorpayOrder)
 router.post("/wallet/payment-success",userAuth,walletController.razorpayPaymentSuccess)
 
-router.get('/logout',userAuth,userController.logout)
 
 module.exports = router

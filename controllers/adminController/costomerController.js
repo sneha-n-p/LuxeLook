@@ -39,7 +39,6 @@ const customerInfo = async (req, res) => {
     }
 }
 
-
 const userBlocked = async (req, res) => {
     try {
         let id = req.body.id
@@ -60,6 +59,7 @@ const userBlocked = async (req, res) => {
         res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
     }
 }
+
 const userUnblocked = async (req, res) => {
     try {
         let id = req.body.id
@@ -76,7 +76,6 @@ const userUnblocked = async (req, res) => {
         res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
     }
 }
-
 
 module.exports = {
     customerInfo,

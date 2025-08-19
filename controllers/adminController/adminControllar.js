@@ -8,7 +8,6 @@ const pageError = async (req, res) => {
     res.render('pageError')
 }
 
-
 const loadLogin = async (req, res) => {
     try {
         if (req.session.admin) {
@@ -29,7 +28,6 @@ const postLogin = async (req, res) => {
         if (admin) {
             const passwordMatch = await bcrypt.compare(password, admin.password)
             if (!passwordMatch) {
-                console.log('done')
                 req.session.message = 'invalid credentials'
                 return res.redirect('/admin/login')
             } else {
@@ -45,6 +43,7 @@ const postLogin = async (req, res) => {
 
     }
 }
+
 const loadDashboard = async (req, res) => {
     try {
         if (req.session.admin) {

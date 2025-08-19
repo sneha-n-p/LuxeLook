@@ -40,8 +40,6 @@ const loadAddress = async (req, res) => {
     }
 };
 
-
-
 const loadAddAddress = async (req, res) => {
     try {
         const user = req.session.user
@@ -135,8 +133,6 @@ const editAddress = async (req, res) => {
     }
 }
 
-
-
 const deleteAddress = async (req, res) => {
     try {
         const userId = req.session.user
@@ -164,6 +160,7 @@ const loadcartAddAddress = async (req, res) => {
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
     }
 }
+
 const cartAddAddress = async (req, res) => {
     try {
         const userId = req.session.user
@@ -193,7 +190,6 @@ const cartAddAddress = async (req, res) => {
         res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
     }
 }
-
 
 module.exports = {
     loadAddress,

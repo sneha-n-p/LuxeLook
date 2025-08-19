@@ -41,7 +41,6 @@ const productInfo = async (req, res) => {
   }
 }
 
-
 const loadAddProduct = async (req, res) => {
   try {
     const categories = await Category.find();
@@ -239,7 +238,6 @@ const editProduct = async (req, res) => {
     res.redirect("/admin/pageError")
   }
 }
-
 
 const deleteSingleImage = async (req, res) => {
   try {
@@ -486,7 +484,6 @@ const addProductOffer = async (req, res) => {
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
   }
 };
-
 
 const getProductEdit = async (req, res) => {
   try {

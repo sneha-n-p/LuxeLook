@@ -54,7 +54,6 @@ const getFilteredSales = async (reportType, startDate, endDate) => {
   return formatted;
 };
 
-
 const loadSalesPage = async (req, res) => {
   try {
     const { reportType, startDate, endDate } = req.query;
@@ -134,7 +133,6 @@ const loadSalesPage = async (req, res) => {
   }
 };
 
-
 const downloadPDF = async (req, res) => {
   try {
     console.log('orders.length:',orders)
@@ -201,7 +199,6 @@ const downloadPDF = async (req, res) => {
     res.status(500).send("Error generating PDF");
   }
 };
-
 
 const downloadExcel = async (req, res) => {
   const { reportType, startDate, endDate } = req.query;

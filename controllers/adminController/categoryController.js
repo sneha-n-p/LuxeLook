@@ -36,6 +36,7 @@ const categoryInfo = async (req, res) => {
     res.status(StatusCode.BAD_REQUEST).redirect("/admin/pageError")
   }
 }
+
 const loadAddCategory = async (req, res) => {
   try {
     const categories = await category.find().sort({ createdAt: -1 });
@@ -46,8 +47,6 @@ const loadAddCategory = async (req, res) => {
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError");
   }
 };
-
-
 
 const addCategory = async (req, res) => {
   try {
@@ -75,8 +74,6 @@ const addCategory = async (req, res) => {
   }
 };
 
-
-
 const unlistCategory = async (req, res) => {
   try {
     let id = req.body.id
@@ -97,6 +94,7 @@ const unlistCategory = async (req, res) => {
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
+
 const listCategory = async (req, res) => {
   try {
     let id = req.body.id
@@ -113,6 +111,7 @@ const listCategory = async (req, res) => {
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
+
 const loadEditCategory = async (req, res) => {
   try {
     const id = req.params.id
@@ -132,9 +131,11 @@ const editCategory = async (req, res) => {
     const { name, description, offer, status } = req.body
     const existingCategory = await category.findById(id);
     const products = await Product.find({category:id})
+
     if (!existingCategory) {
       return res.status(StatusCode.BAD_REQUEST).json({ error: "Category does not exist" });
     }
+
 
     const trimmedName = name.trim().toLowerCase();
     const duplicate = await category.findOne({
@@ -299,7 +300,6 @@ const removeCategoryOffer = async (req, res) => {
   }
 };
 
-
 const editCategoryOffer = async (req, res) => {
   try {
     const { id, offer } = req.body;
@@ -348,7 +348,6 @@ const editCategoryOffer = async (req, res) => {
   }
 };
 
-
 const getCategoryEdit = async (req, res) => {
   try {
     const Category = await category.findById(req.params.id);
@@ -358,8 +357,6 @@ const getCategoryEdit = async (req, res) => {
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Server error' });
   }
 }
-
-
 
 module.exports = {
   categoryInfo,

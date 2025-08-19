@@ -705,7 +705,6 @@ const loadRetryPlaceOrder = async (req, res) => {
   }
 }
 
-
 const generateInvoice = async (req, res) => {
   try {
     const userId = req.session.user;

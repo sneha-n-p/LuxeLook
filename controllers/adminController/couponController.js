@@ -63,7 +63,6 @@ const createCoupon = async (req, res) => {
   }
 }
 
-
 const loadEditCoupon = async (req, res) => {
   try {
     const id = req.params.id;
@@ -98,6 +97,7 @@ const updateCoupon = async (req, res) => {
 
     const startDateObj = new Date(startDate);
     const endDateObj = new Date(endDate);
+    
 
     const updatedCoupon = await Coupon.updateOne(
       { _id: objectId },
@@ -160,7 +160,6 @@ const unlistCategory = async (req, res) => {
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
-
 
 module.exports = {
   loadCoupon,

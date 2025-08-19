@@ -62,6 +62,8 @@ const loadShop = async (req, res) => {
       .skip((page - 1) * limit)
       .exec();
 
+      
+
     const count = await Product.find(query).countDocuments();
     const totalPages = Math.ceil(count / limit);
 
@@ -101,7 +103,6 @@ const loadShop = async (req, res) => {
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
 };
-
 
 const loadProductDetails = async (req, res) => {
   try {
