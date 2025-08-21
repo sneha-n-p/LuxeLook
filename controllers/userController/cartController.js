@@ -46,7 +46,7 @@ const loadcart = async (req, res) => {
                 return acc + (curr.totalPrice || 0);
             }, 0);
 
-            console.log("subTotal:",subTotal)
+            console.log("subTotal:", subTotal)
 
             res.render("cart", {
                 cart: items,
@@ -76,11 +76,14 @@ const procedToCheckOut = async (req, res) => {
         })
         for (let item of cartItems) {
             const product = await Product.findById(item.productId)
-            console.log('Product',product)
-            for(let variants of product.variant){
-                if(variants.size===item.size){
-                    if(variants.quantity<item.quantity){
-                        return res.status(StatusCode.OK).json({success:false,message:`Only ${variants.quantity} item available for this size.`})
+            console.log('Product', product)
+            for (let variants of product.variant) {
+                if (variants.size === item.size) {
+                    if (variants.quantity < item.quantity) {
+                        return res.status(StatusCode.OK).json({ success: false, message: `In ${product.productName} ,Only ${variants.quantity} item available for this size.` })
+                    } else if(item.quantity === 0){
+                        return res.status(StatusCode.OK).json({ success: false, message: `In ${product.productName} ,Only ${variants.quantity} item available for this size.` })
+
                     }
                 }
             }
@@ -106,10 +109,10 @@ const procedToCheckOut = async (req, res) => {
 const addToCart = async (req, res) => {
     try {
         const userId = req.session.user;
-        if (!userId){
+        if (!userId) {
             res.json({ success: false, redirect: "/login" });
         }
-        console.log("cart req.body:",req.body)
+        console.log("cart req.body:", req.body)
         const { productId, quantity, size } = req.body;
         const CarQquantity = parseInt(quantity);
         const productData = await Product.findById(productId);
@@ -120,18 +123,18 @@ const addToCart = async (req, res) => {
         if (!variant) {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid product variant" });
         }
-        
+
         const maxAllowed = stock <= 5 ? stock : 5;
 
         if (CarQquantity > maxAllowed) {
             return res.status(StatusCode.BAD_REQUEST).json({
                 success: false,
                 message: stock < 5
-                ? `Only ${stock} item(s) available in stock.`
-                : `Only 5 quantity of this product is allowed per order.`
+                    ? `Only ${stock} item(s) available in stock.`
+                    : `Only 5 quantity of this product is allowed per order.`
             });
         }
-        
+
         const cart = await Cart.findOne({ userId });
 
         const user = await User.findById(userId);

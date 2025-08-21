@@ -110,16 +110,20 @@ const loadSalesPage = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    let totalOrder = await Order.find(query)
     const totalPage = Math.ceil(totalOrders / limit);
-
+    for(let order of orders){
+      let user = await User.findById(order.userId)
+      order.userName = user.name
+      order.save()
+    }
+    
     const totalSales = totalOrders;
-    const totalAmount = totalOrder.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
-    const totalDiscount = totalOrder.reduce((sum, order) => sum + (order.discount || 0), 0);
-
+    const totalAmount = orders.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
+    const totalDiscount = orders.reduce((sum, order) => sum + (order.discount || 0), 0);
+    
     const salesData = { totalSales, totalAmount, totalDiscount, orders };
     const queryParams = new URLSearchParams(req.query).toString();
-
+    
     res.render('salesReport', {
       salesData,
       queryParams,
@@ -180,14 +184,20 @@ const downloadPDF = async (req, res) => {
     }
 
     const orders = await Order.find(query).sort({ createdOn: -1 });
+    let salesData=[]
 
-    const salesData = {
-      totalSales: orders.length,
-      totalAmount: orders.reduce((sum, o) => sum + (o.finalAmount || 0), 0),
-      totalDiscount: orders.reduce((sum, o) => sum + (o.discount || 0), 0),
-      orders,
-    };
+    for(let order of orders){
+      const user = await User.findById(order.userId)
+      salesData.push({
+        userName:user.name,
+        totalSales: orders.length,
+        totalAmount: orders.reduce((sum, o) => sum + (o.finalAmount || 0), 0),
+        totalDiscount: orders.reduce((sum, o) => sum + (o.discount || 0), 0),
+        orders,
+      })
+    }
 
+    console.log("salesData:",salesData)
     const pdfBuffer = await PDFDocument(salesData);
 
     res.setHeader("Content-Type", "application/pdf");

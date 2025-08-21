@@ -1,6 +1,6 @@
 <%-include("../../views/partials/userPartial/header")%>
 
-    
+
 
     <style>
         body {
@@ -207,8 +207,8 @@
                 </thead>
                 <tbody>
                     <% for (let product of cart) { const quantity=product.quantity < 1 ? 1 : product.quantity; const
-                        price=product.price; const size=product.size; const totalPrice=product.totalPrice;
-                        const matchingVariant=product.productId.variant.find(v=> v.size === size);
+                        price=product.price; const size=product.size; const totalPrice=product.totalPrice; const
+                        matchingVariant=product.productId.variant.find(v=> v.size === size);
                         const available = matchingVariant ? matchingVariant.quantity : 0;
                         %>
                         <tr>
@@ -233,20 +233,15 @@
                                 <%= product.size %>
                             </td>
                             <td>
-                                <% if (available <= 0) { %>
-    <input type="number" value="0" class="quantity-input"
-        data-id="<%= product.productId._id %>" disabled>
-    <div class="text-danger small mt-1">Out of stock! Max available: 0</div>
-<% } else { %>
-    <input type="number" value="<%= quantity %>" 
-        min="1" 
-        max="<%= available %>" 
-        class="quantity-input no-typing"
-        data-id="<%= product.productId._id %>"
-        data-price="<%= price %>" 
-        data-size="<%= product.size %>"
-        data-max="5">
-<% } %>
+                                <% if (available <=0) { %>
+                                    <input type="number" value="0" class="quantity-input"  max="<%= available %>"
+                                        data-id="<%= product.productId._id %>" data-name="<%=product.productId.productName%>">
+                                    <div class="text-danger small mt-1">Out of stock! Max available: 0</div>
+                                    <% } else { %>
+                                        <input type="number" value="<%= quantity %>" min="1" max="<%= available %>"
+                                            class="quantity-input no-typing" data-id="<%= product.productId._id %>"
+                                            data-price="<%= price %>" data-size="<%= product.size %>" data-max="5">
+                                        <% } %>
 
                             </td>
                             <td class="product-total">
@@ -259,8 +254,8 @@
                                     class="btn btn-sm btn-danger">🗑️ Remove</button>
                             </td>
                         </tr>
-                       
-                       
+
+
 
                         <% } %>
                 </tbody>
@@ -346,11 +341,20 @@
                 const row = this.closest("tr");
                 const price = parseInt(this.getAttribute('data-price'));
                 const max = parseInt(this.getAttribute('data-max'));
+                const available = parseInt(this.getAttribute('max'));
+                console.log(available)
                 let quantity = parseInt(this.value);
 
                 const limit = max < 5 ? max : 5;
-
-                if (quantity > limit) {
+                if (available == 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Out of stock",
+                        text: "product is out of stock",
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                } else if (quantity > limit) {
                     this.value = limit;
                     quantity = limit;
 
@@ -395,49 +399,59 @@
         }
 
         document.getElementById("proceedCheckout")?.addEventListener("click", function () {
-    const cartItems = [];
+            const cartItems = [];
 
-    for (let input of document.querySelectorAll(".quantity-input")) {
-        if (input.disabled) continue; 
+            for (let input of document.querySelectorAll(".quantity-input")) {
+                if (input.disabled) continue;
 
-        const productId = input.getAttribute("data-id");
-        const quantity = parseInt(input.value);
-        const price = parseInt(input.getAttribute("data-price"));
-        const size = input.getAttribute("data-size")
-        const maxAvailable = parseInt(input.getAttribute("data-max")); 
+                const productId = input.getAttribute("data-id");
+                const quantity = parseInt(input.value);
+                const price = parseInt(input.getAttribute("data-price"));
+                const size = input.getAttribute("data-size")
+                const maxAvailable = parseInt(input.getAttribute("data-max"));
+                const name = input.getAttribute("data-name")
 
-        if (quantity > maxAvailable) {
-            Swal.fire({
-                icon: "warning",
-                title: "Stock limit reached!",
-                text: `Only ${maxAvailable} item available for this size.`,
-            })
-            return; 
-        }
+                if (quantity > maxAvailable) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Stock limit reached!",
+                        text: `Only ${maxAvailable} item available for this size.`,
+                    })
+                    return;
+                }
+                if (quantity == 0) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Out of stock",
+                        text: `${name} Product Out Of Stock`,
+                    })
+                    return;
+                }
 
-        cartItems.push({ productId, quantity, price, size });
-    }
-
-    axios.post('/cart', { cartItems })
-        .then(response => {
-            if (response.data.success) {
-                window.location.href = "/checkout";
-            } else {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Info!",
-                    text: response.data.message
-                });
+                cartItems.push({ productId, quantity, price, size });
             }
-        })
-        .catch(error => {
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Something went wrong!"
-            });
+
+            axios.post('/cart', { cartItems })
+                .then(response => {
+                    if (response.data.success) {
+                        window.location.href = "/checkout";
+                    } else {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Info!",
+                            text: response.data.message
+                        })
+                            .then(window.location.reload())
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Something went wrong!"
+                    });
+                });
         });
-});
 
     </script>
 

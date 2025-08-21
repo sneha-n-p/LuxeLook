@@ -500,109 +500,83 @@
         denyButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Excel
             downloadExcel(orderId);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            // PDF
             window.location.href = `/downloadInvoice?orderId=${orderId}`;
         }
-        // If denied, do nothing
     });
 }
 
 
         function downloadExcel() {
-            console.log("Generating Excel");
+  console.log("Generating Excel");
 
-            const orderData = {
-                orderId: "<%= order.orderId %>",
-                status: "<%= order.status %>",
-                totalPrice: "₹<%= order.totalPrice.toFixed(2) %>",
-                finalAmount: "₹<%= order.finalAmount.toFixed(2) %>",
-                address: `<% if(order.address && order.address.length > 0) { %>
-            <%= order.address[0].name %>, <%= order.address[0].streetAddress %><%= order.address[0].apartment ? ", " + order.address[0].apartment : "" %>, <%= order.address[0].city %>, <%= order.address[0].state %> - <%= order.address[0].pincode %>, Phone: <%= order.address[0].phone %><%= order.address[0].altPhone ? ", Alt Phone: " + order.address[0].altPhone : "" %>
-        <% } else { %>
-            No address provided
-        <% } %>`,
-                couponApplied: "<%= order.couponApplied ? 'Yes' : 'No' %>",
-                orderDate: "<%= order.createdOn.toDateString() %>",
-                orderedItems: [
-            <% order.orderedItems.forEach(function (item, index) { %>
-                {
-                    productName: "<%= item.product.productName %>",
-                    quantity: <%= item.quantity %>,
-                    price: "₹<%= item.price.toFixed(2) %>",
-                    status: "<%= item.status %>"
-                } <%= index < order.orderedItems.length - 1 ? ',' : '' %>
-            <% }); %>
-        ]
-        };
+  const orderData = {
+    orderId: "<%= order.orderId %>",
+    status: "<%= order.status %>",
+    totalPrice: "₹<%= order.totalPrice.toFixed(2) %>",
+    finalAmount: "₹<%= order.finalAmount.toFixed(2) %>",
+    address: `<% if(order.address && order.address.length > 0) { %>
+      <%= order.address[0].name %>, <%= order.address[0].streetAddress %><%= order.address[0].apartment ? ", " + order.address[0].apartment : "" %>, <%= order.address[0].city %>, <%= order.address[0].state %> - <%= order.address[0].pincode %>, Phone: <%= order.address[0].phone %><%= order.address[0].altPhone ? ", Alt Phone: " + order.address[0].altPhone : "" %>
+    <% } else { %>
+      No address provided
+    <% } %>`,
+    couponApplied: "<%= order.couponApplied ? 'Yes' : 'No' %>",
+    orderDate: "<%= order.createdOn.toDateString() %>",
+    orderedItems: [
+      <% order.orderedItems.forEach(function (item, index) { %>
+        {
+          productName: "<%= item.product.productName %>",
+          quantity: <%= item.quantity %>,
+          price: "₹<%= item.price.toFixed(2) %>",
+          status: "<%= item.status %>"
+        } <%= index < order.orderedItems.length - 1 ? ',' : '' %>
+      <% }); %>
+    ]
+  };
 
-        const worksheetData = [
-            ["Order ID", orderData.orderId],
-            ["Status", orderData.status],
-            ["Total Price", orderData.totalPrice],
-            ["Final Amount", orderData.finalAmount],
-            ["Address", orderData.address],
-            ["Coupon Applied", orderData.couponApplied],
-            ["Order Date", orderData.orderDate],
-            [],
-            ["Ordered Items"],
-            ["Product Name", "Quantity", "Price", "Status"]
-        ];
+  const worksheetData = [
+    ["Order ID", orderData.orderId],
+    ["Status", orderData.status],
+    ["Total Price", orderData.totalPrice],
+    ["Final Amount", orderData.finalAmount],
+    ["Address", orderData.address],
+    ["Coupon Applied", orderData.couponApplied],
+    ["Order Date", orderData.orderDate],
+    [],
+    ["Ordered Items"],
+    ["Product Name", "Quantity", "Price", "Status"]
+  ];
 
-        orderData.orderedItems.forEach(item => {
-            worksheetData.push([
-                item.productName,
-                item.quantity,
-                item.price,
-                item.status
-            ]);
-        });
+  orderData.orderedItems.forEach(item => {
+    worksheetData.push([
+      item.productName,
+      item.quantity,
+      item.price,
+      item.status
+    ]);
+  });
 
-        const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Order Details");
+  const ws = XLSX.utils.aoa_to_sheet(worksheetData);
 
-        // Correct way to download
-        XLSX.writeFile(wb, `Order_${orderData.orderId}.xlsx`);
+  const colWidths = worksheetData[0].map((_, colIndex) => {
+    let maxLength = 10;
+    worksheetData.forEach(row => {
+      if (row[colIndex]) {
+        const cellLength = row[colIndex].toString().length;
+        if (cellLength > maxLength) maxLength = cellLength;
+      }
+    });
+    return { wch: maxLength + 5 };
+  });
+
+  ws['!cols'] = colWidths;
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Order Details");
+
+  XLSX.writeFile(wb, `Order_${orderData.orderId}.xlsx`);
 }
-
-
-        // function downloadPDF() {
-        //     console.log("Generating PDF");
-
-        //     const element = document.getElementById('product-detail-section');
-        //     html2canvas(element, { scale: 2 }).then(canvas => {
-        //         const imgData = canvas.toDataURL('image/jpeg', 1.0);
-
-        //         const { jsPDF } = window.jspdf;
-        //         const pdf = new jsPDF('p', 'mm', 'a4');
-        //         const pdfWidth = pdf.internal.pageSize.getWidth();
-        //         const pdfHeight = pdf.internal.pageSize.getHeight();
-
-        //         const imgProps = {
-        //             width: canvas.width,
-        //             height: canvas.height
-        //         };
-        //         const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
-        //         const imgWidth = imgProps.width * ratio;
-        //         const imgHeight = imgProps.height * ratio;
-
-        //         const x = (pdfWidth - imgWidth) / 2;
-        //         const y = 10;
-
-        //         pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
-        //         pdf.save('Order_<%= order.orderId %>.pdf');
-        //     }).catch(error => {
-        //         showSwal({
-        //             icon: 'error',
-        //             title: 'Oops...',
-        //             text: 'Something went wrong while generating the PDF!'
-        //         });
-        //         console.error("PDF generation error:", error);
-        //     });
-        // }
 
     </script>
 
