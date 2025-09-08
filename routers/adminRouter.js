@@ -70,14 +70,16 @@ router.get("/Coupons",adminAuth,couponController.loadCoupon)
 router.post("/createCoupon",adminAuth,couponController.createCoupon)
 router.get('/editCoupon/:id',adminAuth,couponController.loadEditCoupon)
 router.patch("/updateCoupon",adminAuth,couponController.updateCoupon)
-router.patch("/list-Coupon",adminAuth,couponController.listCategory)
-router.patch("/Unlist-Coupon",adminAuth,couponController.unlistCategory)
+router.patch("/list-Coupon",adminAuth,couponController.listCoupon)
+router.patch("/Unlist-Coupon",adminAuth,couponController.unlistCoupon)
 
 //salesRepoart Controller//
 
 router.get("/sales",adminAuth,salesRepoartController.loadSalesPage)
 router.get('/sales/download/pdf',adminAuth, salesRepoartController.downloadPDF);
 router.get('/sales/download/excel',adminAuth, salesRepoartController.downloadExcel);
+router.get("/api/sales-data", adminAuth, adminControllar.getSalesData)
+router.get("/api/top-selling", adminAuth, adminControllar.getTopSelling)
 
 
 module.exports = router

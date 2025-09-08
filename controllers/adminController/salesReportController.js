@@ -106,24 +106,25 @@ const loadSalesPage = async (req, res) => {
     const totalOrders = await Order.countDocuments(query);
 
     const orders = await Order.find(query)
-      .sort({ createdOn: -1 }) 
+      .sort({ createdOn: -1 })
       .skip(skip)
       .limit(limit);
 
     const totalPage = Math.ceil(totalOrders / limit);
-    for(let order of orders){
+    for (let order of orders) {
       let user = await User.findById(order.userId)
       order.userName = user.name
       order.save()
     }
-    
+
     const totalSales = totalOrders;
     const totalAmount = orders.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
     const totalDiscount = orders.reduce((sum, order) => sum + (order.discount || 0), 0);
-    
+
+
     const salesData = { totalSales, totalAmount, totalDiscount, orders };
     const queryParams = new URLSearchParams(req.query).toString();
-    
+
     res.render('salesReport', {
       salesData,
       queryParams,
@@ -139,7 +140,7 @@ const loadSalesPage = async (req, res) => {
 
 const downloadPDF = async (req, res) => {
   try {
-    console.log('orders.length:',orders)
+    console.log('orders.length:', orders)
     const { reportType, startDate, endDate } = req.query;
     let query = { status: "Delivered" };
 
@@ -184,12 +185,12 @@ const downloadPDF = async (req, res) => {
     }
 
     const orders = await Order.find(query).sort({ createdOn: -1 });
-    let salesData=[]
+    let salesData = []
 
-    for(let order of orders){
+    for (let order of orders) {
       const user = await User.findById(order.userId)
       salesData.push({
-        userName:user.name,
+        userName: user.name,
         totalSales: orders.length,
         totalAmount: orders.reduce((sum, o) => sum + (o.finalAmount || 0), 0),
         totalDiscount: orders.reduce((sum, o) => sum + (o.discount || 0), 0),
@@ -197,7 +198,7 @@ const downloadPDF = async (req, res) => {
       })
     }
 
-    console.log("salesData:",salesData)
+    console.log("salesData:", salesData)
     const pdfBuffer = await PDFDocument(salesData);
 
     res.setHeader("Content-Type", "application/pdf");

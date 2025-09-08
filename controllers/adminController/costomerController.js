@@ -43,7 +43,6 @@ const userBlocked = async (req, res) => {
     try {
         let id = req.body.id
         const mongooseId = new mongoose.Types.ObjectId(id)
-        console.log(mongooseId)
         const update = await User.updateOne({ _id: mongooseId }, { $set: { isBlocked: true } })
         if (update) {
             if (req.session.user === id) {

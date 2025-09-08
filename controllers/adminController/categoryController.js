@@ -40,7 +40,6 @@ const categoryInfo = async (req, res) => {
 const loadAddCategory = async (req, res) => {
   try {
     const categories = await category.find().sort({ createdAt: -1 });
-    console.log('f')
     res.render("addCategory", { categories });
   } catch (error) {
     console.error(error);
@@ -51,7 +50,6 @@ const loadAddCategory = async (req, res) => {
 const addCategory = async (req, res) => {
   try {
     const { name, description, offer, status } = req.body;
-    console.log(req.body);
     const Tname = name.trim()
     const existingCategory = await category.findOne({ name: { $regex: new RegExp(`^${Tname}$`, 'i') } });
     if (existingCategory) {
@@ -78,7 +76,6 @@ const unlistCategory = async (req, res) => {
   try {
     let id = req.body.id
     const mongooseId = new mongoose.Types.ObjectId(id)
-    console.log(mongooseId)
     const update = await category.updateOne({ _id: mongooseId }, { $set: { status: 'Unlisted' } })
     if (update) {
       if (req.session.category === id) {
@@ -117,7 +114,6 @@ const loadEditCategory = async (req, res) => {
     const id = req.params.id
     const mongooseId = new mongoose.Types.ObjectId(id)
     const Category = await category.findById(mongooseId)
-    console.log('CategoryL')
     res.render("edit-category", { Category: Category })
   } catch (error) {
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
@@ -126,7 +122,6 @@ const loadEditCategory = async (req, res) => {
 
 const editCategory = async (req, res) => {
   try {
-    console.log('updated:', req.body)
     const id = req.params.id
     const { name, description, offer, status } = req.body
     const existingCategory = await category.findById(id);

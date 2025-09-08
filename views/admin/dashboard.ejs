@@ -1,19 +1,581 @@
-<%-include("../../views/partials/adminPartial/header")%>
-<style>
-  .dashboard{
-    color: blue;
-  }
-</style>
-  <div class="main-content">
+<%- include("../../views/partials/adminPartial/header") %>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    .dashboard-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      color: #000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: 0.3s ease;
+      height: 100%;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .dashboard-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #000;
+    }
+
+    .table-container {
+      max-height: 250px;
+      /* Compact table height */
+      overflow-y: auto;
+      overflow-x: hidden;
+      /* Prevent horizontal overflow */
+    }
+
+    .table {
+      background: #fff;
+      color: #000;
+      font-size: 0.9rem;
+      /* Smaller font size */
+      width: 100%;
+      table-layout: fixed;
+      /* Enforce column widths */
+    }
+
+    .table th,
+    .table td {
+      color: #000;
+      padding: 4px;
+      /* Reduced padding */
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      vertical-align: middle;
+    }
+
+    /* Column widths for Top Selling Products/Categories */
+    .table th:nth-child(1),
+    .table td:nth-child(1) {
+      width: 20%;
+    }
+
+    /* Product/Category */
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+      width: 25%;
+    }
+
+    /* Category/Product Count */
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+      width: 25%;
+    }
+
+    /* Price/Total Sales */
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+      width: 20%;
+    }
+
+    /* Sold */
+    .table th:nth-child(5),
+    .table td:nth-child(4) {
+      width: 10%;
+    }
+
+    /* Sold */
+
+    /* Column widths for Recent Orders */
+    .recent-orders-table th:nth-child(1),
+    .recent-orders-table td:nth-child(1) {
+      width: 20%;
+    }
+
+    /* Order ID */
+    .recent-orders-table th:nth-child(2),
+    .recent-orders-table td:nth-child(2) {
+      width: 30%;
+    }
+
+    /* Customer */
+    .recent-orders-table th:nth-child(3),
+    .recent-orders-table td:nth-child(3) {
+      width: 25%;
+    }
+
+    /* Amount */
+    .recent-orders-table th:nth-child(4),
+    .recent-orders-table td:nth-child(4) {
+      width: 20%;
+    }
+
+    /* Status */
+
+    .filter-btn {
+      background: #e2e8f0;
+      color: #000;
+      font-size: 0.85rem;
+    }
+
+    .filter-btn.active {
+      background-color: #2563eb !important;
+      color: #fff !important;
+    }
+
+    .filter-btn:hover {
+      background-color: #1e40af;
+      color: #fff;
+    }
+
+    .status-badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .status-delivered {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status-cancelled {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+
+    .report-btn {
+      background: #fbca1f;
+      font-family: inherit;
+      padding: 0.6em 1.3em;
+      font-weight: 900;
+      font-size: 18px;
+      border: 3px solid black;
+      border-radius: 0.4em;
+      box-shadow: 0.1em 0.1em;
+      cursor: pointer;
+    }
+
+    .report-btn:hover {
+      transform: translate(-0.05em, -0.05em);
+      box-shadow: 0.15em 0.15em;
+    }
+
+    .report-btn:active {
+      transform: translate(0.05em, 0.05em);
+      box-shadow: 0.05em 0.05em;
+    }
+  </style>
+
+  <div class="main-content py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Admin DashBoard</h2>
+      <h2 class="fw-bold" style="color: #000;">Admin Dashboard</h2>
+      <button class="report-btn" onclick="window.location.href='/admin/sales'">Get or Download Sales Report</button>
     </div>
 
-    
+    <!-- Top Stats -->
+    <div class="row mb-4">
+      <div class="col-md-3 mb-3">
+        <div class="dashboard-card text-center">
+          <h5>Total Products</h5>
+          <h3>₹<%= totalProduct %>
+          </h3>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="dashboard-card text-center">
+          <h5>Total Customers</h5>
+          <h3>
+            <%= totalCustomers %>
+          </h3>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="dashboard-card text-center">
+          <h5>Total Orders</h5>
+          <h3>
+            <%= totalOrders %>
+          </h3>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="dashboard-card text-center">
+          <h5>Total Revenue</h5>
+          <h3>₹<%= totalSales.toLocaleString() %>
+          </h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Chart and Order Status -->
+    <div class="row mb-4">
+      <div class="col-lg-8 mb-3">
+        <div class="dashboard-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="dashboard-title">Sales Report</h5>
+            <div>
+              <button id="yearlyBtn" class="btn btn-sm filter-btn">Yearly</button>
+              <button id="monthlyBtn" class="btn btn-sm filter-btn active">Monthly</button>
+              <button id="weeklyBtn" class="btn btn-sm filter-btn">Weekly</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="salesChart" height="150"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-3">
+        <div class="dashboard-card">
+          <h5 class="dashboard-title">Order Status</h5>
+          <div class="chart-container">
+            <canvas id="orderStatusChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Selling Products and Recent Orders -->
+    <div class="row">
+      <div class="col-lg-8 mb-3">
+        <div class="dashboard-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="dashboard-title" id="best-product-head">Top Selling Products</h5>
+            <div>
+              <select class="form-control form-control-sm" id="productFilter"
+                onchange="updateTopSellingProducts(this.value); Title(this.value)">
+                <option value="products">Products</option>
+                <option value="categories">Categories</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="table table-striped">
+              <thead>
+                <tr id="tableHeader">
+                  <th>Product</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Sold</th>
+                </tr>
+              </thead>
+              <tbody id="topSellingItemsTable">
+                <% if (topProducts && topProducts.length> 0) { %>
+                  <% topProducts.forEach(product=> { %>
+                    <tr>
+                      <td class="d-flex align-items-center">
+                        <img src="<%= product.productImage %>" alt="<%= product.name %>" class="mr-2"
+                          style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                      </td>
+                      <td>
+                        <%= product.Product %>
+                      </td>
+                      <td>
+                        <%= product.category %>
+                      </td>
+                      <td>₹<%= product.price.toLocaleString() %>
+                      </td>
+                      <td>
+                        <%= product.soldCount %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="4" class="text-center">No products found</td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-3">
+        <div class="dashboard-card">
+          <h5 class="dashboard-title">Recent Orders</h5>
+          <div class="table-container">
+            <table class="table table-striped recent-orders-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (recentOrders &&recentOrders.length> 0) { %>
+                  <% recentOrders.forEach(order=> { %>
+                    <tr>
+                      <td><a href="/admin/orderDetails/<%= order._id %>" class="text-primary">#<%= order.orderId %></a>
+                      </td>
+                      <td>
+                        <%= order.userId.name %>
+                      </td>
+                      <td>₹<%= order.finalAmount.toLocaleString() %>
+                      </td>
+                      <td>
+                        <% if (order.status==='delivered' ) { %>
+                          <span class="status-badge status-delivered">Delivered</span>
+                          <% } else if (order.status==='cancelled' ) { %>
+                            <span class="status-badge status-cancelled">Cancelled</span>
+                            <% } else { %>
+                              <span class="status-badge status-pending">
+                                <%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %>
+                              </span>
+                              <% } %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="4" class="text-center">No recent orders</td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-right mt-3">
+            <a href="/admin/orders" class="btn btn-sm filter-btn">View All Orders</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-</body>
-</html>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    let salesChart, orderStatusChart;
+
+    // Initialize Sales Chart
+    function initializeSalesChart(labels, data) {
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+
+    salesChart = new Chart(salesCtx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Sales (₹)',
+          data: data,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function (value) {
+                return '₹' + value.toLocaleString();
+              }
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                return '₹' + context.parsed.y.toLocaleString();
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 
 
-   
+    // Initialize Order Status Chart
+    function initializeOrderStatusChart(labels, data) {
+    const statusCtx = document.getElementById('orderStatusChart').getContext('2d');
+
+    orderStatusChart = new Chart(statusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            'rgba(46, 204, 113, 0.7)',
+            'rgba(52, 152, 219, 0.7)',
+            'rgba(231, 76, 60, 0.7)',
+            'rgba(241, 196, 15, 0.7)',
+            'rgba(155, 89, 182, 0.7)'
+          ],
+          borderColor: [
+            'rgba(46, 204, 113, 1)',
+            'rgba(52, 152, 219, 1)',
+            'rgba(231, 76, 60, 1)',
+            'rgba(241, 196, 15, 1)',
+            'rgba(155, 89, 182, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right'
+          }
+        }
+      }
+    });
+  }
+
+
+      function updateSalesChart(period) {
+    // Toggle active button
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(period + 'Btn').classList.add('active');
+
+    let url = `/admin/api/sales-data?period=${period}`;
+
+    fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(data => {
+        salesChart.data.labels = data.labels;
+        salesChart.data.datasets[0].data = data.data;
+        salesChart.update();
+      })
+      .catch(error => {
+        console.log('Error fetching sales data:', error);
+        alert('Failed to update chart. Please try again.');
+      });
+  }
+
+
+ document.addEventListener('DOMContentLoaded', function () {
+    const initialLabels = <%- JSON.stringify(salesLabels) %>;
+    const initialData = <%- JSON.stringify(salesData) %>;
+    const orderStatusLabels = <%- JSON.stringify(orderStatusLabels) %>;
+    const orderStatusData = <%- JSON.stringify(orderStatusData) %>;
+
+    initializeSalesChart(initialLabels, initialData);
+    initializeOrderStatusChart(orderStatusLabels, orderStatusData);
+
+    // Button click handlers
+    document.getElementById('yearlyBtn').addEventListener('click', () => updateSalesChart('yearly'));
+    document.getElementById('monthlyBtn').addEventListener('click', () => updateSalesChart('monthly'));
+    document.getElementById('weeklyBtn').addEventListener('click', () => updateSalesChart('weekly'));
+
+    // Default state
+    document.getElementById('monthlyBtn').classList.add('active');
+  });
+
+
+    // Update Top Selling Products/Categories
+    function updateTopSellingProducts(filter) {
+      const tableHeader = document.getElementById('tableHeader');
+      const title = document.getElementById('best-product-head');
+      if (filter === 'categories') {
+        tableHeader.innerHTML = `
+        <th>Category</th>
+        <th>Products Count</th>
+        <th>Total Sales</th>
+        <th>Items Sold</th>
+      `;
+        title.innerText = 'Top Selling Categories';
+      } else {
+        tableHeader.innerHTML = `
+        <th>Product</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Sold</th>
+      `;
+        title.innerText = 'Top Selling Products';
+      }
+
+      fetch(`/admin/api/top-selling?type=${filter}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          const tableBody = document.getElementById('topSellingItemsTable');
+          tableBody.innerHTML = '';
+          if (filter === 'categories') {
+            if (data.topCategories && data.topCategories.length > 0) {
+              data.topCategories.forEach(category => {
+                tableBody.innerHTML += `
+                <tr>
+                  <td>${category.category}</td>
+                  <td>${category.productCount}</td>
+                  <td>₹${category.totalSales.toLocaleString()}</td>
+                  <td>${category.soldCount}</td>
+                </tr>
+              `;
+              });
+            } else {
+              tableBody.innerHTML = '<tr><td colspan="4" class="text-center">No categories found</td></tr>';
+            }
+          } else {
+            if (data.topProducts && data.topProducts.length > 0) {
+              data.topProducts.forEach(product => {
+                tableBody.innerHTML += `
+                <tr>
+                  <td class="d-flex align-items-center">
+                    <img src="${product.productImage || 'https://via.placeholder.com/40'}" alt="${product.name}" class="mr-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                  </td>
+                  <td>${product.Product}</td>
+                  <td>${product.category}</td>
+                  <td>₹${product.price.toLocaleString()}</td>
+                  <td>${product.soldCount}</td>
+                </tr>
+              `;
+              });
+            } else {
+              tableBody.innerHTML = '<tr><td colspan="4" class="text-center">No products found</td></tr>';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching top selling items:', error);
+          alert('Failed to update data. Please try again.');
+        });
+    }
+
+
+
+    initializeSalesChart(initialSalesLabels, initialSalesData);
+    initializeOrderStatusChart(orderStatusLabels, orderStatusData);
+
+    // Set default filter and button state
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('productFilter').value = 'products';
+      document.getElementById('monthlyBtn').classList.add('active');
+    });
+
+    // Update title for product filter
+    function Title(value) {
+      const title = document.getElementById('best-product-head');
+      title.innerText = value === 'products' ? 'Top Selling Products' : 'Top Selling Categories';
+    }
+
+
+  </script>

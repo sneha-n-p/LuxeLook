@@ -123,7 +123,7 @@ const addproduct = async (req, res) => {
     }
     console.log(errors)
     if (Object.keys(errors).length > 0) {
-      console.log('Error in validation')
+      console.log('Error in validation',error)
       return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
         message: "Validation errors occurred",
         errors,
@@ -183,8 +183,6 @@ const addproduct = async (req, res) => {
       }
     }
 
-
-
     if (imagesPaths.length === 0) {
       errors.image1 = "At least one image is required";
     }
@@ -216,7 +214,7 @@ const addproduct = async (req, res) => {
     console.log("Product saved successfully!");
     return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });
   } catch (error) {
-    console.error("Error adding product:", error);
+    console.log("Error adding product:", error);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("addProduct", {
       message: "Failed to add product. Please try again.",
       errors: {},

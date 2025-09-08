@@ -123,7 +123,7 @@ const updateCoupon = async (req, res) => {
   }
 };
 
-const listCategory = async (req, res) => {
+const listCoupon = async (req, res) => {
   try {
     let id = req.body.id
     const mongooseId = new mongoose.Types.ObjectId(id)
@@ -140,11 +140,10 @@ const listCategory = async (req, res) => {
   }
 }
 
-const unlistCategory = async (req, res) => {
+const unlistCoupon = async (req, res) => {
   try {
     let id = req.body.id
     const mongooseId = new mongoose.Types.ObjectId(id)
-    console.log(mongooseId)
     const update = await Coupon.updateOne({ _id: mongooseId }, { $set: { islist: "false" } })
     if (update) {
       if (req.session.coupon === id) {
@@ -166,6 +165,6 @@ module.exports = {
   createCoupon,
   loadEditCoupon,
   updateCoupon,
-  listCategory,
-  unlistCategory
+  listCoupon,
+  unlistCoupon
 }
