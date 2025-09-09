@@ -17,14 +17,20 @@
       background-color: #0f172a;
       color: #f1f5f9;
       font-family: 'Segoe UI', sans-serif;
+      margin: 0;
     }
 
+    /* Sidebar */
     .sidebar {
       width: 220px;
       height: 100vh;
       background-color: #1e293b;
       position: fixed;
+      top: 0;
+      left: 0;
       padding: 20px;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1050;
     }
 
     .sidebar a {
@@ -49,65 +55,75 @@
       font-weight: bold;
     }
 
+    /* Main Content */
     .main-content {
       margin-left: 240px;
       padding: 20px;
-    }
-    .badge {
-      font-size: 0.75rem;
+      transition: margin-left 0.3s;
     }
 
-    .table th,
-    .table td {
+    /* Toggle Button */
+    .toggle-btn {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background: #1e293b;
       color: #f1f5f9;
-      vertical-align: middle;
-    }
-
-    .nav-link {
-      color: #cbd5e1;
-    }
-
-    .nav-link:hover {
-      color: #38bdf8;
-    }
-
-    .btn-primary {
-      background-color: #7c3aed;
       border: none;
+      padding: 10px 12px;
+      border-radius: 8px;
     }
 
-    .btn-primary:hover {
-      background-color: #6d28d9;
+    /* Overlay for mobile */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1049;
     }
 
-    .chart-placeholder {
-      height: 300px;
-      background: #334155;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #94a3b8;
-    }
-
-    @media (max-width: 768px) {
+    /* Mobile (<768px) */
+    @media (max-width: 767px) {
       .sidebar {
-        width: 60px;
-        overflow: hidden;
-        transition: width 0.3s;
+        transform: translateX(-100%);
       }
-      .sidebar:hover {
-        width: 220px;
+
+      .sidebar.show {
+        transform: translateX(0);
       }
+
       .main-content {
-        margin-left: 80px;
+        margin-left: 0;
+      }
+
+      .toggle-btn {
+        display: block;
+      }
+
+      .overlay.show {
+        display: block;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="sidebar" role="navigation" aria-label="Admin Navigation">
+  <!-- Toggle Button (mobile only) -->
+  <button class="toggle-btn" id="toggleSidebar">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar" role="navigation" aria-label="Admin Navigation">
     <h5 class="text-white">LuxeLook</h5>
     <a href="/admin" id="dashboard" aria-current="page"><i class="bi bi-house"></i> Dashboard</a>
     <a href="/admin/users"><i class="bi bi-people"></i> Users</a>
@@ -121,10 +137,25 @@
     </form>
   </div>
 
- 
 
+  <!-- SweetAlert + Script -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
   <script>
+    // Sidebar & Overlay Toggle
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+      overlay.classList.toggle('show');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+    });
+
     // Logout confirmation
     document.getElementById('logoutBtn').addEventListener('click', function (e) {
       e.preventDefault();
@@ -155,5 +186,4 @@
     });
   </script>
 </body>
-
 </html>

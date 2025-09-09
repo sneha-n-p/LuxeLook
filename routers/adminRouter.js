@@ -7,6 +7,7 @@ const productController = require("../controllers/adminController/productControl
 const orderController = require('../controllers/adminController/orderController')
 const couponController = require('../controllers/adminController/couponController')
 const salesRepoartController = require("../controllers/adminController/salesReportController")
+const dashboardController = require('../controllers/adminController/dashboardController')
 const upload = require("../helpers/multer")
 const {adminAuth,adminAuthCheck} = require('../middlewares/auth')
 
@@ -15,7 +16,6 @@ const {adminAuth,adminAuthCheck} = require('../middlewares/auth')
 
 router.get("/login",adminAuthCheck,adminControllar.loadLogin)
 router.post('/login',adminControllar.postLogin)
-router.get('/',adminAuth,adminControllar.loadDashboard)
 router.get('/pageError',adminControllar.pageError)
 router.post("/logout",adminControllar.logout)
 
@@ -78,8 +78,12 @@ router.patch("/Unlist-Coupon",adminAuth,couponController.unlistCoupon)
 router.get("/sales",adminAuth,salesRepoartController.loadSalesPage)
 router.get('/sales/download/pdf',adminAuth, salesRepoartController.downloadPDF);
 router.get('/sales/download/excel',adminAuth, salesRepoartController.downloadExcel);
-router.get("/api/sales-data", adminAuth, adminControllar.getSalesData)
-router.get("/api/top-selling", adminAuth, adminControllar.getTopSelling)
+
+//dashboard Condroller
+
+router.get('/',adminAuth,dashboardController.loadDashboard)
+router.get("/api/sales-data", adminAuth, dashboardController.getSalesData)
+router.get("/api/top-selling", adminAuth, dashboardController.getTopSelling)
 
 
 module.exports = router

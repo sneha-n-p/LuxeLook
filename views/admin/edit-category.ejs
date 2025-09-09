@@ -76,7 +76,7 @@
           <div class="mb-3">
             <label for="categoryDescription" class="form-label">Description:</label>
             <p class="edit-category-errors" id="category-Description-Error"></p>
-            <textarea class="form-control" id="categoryDescription" name="description" rows="3" required maxlength="150"
+            <textarea class="form-control" id="categoryDescription" name="description" rows="3" required maxlength="100"
               pattern="/^[A-Za-z0-9 .,-]+$/"
               title="Only alphabets allowed, no spaces or numbers."><%= Category.description %></textarea>
           </div>

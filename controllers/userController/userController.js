@@ -21,7 +21,7 @@ const loadHomePage = async (req, res) => {
 
     const products = await Product.find({ isBlocked: false }).populate('category');
     const categorys = await Category.find({ status: "Listed" });
-
+    
     
     const processedProducts = products.map(product => {
         const productOffer = product.offer || 0;
