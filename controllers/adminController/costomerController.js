@@ -41,7 +41,9 @@ const customerInfo = async (req, res) => {
 
 const userBlocked = async (req, res) => {
     try {
+        console.log(req.body)
         let id = req.body.id
+        console.log(id)
         const mongooseId = new mongoose.Types.ObjectId(id)
         const update = await User.updateOne({ _id: mongooseId }, { $set: { isBlocked: true } })
         if (update) {

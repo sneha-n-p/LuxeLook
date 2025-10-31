@@ -3,6 +3,7 @@ const User = require("../../models/userSchema")
 const env = require("dotenv").config()
 const mongoose = require('mongoose');
 const StatusCode = require("../../statusCode");
+const { default: axios } = require("axios");
 
 const loadAddress = async (req, res) => {
     try {
@@ -31,7 +32,7 @@ const loadAddress = async (req, res) => {
             currentPage: page,
             totalPages,
             activePage: 'address',
-            currentPath:'/addresses'
+            currentPath: '/addresses'
         });
 
     } catch (error) {
@@ -43,7 +44,7 @@ const loadAddress = async (req, res) => {
 const loadAddAddress = async (req, res) => {
     try {
         const user = req.session.user
-        res.render("add-address", { user: user, activePage: 'add-address',currentPath:'/addresses' })
+        res.render("add-address", { user: user, activePage: 'add-address', currentPath: '/addresses' })
     } catch (error) {
         console.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
@@ -55,6 +56,14 @@ const AddAddress = async (req, res) => {
         const userId = req.session.user
         const userData = await User.findById(userId)
         const { addressType, name, state, streetAddress, apartment, city, pincode, phone, altPhone, isDefault } = req.body
+        const apiKey = process.env.GOOGLE_API_KEY;
+
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(streetAddress)}&key=${apiKey}`;
+        const { data } = await axios.get(url);
+        if (data.status !== "OK" || !data.results.length) {
+            console.log('data:',data)
+            return res.json({ success: false, message: "Address not found" });
+        }
         const userAddress = await Address.findOne({ userId: userData._id })
         console.log(req.body)
         if (!userAddress) {
@@ -72,7 +81,7 @@ const AddAddress = async (req, res) => {
             userAddress.address.push({ addressType, name, streetAddress, apartment, city, state, pincode, phone, altPhone, isDefault })
             await userAddress.save()
         }
-        res.redirect("/addresses")
+        res.json({success:true,redirectUrl:'/addresses'})
     } catch (error) {
         console.error(error)
 
@@ -89,7 +98,7 @@ const loadEditAddress = async (req, res) => {
         const addressId = new mongoose.Types.ObjectId(id)
         for (let add of addressData.address) {
             if (add._id.equals(addressId)) {
-                res.render("edit-Address", { user: userData, address: add, activePage: " edit-addresses",currentPath:'/addresses' })
+                res.render("edit-Address", { user: userData, address: add, activePage: " edit-addresses", currentPath: '/addresses' })
             }
         }
         console.log(addressId)
@@ -154,7 +163,7 @@ const deleteAddress = async (req, res) => {
 const loadcartAddAddress = async (req, res) => {
     try {
         const user = req.session.user
-        res.render("cartAdd-address", { user: user, activePage: 'cartAdd-address',currentPath:'/addresses' })
+        res.render("cartAdd-address", { user: user, activePage: 'cartAdd-address', currentPath: '/addresses' })
     } catch (error) {
         console.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")

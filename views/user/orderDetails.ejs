@@ -28,48 +28,49 @@
     }
 
     .sidebar {
-    background-color: #F2E8DC;
-    padding: 30px 20px;
-    height: auto;
-    color: #6B4C3B;
-    border-radius: 8px;
-  }
+      background-color: #F2E8DC;
+      padding: 30px 20px;
+      height: auto;
+      color: #6B4C3B;
+      border-radius: 8px;
+    }
 
-  .sidebar h5 {
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
+    .sidebar h5 {
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
 
-  .sidebar a {
-    display: flex; 
-    align-items: center;
-    color: #333;
-    margin-bottom: 10px;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 10px 15px;
-    border-radius: 5px; 
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      color: #333;
+      margin-bottom: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 10px 15px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-  .sidebar a:hover {
-    color: #B5654B;
-    background-color: rgba(181, 101, 75, 0.1); 
-  }
+    .sidebar a:hover {
+      color: #B5654B;
+      background-color: rgba(181, 101, 75, 0.1);
+    }
 
-  .sidebar a i {
-    margin-right: 10px;
-    font-size: 16px; 
-    width: 20px; 
-    text-align: center;
-    color: #333; 
-    transition: color 0.3s ease; 
-  }
+    .sidebar a i {
+      margin-right: 10px;
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #333;
+      transition: color 0.3s ease;
+    }
 
-  .sidebar a:hover i {
-    color: #B5654B; 
-  }
+    .sidebar a:hover i {
+      color: #B5654B;
+    }
+
     .orders-section {
       background-color: #FCF4ED;
       padding: 40px;
@@ -200,6 +201,18 @@
     .Empty-Orders button:hover {
       background-color: #333;
     }
+
+    .custom-textarea {
+      width: 80%;
+      margin: 10px auto 0 auto;
+      display: block;
+      font-size: 15px;
+      resize: none;
+      border-radius: 6px;
+      border: 1px solid #4b4848;
+      padding: 10px;
+      box-sizing: border-box;
+    }
   </style>
 
   <!-- Banner -->
@@ -213,7 +226,7 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Sidebar -->
-     <div class="col-md-2 sidebar">
+      <div class="col-md-2 sidebar">
         <h5>SETTINGS</h5>
         <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
           <i class="fas fa-shopping-cart"></i> Orders
@@ -369,7 +382,12 @@
         <option value="" disabled selected>Select a reason</option>
         ${optionsHtml}
       </select>
-      <textarea id="other-reason" class="swal2-textarea" placeholder="Please specify your reason" style="display:none;"></textarea>
+     <textarea 
+  id="other-reason" 
+  class="swal2-textarea custom-textarea" 
+  placeholder="Please specify your reason" 
+  style="display:none;"
+></textarea>
     `,
         showCancelButton: true,
         confirmButtonColor: "#B5654B",
@@ -389,33 +407,35 @@
             }
           });
         },
-       preConfirm: () => {
-  // Get the "Other" input field safely
-  const otherReasonElement = document.getElementById('other-reason');
-  const otherReasonText = otherReasonElement ? otherReasonElement.value.trim() : '';
+        preConfirm: () => {
+          // Get the "Other" input field safely
+          const otherReasonElement = document.getElementById('other-reason');
+          const otherReasonText = otherReasonElement ? otherReasonElement.value.trim() : '';
 
-  // Get the selected reason
-  const reasonSelect = document.getElementById('cancel-reason');
-  const selectedReason = reasonSelect ? reasonSelect.value : '';
+          // Get the selected reason
+          const reasonSelect = document.getElementById('cancel-reason');
+          const selectedReason = reasonSelect ? reasonSelect.value : '';
 
-  // Validate selection
-  if (!selectedReason) {
-    Swal.showValidationMessage('Please select a reason');
-    return false;
-  }
+          // Validate selection
+          if (!selectedReason) {
+            Swal.showValidationMessage('Please select a reason');
+            return false;
+          }
 
-  // If "Other" is chosen but input is empty
-  if (selectedReason === 'Other' && !otherReasonText) {
-    Swal.showValidationMessage('Please enter your custom reason');
-    return false;
-  }
+          // If "Other" is chosen but input is empty
+          if (selectedReason === 'Other' && !otherReasonText) {
+            Swal.showValidationMessage('Please enter your custom reason');
+            return false;
+          }
 
-  // Return the correct value
-  return selectedReason === 'Other' ? otherReasonText : selectedReason;
-}
+          // Return the correct value
+          return selectedReason === 'Other' ? otherReasonText : selectedReason;
+        }
 
 
       }).then((result) => {
+
+        console.log('result',result)
         if (result.isConfirmed) {
           axios.post('/orders/cancel', {
             orderId,
@@ -460,8 +480,12 @@
           <option value="" disabled selected>Select a reason</option>
           ${optionsHtml}
         </select>
-              <textarea id="other-reason" class="swal2-textarea" placeholder="Please specify your reason" style="display:none;"></textarea>
-      `,
+<textarea 
+  id="other-reason" 
+  class="swal2-textarea custom-textarea" 
+  placeholder="Please specify your reason" 
+  style="display:none;"
+></textarea>      `,
         didOpen: () => {
           const otherReason = document.getElementById('other-reason')
           const selectedReason = document.getElementById('returnReasonSelect')

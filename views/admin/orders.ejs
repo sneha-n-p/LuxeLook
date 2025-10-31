@@ -79,7 +79,7 @@
     padding: 10px 15px;
     border-radius: 6px;
     width: 100%;
-    max-width: 400px;
+    /* max-width: 400px; */
     margin-bottom: 25px;
   }
 
@@ -106,26 +106,26 @@
     vertical-align: middle;
     font-size: 0.95rem;
   }
-  .search-container {
+  /* .search-container {
     margin: 20px;
-  }
+  } */
 
-  .search-input {
+  /* .search-input {
     padding: 8px 12px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 6px;
-    width: 250px;
-  }
+    width: 100%;
+  } */
 </style>
 
 <body>
   <div class="main-content">
-    <div class="search-bar">
-      <input type="text" id="orderSearch" class="search-bar" placeholder="Search for Order Id">
-    </div>
-
+    
     <h3>Orders</h3>
+    <div class="mb-4">
+      <input type="text" id="orderSearch" class="form-control search-bar" placeholder="Search for Order Id">
+    </div>
     <div class="table-responsive">
       <table class="table table-borderless text-center">
         <thead>

@@ -34,6 +34,10 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
+    .product-section h1 {
+      font-size: 40px;
+    }
+
     .main-image {
       position: relative;
       overflow: hidden;
@@ -191,9 +195,9 @@
         </div>
 
         <div class="col-md-6">
-          <h2 class="fw-bold mb-3">
+          <h1 class="fw-bold mb-3">
             <%= product.productName %>
-          </h2>
+          </h1>
           <p class="mb-4">
             <%= product.description %>
           </p>
@@ -207,11 +211,11 @@
               <% }) %>
           </select>
           <div class="d-flex align-items-center">
-            <strike style="color: #bbb;">
+            <strike style="color: #bbb; padding-right: 1rem;">
               <p class="price-tag   mb-3">₹<%= product.regularPrice %>
               </p>
             </strike>
-            <p id="variant-price" class="price-tag fw-bold mb-3">₹
+            <p id="variant-price" class="price-tag fw-bold mb-3">
             </p>
           </div>
           <%if(product.offer>0){%>
@@ -284,104 +288,112 @@
     });
 
     function addToWishlist(productId) {
-  const size = document.querySelector('select[name="size"]').value;
+      const size = document.querySelector('select[name="size"]').value;
 
-  if (!size) {
-    Swal.fire({
-      title: "Select a Size",
-      icon: "warning",
-      showConfirmButton: true
-    });
-    return;
-  }
-
-  axios.post("/addToWishlist", { productId, size })
-    .then(function (response) {
-      if (response.data.success) {
+      if (!size) {
         Swal.fire({
-          title: "Added to Wishlist",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500
+          title: "Select a Size",
+          icon: "warning",
+          showConfirmButton: true
         });
-      } else if (response.data.redirect) {
-        window.location.href = response.data.redirect;
-      } else {
-        Swal.fire({
-          title: "Error Occurred",
-          icon: "error",
-          text: response.data.message || "Something went wrong",
-          showConfirmButton: false,
-          timer: 1500
-        });
+        return;
       }
-    })
-    .catch(() => {
-      Swal.fire({
-        title: "Error Occurred",
-        icon: "error",
-        text: "Already Exist In Wishlist",
-        showConfirmButton: false,
-        timer: 1500
-      });
-    });
-}
+
+      axios.post("/addToWishlist", { productId, size })
+        .then(function (response) {
+          if (response.data.success) {
+            Swal.fire({
+              title: "Added to Wishlist",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1500
+            });
+          } else if (response.data.redirect) {
+            window.location.href = response.data.redirect;
+          } else {
+            Swal.fire({
+              title: "Error Occurred",
+              icon: "error",
+              text: response.data.message || "Something went wrong",
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        })
+        .catch(() => {
+          Swal.fire({
+            title: "Error Occurred",
+            icon: "error",
+            text: "Already Exist In Wishlist",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
+    }
 
     function addToCart(productId) {
-  const quantity = document.querySelector('input[name="quantity"]').value;
-  const size = document.querySelector('select[name="size"]').value;
+      const quantity = document.querySelector('input[name="quantity"]').value;
+      const size = document.querySelector('select[name="size"]').value;
 
-  if (!size) {
-    Swal.fire({
-      title: "Select a Size",
-      icon: "warning",
-      showConfirmButton: true
-    });
-    return;
-  }
-
-  if (!quantity || quantity <= 0) {
-    Swal.fire({
-      title: "Invalid Quantity",
-      icon: "warning",
-      showConfirmButton: true
-    });
-    return;
-  }
-
-  axios.post("/addToCart", { productId, quantity, size })
-    .then(function (response) {
-      if (response.data.success) {
+      if (!size) {
         Swal.fire({
-          title: "Added to Cart",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 1500
-        }).then(() => {
-          location.reload(); 
+          title: "Select a Size",
+          icon: "warning",
+          showConfirmButton: true
         });
-      } else if (response.data.redirect) {
-        window.location.href = response.data.redirect;
-      } else {
-        Swal.fire({
-          title: "Error Occurred",
-          icon: "error",
-          text: response.data.message || "Something went wrong",
-          showConfirmButton: false,
-          timer: 1500
-        });
+        return;
       }
-    })
-    .catch(() => {
-      Swal.fire({
-        title: "Error Occurred",
-        icon: "error",
-        text: "Already Exist In Cart",
-        showConfirmButton: false,
-        timer: 1500
-      });
-    });
-}
+
+      if (!quantity || quantity <= 0) {
+        Swal.fire({
+          title: "Invalid Quantity",
+          icon: "warning",
+          showConfirmButton: true
+        });
+        return;
+      }
+
+      axios.post("/addToCart", { productId, quantity, size })
+        .then(function (response) {
+          if (response.data.success) {
+            Swal.fire({
+              title: "Added to Cart",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+              let length = response.data.cartLength
+              console.log("length:", length)
+              if (length > 0) {
+                const cartEl = document.getElementById('cartLength');
+                cartEl.innerHTML = length;
+                cartEl.style.display = 'inline-block';
+              } else {
+                document.getElementById('cartLength').style.display = 'none';
+              }
+            });
+          } else if (response.data.redirect) {
+            window.location.href = response.data.redirect;
+          } else {
+            Swal.fire({
+              title: "Error Occurred",
+              icon: "error",
+              text: response.data.message || "Something went wrong",
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        })
+        .catch(() => {
+          Swal.fire({
+            title: "Error Occurred",
+            icon: "error",
+            text: "Already Exist In Cart",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        });
+    }
 
     const sizeQuantityMap = {
     <% product.variant.forEach(variant => { %>

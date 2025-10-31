@@ -166,6 +166,18 @@
             transform: translateY(-2px);
         }
 
+         .custom-textarea {
+  width: 80%;
+  margin: 10px auto 0 auto;
+  display: block;
+  font-size: 15px;
+  resize: none; 
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
         footer {
             background-color: #f8f9fa;
             padding: 20px;
@@ -263,7 +275,7 @@
                                                                 <%= item.product.productName %>
                                                             </h6>
                                                             <p>Quantity: <%= item.quantity %> | Price: ₹<%=
-                                                                        item.quantity*item.price %> | Status: <%=
+                                                                        item.price %> | Status: <%=
                                                                             item.status %> | size : <%=item.size%>
                                                             </p>
                                                         </div>
@@ -337,8 +349,12 @@
         <option value="" disabled selected>Select a reason</option>
         ${optionsHtml}
       </select>
-            <textarea id="other-reason" class="swal2-textarea" placeholder="Please specify your reason" style="display:none;"></textarea>
-    `,
+<textarea 
+  id="other-reason" 
+  class="swal2-textarea custom-textarea" 
+  placeholder="Please specify your reason" 
+  style="display:none;"
+></textarea>    `,
                 showCancelButton: true,
                 confirmButtonText: "Yes, Cancel it!",
 
@@ -418,8 +434,12 @@
                 <option value="" disabled selected>Select reason</option>
                 ${optionsHtml}
             </select>
-                  <textarea id="other-reason" class="swal2-textarea" placeholder="Please specify your reason" style="display:none;"></textarea>
-        `,
+<textarea 
+  id="other-reason" 
+  class="swal2-textarea custom-textarea" 
+  placeholder="Please specify your reason" 
+  style="display:none;"
+></textarea>        `,
                 showCancelButton: true,
                 confirmButtonText: 'Submit',
 

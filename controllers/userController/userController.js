@@ -109,6 +109,11 @@ const postSignup = async (req, res) => {
     try {
 
         const { name, email, phone, password, Cpassword, referalCode } = req.body
+        
+
+        if(!name|| !email||!phone||!password|| !Cpassword){
+            return res.render('signup',{message:'Please fill the fields'})
+        }
 
         if (password !== Cpassword) {
             return res.render("signup", { message: "password do not match" })

@@ -95,6 +95,18 @@ const loadDashboard = async (req, res) => {
     }
 };
 
+const getSalesData = async (req, res) => {
+    try {
+        const { period = "monthly" } = req.query
+
+        const salesData = await getSalesDataHelper(period)
+        res.status(StatusCode.OK).json(salesData)
+    } catch (error) {
+        console.error("Error in getSalesData API:", error)
+        res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" })
+    }
+}
+
 
 const getSalesDataHelper = async (period = "yearly") => {
     try {
@@ -195,17 +207,6 @@ const getOrderStatusCounts = async () => {
     }
 }
 
-const getSalesData = async (req, res) => {
-  try {
-    const { period = "monthly" } = req.query
-
-    const salesData = await getSalesDataHelper(period)
-    res.status(StatusCode.OK).json(salesData)
-  } catch (error) {
-    console.error("Error in getSalesData API:", error)
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" })
-  }
-}
 
 const getTopSelling = async (req, res) => {
     try {

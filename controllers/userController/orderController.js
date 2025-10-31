@@ -16,7 +16,8 @@ const fs = require('fs');
 const placeOrder = async (req, res) => {
   try {
     const userId = req.session.user;
-    const { addressId, paymentMethod, coupon, couponId } = req.body;
+    const { addressId, paymentMethod, coupon,Total, couponId } = req.body;
+    console.log('req.body:',req.body)
 
     if (!userId) {
       return res.status(StatusCode.UNAUTHORIZED).json({
@@ -91,7 +92,10 @@ const placeOrder = async (req, res) => {
     }
 
 
-    const totalPrice = orderedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
+    const totalPrice = orderedItems.reduce((acc, item) => acc +=item.price, 0);
+
+    console.log('orderedItems:',orderedItems)
+    console.log('totalPrice:',totalPrice)
 
     let discount = 0;
     let appliedCoupon = null;
@@ -256,6 +260,7 @@ const viewOrderDetails = async (req, res) => {
       return res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
     }
 
+    console.log(order)
     res.render("orderDetailsView", { order, user, activePage: "orderDetailsView", currentPath: '/orders' });
   } catch (error) {
     console.log(error);
@@ -384,7 +389,7 @@ const cancelOrders = async (req, res) => {
         reason: "Order Cancel"
       };
 
-      const wallet = await Wallet.findOne({ userId: order.userId });
+      let wallet = await Wallet.findOne({ userId: order.userId });
       const amountToAdd = parseFloat(order.finalAmount)
 
 

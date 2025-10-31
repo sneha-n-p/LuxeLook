@@ -1,8 +1,8 @@
 const User = require('../../models/userSchema')
-// const Order = require('../../models/orderSchema')
-// const Product = require('../../models/productSchema')
-// const Category = require('../../models/categorySchema')
-// const mongoose = require("mongoose")
+const Order = require('../../models/orderSchema')
+const Product = require('../../models/productSchema')
+const Category = require('../../models/categorySchema')
+const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 const StatusCode = require('../../statusCode')
 
@@ -68,9 +68,6 @@ const logout = async (req, res) => {
 module.exports = {
     loadLogin,
     postLogin,
-    // loadDashboard,
     pageError,
     logout,
-    // getTopSelling,
-    // getSalesData
 }

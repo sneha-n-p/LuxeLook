@@ -112,11 +112,9 @@ const addToCart = async (req, res) => {
         if (!userId) {
             res.json({ success: false, redirect: "/login" });
         }
-        console.log("cart req.body:", req.body)
         const { productId, quantity, size } = req.body;
         const CarQquantity = parseInt(quantity);
         const productData = await Product.findById(productId);
-        console.log('productData:', productData)
         const variant = productData.variant.find(v => v.size === size);
         const stock = variant.stock;
 
@@ -124,7 +122,7 @@ const addToCart = async (req, res) => {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid product variant" });
         }
 
-        const maxAllowed = stock <= 5 ? stock : 5;
+        const maxAllowed = stock <= 5 ? stock : 5; 
 
         if (CarQquantity > maxAllowed) {
             return res.status(StatusCode.BAD_REQUEST).json({
@@ -163,6 +161,8 @@ const addToCart = async (req, res) => {
             totalPrice: totalPrice
         };
 
+        let cartLength 
+
         if (cart) {
             const existingItem = cart.items.find(item =>
                 item.productId.toString() === productId && item.size === size
@@ -183,21 +183,25 @@ const addToCart = async (req, res) => {
                 existingItem.quantity = totalQuantity;
                 existingItem.totalPrice = totalQuantity * existingItem.price;
                 await cart.save();
-                return res.status(StatusCode.OK).json({ success: true, message: "Product quantity updated in cart" });
+                cartLength = cart.items.length
+                return res.status(StatusCode.OK).json({ success: true, message: "Product quantity updated in cart",cartLength });
             }
 
             cart.items.push(newCartItem);
             await cart.save();
-            return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart" });
+            cartLength = cart.items.length 
+            console.log("cartLength:",cartLength) 
+
+            return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart" ,cartLength});
         }
 
-        const newCart = new Cart({
+        const newCart =await Cart.create({
             userId,
             items: [newCartItem]
         });
-
-        await newCart.save();
-        return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart" });
+        console.log("newCart:",newCart)
+        cartLength = newCart.items.length
+        return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart",cartLength });
 
     } catch (error) {
         console.error("Add to cart error:", error);

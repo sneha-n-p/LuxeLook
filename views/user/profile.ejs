@@ -190,7 +190,6 @@
   }
 </style>
 <body>
-  <%-include("../../views/partials/userPartial/header")%>
 
   <section class="hero text-center bg-light p-0 mb-4">
     <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
@@ -256,7 +255,7 @@
         <div class="referral-container">
           <span>Your Referral Code:</span>
           <span class="referral-code" id="referralCode"><%= user.referalCode %></span>
-          <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
+          <button class="btn-copy" onclick="copyCoupon()">Copy</button>
         </div>
 
         <!-- Referral Coupons Section -->
@@ -285,7 +284,7 @@
           <% latestOrders.forEach(order => { %>
             <div class="order-box p-3" style="background-color: #FCF4ED; min-width: 200px;">
               <h6>Order ID: <%= order.orderId %></h6>
-              <p><strong>Date:</strong> <span class="order-date" data-date="<%= order.createdOn %>"></span></p>
+              <p><strong>Date:</strong> <span class="order-date" data-date="<%= order.createdOn %>"><%= order.createdOn.toDateString() %></span></p>
               <p><strong>Status:</strong> <%= order.status %></p>
               <p><strong>Total:</strong> ₹<%= order.finalAmount %></p>
             </div>
@@ -296,8 +295,10 @@
   </div>
 
   <script>
+
+    
     function copyCoupon(couponId) {
-      const couponCode = document.getElementById(`coupon-${couponId}`).innerText;
+      const couponCode = document.getElementById(`referralCode`).innerText;
       navigator.clipboard.writeText(couponCode).then(() => {
         Swal.fire({
           icon: 'success',
@@ -317,6 +318,7 @@
 
     function copyReferralCode() {
       const referralCode = document.getElementById('referralCode').innerText;
+      console.log('referralCode:',referralCode)
       navigator.clipboard.writeText(referralCode).then(() => {
         Swal.fire({
           icon: 'success',
@@ -337,9 +339,7 @@
     document.querySelectorAll('.order-date').forEach(el => {
       const rawDate = el.getAttribute('data-date');
       const dateObj = new Date(rawDate);
-      const formattedDate = dateObj.toLocaleString('
-
-en-IN', {
+      const formattedDate = dateObj.toLocaleString('en-IN', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',

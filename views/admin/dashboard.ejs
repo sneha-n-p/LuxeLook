@@ -360,7 +360,7 @@
   <script>
     let salesChart, orderStatusChart;
 
-    // Initialize Sales Chart
+    //  Sales Chart (graph)
     function initializeSalesChart(labels, data) {
     const salesCtx = document.getElementById('salesChart').getContext('2d');
 
@@ -405,7 +405,7 @@
   }
 
 
-    // Initialize Order Status Chart
+    //  Order Status Chart(color)
     function initializeOrderStatusChart(labels, data) {
     const statusCtx = document.getElementById('orderStatusChart').getContext('2d');
 
@@ -446,7 +446,6 @@
 
 
       function updateSalesChart(period) {
-    // Toggle active button
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(period + 'Btn').classList.add('active');
 
@@ -478,17 +477,17 @@
     initializeSalesChart(initialLabels, initialData);
     initializeOrderStatusChart(orderStatusLabels, orderStatusData);
 
-    // Button click handlers
+    // Button click handling(monthly/yearly/weekly)
     document.getElementById('yearlyBtn').addEventListener('click', () => updateSalesChart('yearly'));
     document.getElementById('monthlyBtn').addEventListener('click', () => updateSalesChart('monthly'));
     document.getElementById('weeklyBtn').addEventListener('click', () => updateSalesChart('weekly'));
 
-    // Default state
+    //defualt button
     document.getElementById('monthlyBtn').classList.add('active');
   });
 
 
-    // Update Top Selling Products/Categories
+    // Top Selling Products/Categories
     function updateTopSellingProducts(filter) {
       const tableHeader = document.getElementById('tableHeader');
       const title = document.getElementById('best-product-head');
@@ -565,13 +564,13 @@
     initializeSalesChart(initialSalesLabels, initialSalesData);
     initializeOrderStatusChart(orderStatusLabels, orderStatusData);
 
-    // Set default filter and button state
+    // Set default filter category/product
     document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('productFilter').value = 'products';
       document.getElementById('monthlyBtn').classList.add('active');
     });
 
-    // Update title for product filter
+    // Update title for product filter table
     function Title(value) {
       const title = document.getElementById('best-product-head');
       title.innerText = value === 'products' ? 'Top Selling Products' : 'Top Selling Categories';

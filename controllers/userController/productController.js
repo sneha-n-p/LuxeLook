@@ -16,7 +16,7 @@ const loadShop = async (req, res) => {
     let selectCategory = req.query.selectCategory || ''
     const priceFilter = req.query.priceFilter || "";
     console.log('selected category is:', selectCategory)
-    console.log('priceFilter:',priceFilter)
+    console.log('priceFilter:', priceFilter)
     const limit = 8;
 
     const query = {
@@ -25,7 +25,6 @@ const loadShop = async (req, res) => {
         { productName: { $regex: ".*" + search + ".*", $options: "i" } }
       ]
     };
-
 
     if (selectCategory) {
       const categoryDetails = await Category.findOne({ name: selectCategory });
@@ -47,22 +46,25 @@ const loadShop = async (req, res) => {
 
 
     if (priceFilter === "lt-500") {
-  query['variant.salePrice'] = { $lt: 500 };
-} else if (priceFilter === "lt-1000") {
-  query['variant.salePrice'] = { $lt: 1000 };
-} else if (priceFilter === "gt-1000") {
-  query['variant.salePrice'] = { $gt: 1000 };
-}
-
+      query['variant.salePrice'] = { $lt: 500 };
+    } else if (priceFilter === "lt-1000") {
+      query['variant.salePrice'] = { $lt: 1000 };
+    } else if (priceFilter === "500-1000") {
+      query['variant.salePrice'] = { $lt: 1000,$gt:500 };
+    }
+     else if (priceFilter === "gt-1000") {
+      query['variant.salePrice'] = { $gt: 1000 };
+    }
 
 
     const productData = await Product.find(query)
-      .sort(sortOption)
-      .limit(limit)
-      .skip((page - 1) * limit)
-      .exec();
+    .sort(sortOption)
+    .limit(limit)
+    .skip((page - 1) * limit)
+    .exec();
+    console.log('query:',productData)
 
-      
+
 
     const count = await Product.find(query).countDocuments();
     const totalPages = Math.ceil(count / limit);
@@ -107,7 +109,7 @@ const loadShop = async (req, res) => {
 const loadProductDetails = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) {
+    if (!product || product.isBlocked) {
       return res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
     }
 

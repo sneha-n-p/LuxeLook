@@ -118,7 +118,7 @@ const verifyRequest = async (req, res) => {
                             product.quatity += item.quantity
                             await product.save();
                         }
-                        totalRefund += item.price * item.quantity;
+                        totalRefund += item.price;
                     }
                 }
             }
