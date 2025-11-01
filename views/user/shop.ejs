@@ -257,13 +257,15 @@
 
 
       <script>
-        function addToWishlist(productId) {
-          axios.post("/addToWishlist", { productId })
+        function addToWishlist(productId,TotalWhishListCount) {
+          axios.post("/addToWishlist", { productId,TotalWhishListCount })
             .then(function (responce) {
+              console.log(responce.data)
               Swal.fire({
-                title: responce.data.success ? "Added to Wishlist" : "Error",
+                title: responce.data.success ? `Added to Wishlist ` : "Error",
                 icon: responce.data.success ? 'success' : 'error',
                 text: responce.data.message || '',
+                text:`${responce.data.TotalWhishlistCount} Products are in your whishalist`,
                 showConfirmButton: false,
                 timer: 1500
               }).then(()=>location.reload())

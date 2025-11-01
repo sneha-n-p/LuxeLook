@@ -250,15 +250,15 @@
 
   <script>
 
-    function addToWishlist(productId) {
-
-      axios.post("/addToWishlist", { productId })
+    function addToWishlist(productId,TotalWhishListCount) {
+      axios.post("/addToWishlist", { productId,TotalWhishListCount })
         .then(function (responce) {
           if (responce.data.success) {
             Swal.fire({
               title: `Add To Wishlist`,
               icon: 'success',
               showConfirmButton: false,
+              text:`${responce.data.TotalWhishlistCount} Products are in your whishalist`,
               timer: 1500
             }).then(()=>location.reload())
           } else {

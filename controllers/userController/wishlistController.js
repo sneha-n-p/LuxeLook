@@ -67,9 +67,11 @@ const addToWishlist = async (req, res) => {
         if (user.wishlist.includes(productId)) {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Product Already In Wishlist" })
         }
+        const products = await Product.find({ _id: { $in: user.wishlist } }).populate('category')
+        const whishListCount = products.length+1
         user.wishlist.push(productId)
         await user.save()
-        return res.status(StatusCode.OK).json({ success: true, message: "Product Added To Wishlist" })
+        return res.status(StatusCode.OK).json({ success: true, message: "Product Added To Wishlist",TotalWhishlistCount:whishListCount })
 
     } catch (error) {
         console.error(error)

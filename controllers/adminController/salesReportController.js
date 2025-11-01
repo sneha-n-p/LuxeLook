@@ -14,6 +14,7 @@ const StatusCode = require("../../statusCode")
 const getFilteredSales = async (reportType, startDate, endDate) => {
   let filter = {};
 
+  console.log('filter')
   if (reportType === 'custom' && startDate && endDate) {
     filter.date = {
       $gte: moment(startDate).startOf('day').toDate(),
