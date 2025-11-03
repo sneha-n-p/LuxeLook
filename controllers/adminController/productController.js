@@ -21,9 +21,9 @@ const productInfo = async (req, res) => {
     const skip = (page - 1) * limit
 
     const Data = await Product.find({})
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit).populate('category')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit).populate('category')
 
     const totalProducts = await Product.countDocuments()
     const totalPage = Math.ceil(totalProducts / limit)
@@ -83,7 +83,7 @@ const addproduct = async (req, res) => {
     }
 
 
-    let stock  =0
+    let stock = 0
     let variants = [];
     if (Array.isArray(variantSize)) {
       for (let i = 0; i < variantSize.length; i++) {
@@ -123,7 +123,7 @@ const addproduct = async (req, res) => {
     }
     console.log(errors)
     if (Object.keys(errors).length > 0) {
-      console.log('Error in validation',error)
+      console.log('Error in validation', error)
       return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
         message: "Validation errors occurred",
         errors,
@@ -131,16 +131,16 @@ const addproduct = async (req, res) => {
         formData: req.body
       });
     }
-    
+
     const categoryDoc = await Category.findOne({ name: category });
 
-    let bestOffer = Math.max(categoryDoc.offer,offer)
-    if(Array.isArray(variants)){
-      variants = variants.map(item=>{
-        let varinatAppliedDiscount = Math.round(item.salePrice - (item.salePrice  * (bestOffer / 100)))
-        return{
+    let bestOffer = Math.max(categoryDoc.offer, offer)
+    if (Array.isArray(variants)) {
+      variants = variants.map(item => {
+        let varinatAppliedDiscount = Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)))
+        return {
           ...item,
-          salePrice:varinatAppliedDiscount
+          salePrice: varinatAppliedDiscount
         }
       })
     }
@@ -200,7 +200,7 @@ const addproduct = async (req, res) => {
     const newProduct = new Product({
       productName: ProductName,
       description,
-      productOffer:offer,
+      productOffer: offer,
       quatity: stock,
       size: variants.map(v => v.size),
       category: categoryDoc._id,
@@ -267,7 +267,7 @@ const deleteSingleImage = async (req, res) => {
   }
 }
 
-const postEditProduct = async (req, res) => { 
+const postEditProduct = async (req, res) => {
   try {
     console.log('Received body:', req.body);
     console.log('Received files:', req.files);
@@ -287,10 +287,10 @@ const postEditProduct = async (req, res) => {
       existingImage3,
       existingImage4
     } = req.body;
-    
+
     const product = await Product.findById(productId)
-    const  findCategory = await Category.findById(category)
-    console.log('findCategory:',findCategory)
+    const findCategory = await Category.findById(category)
+    console.log('findCategory:', findCategory)
 
     if (!name || !description || !category || !price || !variantSize || !variantQuantity) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'All required fields must be provided' });
@@ -315,38 +315,38 @@ const postEditProduct = async (req, res) => {
 
     let variant = []
     let stock = 0
-    const addVariant = async()=>{
-      for(i=0;i<variantSize.length;i++){
+    const addVariant = async () => {
+      for (i = 0; i < variantSize.length; i++) {
         let obj = {
-          size : variantSize[i],
-          salePrice : Number(variantPrice[i]),
-          quantity : Number(variantQuantity[i])
+          size: variantSize[i],
+          salePrice: Number(variantPrice[i]),
+          quantity: Number(variantQuantity[i])
         }
-        stock+=Number(variantQuantity[i])
+        stock += Number(variantQuantity[i])
         variant.push(obj)
       }
     }
     addVariant()
 
     let pareseOffer = Number(offer)
-    let parseCAtegoryOffer = Number(findCategory.offer)||0
+    let parseCAtegoryOffer = Number(findCategory.offer) || 0
     let previousProductOffer = product.productOffer || 0
-    let previousBestOffer = Math.max(previousProductOffer,parseCAtegoryOffer)
-    if(Array.isArray(variant)){
-      variant = variant.map(item=>{
+    let previousBestOffer = Math.max(previousProductOffer, parseCAtegoryOffer)
+    if (Array.isArray(variant)) {
+      variant = variant.map(item => {
         const originalPrice = item.salePrice / (1 - (previousBestOffer / 100))
-        console.log("originalPrice:",originalPrice)
-        const RoundtheOgPrice =  Math.round(originalPrice)
-        return {...item,salePrice:RoundtheOgPrice}
+        console.log("originalPrice:", originalPrice)
+        const RoundtheOgPrice = Math.round(originalPrice)
+        return { ...item, salePrice: RoundtheOgPrice }
       })
     }
 
-    let bestOffer = Math.max(pareseOffer,parseCAtegoryOffer)
-    if(Array.isArray(variant)){
-      variant = variant.map(item=>{
-        const offerAppliedPrice = item.salePrice - (item.salePrice*bestOffer/100)
-        const RoundThePrice = Math.round(offerAppliedPrice) 
-        return {...item,salePrice:RoundThePrice}
+    let bestOffer = Math.max(pareseOffer, parseCAtegoryOffer)
+    if (Array.isArray(variant)) {
+      variant = variant.map(item => {
+        const offerAppliedPrice = item.salePrice - (item.salePrice * bestOffer / 100)
+        const RoundThePrice = Math.round(offerAppliedPrice)
+        return { ...item, salePrice: RoundThePrice }
       })
     }
 
@@ -362,10 +362,10 @@ const postEditProduct = async (req, res) => {
         description,
         category,
         productOffer: offer ? parseFloat(offer) : 0,
-        offer : parseFloat(bestOffer) || 0,
+        offer: parseFloat(bestOffer) || 0,
         regularPrice: parseFloat(price),
         size: variantSize,
-        variant : variant,
+        variant: variant,
         quatity: stock,
         productImage: filteredImages
       },
@@ -444,11 +444,12 @@ const unblockProduct = async (req, res) => {
 const addProductOffer = async (req, res) => {
   try {
     const { id, offer } = req.body;
-
+    console.log('req.body', req.body)
     const product = await Product.findById(id);
     if (!product) {
       return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
     }
+    console.log('product', product)
 
     const category = await Category.findById(product.category);
     const categoryOffer = category.offer
@@ -458,9 +459,9 @@ const addProductOffer = async (req, res) => {
 
     product.productOffer = offer;
 
-    if(categoryOffer<offer){
+    if (categoryOffer < offer) {
       product.variant = product.variant.map(variant => {
-        const restoreAmount =  Math.round(variant.salePrice / (1 - categoryOffer / 100))
+        const restoreAmount = Math.round(variant.salePrice / (1 - categoryOffer / 100))
         const variantDiscount = restoreAmount - (restoreAmount * (offer / 100));
         return {
           ...variant,
@@ -470,10 +471,10 @@ const addProductOffer = async (req, res) => {
     }
 
     await product.save();
-
+    console.log('product', product)
     res.status(StatusCode.CREATED).json({
       success: true,
-      message: "Product offer applied."
+      message: "Product offer applied.", finalOffer,salePrice:product.variant[0].salePrice
     });
 
 
@@ -514,7 +515,7 @@ const editProductOffer = async (req, res) => {
 
     const bestOffer = Math.max(categoryOffer, newOffer);
     product.variant = product.variant.map(item => {
-      const newSalePrice =  Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)));
+      const newSalePrice = Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)));
       return { ...item, salePrice: newSalePrice };
     });
 
@@ -546,7 +547,7 @@ const removeProductOffer = async (req, res) => {
     const category = await Category.findById(product.category);
     const productOffer = product.productOffer || 0;
     const categoryOffer = category?.offer || 0;
-    const bestOffer = categoryOffer; 
+    const bestOffer = categoryOffer;
 
     let appliedOffer = 0;
 

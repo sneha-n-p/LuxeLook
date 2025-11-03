@@ -57,6 +57,30 @@
     .submit-btn:hover {
  background: linear-gradient(90deg, #B5654B  , #D17C63 );
     }
+    .back-arrow-btn {
+    position: absolute;
+    top: 60px;
+    left: 50px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .back-arrow-btn:hover {
+    background-color: #B5654B;
+    color: white;
+    transform: scale(1.1);
+  }
   </style>
 </head>
 
@@ -64,13 +88,16 @@
 
   <!-- Banner/Header -->
   <div class="email-banner">
+    <button onclick="window.history.back()" class="back-arrow-btn">
+            &#8592;
+        </button>
     <div class="email-header">RESET EMAIL</div>
   </div>
 
   <!-- Reset Email Box -->
   <div class="email-box" style="background-color: #F2E8DC;">
     <div class="email-title">Enter your new email address</div>
-    <form action="/profile/change-email" id="resetEmailForm" method="POST" onsubmit="return validateLoginForm()">
+    <form action="/profile/change-email" id="resetEmailForm" method="POST">
       <div class="mb-3">
         <input type="email" name="newEmail" class="form-control" id='newEmail' placeholder="New Email Address" required>
       </div>
@@ -86,7 +113,8 @@
 <script>
   const emailInput = document.getElementById('newEmail');
   const emailForm = document.getElementById('resetEmailForm');
-  const emailPattern = /^[a-zA-Z][a-zA-Z0-9._%+-]*@gmail\.com$/;
+
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
   emailInput.addEventListener('input', () => {
     const email = emailInput.value.trim();
@@ -97,18 +125,25 @@
     }
   });
 
-  // Submit form
-  function validateLoginForm() {
+  emailForm.addEventListener('submit', (e) => {
+    e.preventDefault(); 
+
     const newEmail = emailInput.value.trim();
 
     if (!emailPattern.test(newEmail)) {
-      return Swal.fire("Error", "Email must start with a valid letter and end with @gmail.com", "error");
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Email",
+        text: "Please enter a valid Gmail address (example@gmail.com)",
+        confirmButtonColor: "#B5654B"
+      });
+      return; 
     }
-    return true
 
-    
-  }
+    emailForm.submit();
+  });
 </script>
+
 
 </body>
 

@@ -11,7 +11,7 @@
         }
 
         .banner img {
-            height: 577px;
+            height: 417px;
             object-fit: cover;
             width: 100%;
         }
@@ -182,12 +182,39 @@
             background-color: #f8f9fa;
             padding: 20px;
         }
+        .back-arrow-btn {
+    position: absolute;
+    top: 247px;
+    left: 25px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .back-arrow-btn:hover {
+    background-color: #B5654B;
+    color: white;
+    transform: scale(1.1);
+  }
     </style>
 
     <!-- Banner -->
     <section class="hero text-center bg-light p-0 mb-4">
         <div class="banner">
-            <img src="/wallpaper/wall4.jpg" alt="Order Details Banner" class="img-fluid w-100">
+            <img src="\wallpaper\pageBanner-1.jpg" alt="Order Details Banner" class="img-fluid w-100">
+            <button onclick="window.history.back()" class="back-arrow-btn">
+            &#8592;
+        </button>
             <h1>ORDER DETAILS</h1>
         </div>
     </section>

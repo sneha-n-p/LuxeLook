@@ -22,46 +22,63 @@
     }
 
     .card {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      border: none;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s ease-in-out;
-    }
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
 
-    .card:hover {
-      transform: scale(1.02);
-    }
+.card:hover {
+  transform: scale(1.02);
+}
 
-    .card-img-top {
-      height: 320px;
-      object-fit: cover;
-      border-radius: 15px 15px 0 0;
-    }
+.card-img-top {
+  height: 320px;
+  object-fit: cover;
+  border-radius: 15px 15px 0 0;
+}
 
-    .card-body {
-      padding: 1rem;
-      text-align: center;
-      background-color: #F2E8DC;
-    }
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Keeps elements spaced evenly */
+  background-color: #F2E8DC;
+  text-align: center;
+  padding: 1rem;
+}
 
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-      min-height: 48px;
-    }
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  min-height: 48px;
+}
 
-    .card-text {
-      font-size: 1rem;
-      color: #444;
-      margin-bottom: 10px;
-    }
+.card-text {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+/* Make sure the button stays at the bottom */
+.card-body .btn-outline-dark {
+  margin-top: auto;
+  border-radius: 50px;
+  padding: 6px 18px;
+  font-size: 0.9rem;
+  background: linear-gradient(90deg, #B5654B, #D17C63);
+  border: none;
+}
+
+.card-body .btn-outline-dark:hover {
+  background-color: #333;
+}
+
 
     .btn-outline-dark {
       border-radius: 50px;
@@ -138,11 +155,38 @@
       position: relative;
       z-index: 1;
     }
+    .back-arrow-btn {
+    position: absolute;
+    top: 247px;
+    left: 25px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .back-arrow-btn:hover {
+    background-color: #B5654B;
+    color: white;
+    transform: scale(1.1);
+  }
   </style>
 
   <!-- Banner Section -->
   <section class="hero text-center bg-light p-0 mb-4">
-    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100" style="height: 442px; object-fit: cover;">
+    <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100" style="height: 417px; object-fit: cover;">
+    <button onclick="window.history.back()" class="back-arrow-btn">
+            &#8592;
+        </button>
     <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg"
       style="text-shadow: 2px 2px 8px black;">SHOP</h1>
 
@@ -153,38 +197,39 @@
     <div class="container mt-5">
       <!-- Search -->
       <div class="search-bar d-flex align-items-center">
-  <input id="searchInput" type="text" class="form-control me-2" value="<%= search %>" placeholder="Search products...">
+        <input id="searchInput" type="text" class="form-control me-2" value="<%= search %>"
+          placeholder="Search products...">
 
-  <!-- Sort Dropdown -->
-<select id="sortSelect" class="form-select me-2" style="width: auto;">
-  <option value="">Sort By</option>
-  <option value="price-asc" <%= sort === 'price-asc' ? 'selected' : '' %>>Price: Low to High</option>
-  <option value="price-desc" <%= sort === 'price-desc' ? 'selected' : '' %>>Price: High to Low</option>
-  <option value="name-asc" <%= sort === 'name-asc' ? 'selected' : '' %>>Name: A to Z</option>
-  <option value="name-desc" <%= sort === 'name-desc' ? 'selected' : '' %>>Name: Z to A</option>
-</select>
+        <!-- Sort Dropdown -->
+        <select id="sortSelect" class="form-select me-2" style="width: auto;">
+          <option value="">Sort By</option>
+          <option value="price-asc" <%=sort==='price-asc' ? 'selected' : '' %>>Price: Low to High</option>
+          <option value="price-desc" <%=sort==='price-desc' ? 'selected' : '' %>>Price: High to Low</option>
+          <option value="name-asc" <%=sort==='name-asc' ? 'selected' : '' %>>Name: A to Z</option>
+          <option value="name-desc" <%=sort==='name-desc' ? 'selected' : '' %>>Name: Z to A</option>
+        </select>
 
-  <select id="selectCat" class="form-select me-2" style="width: auto;">
-    <option value="">All Category</option>
-    <%for(let i=0;i<categories.length;i++) {%>
-    <option value="<%= categories[i].name %>" <%= selectCategory === categories[i].name ? 'selected' : '' %>>
-  <%= categories[i].name %>
-</option>
-    <%}%>
-  </select>
-  <select id="priceFilter" class="form-select me-2" style="width: auto;">
-  <option value="">All Prices</option>
-  <option value="lt-500" <%= priceFilter === 'lt-500' ? 'selected' : '' %>>Less than ₹500</option>
-  <option value="lt-1000" <%= priceFilter === 'lt-1000' ? 'selected' : '' %>>Less than ₹1000</option>
-  <option value="500-1000" <%= priceFilter === 'lt-1000' ? 'selected' : '' %>>₹500-₹1000</option>
-  <option value="gt-1000" <%= priceFilter === 'gt-1000' ? 'selected' : '' %>>Greater than ₹1000</option>
-</select>
+        <select id="selectCat" class="form-select me-2" style="width: auto;">
+          <option value="">All Category</option>
+          <%for(let i=0;i<categories.length;i++) {%>
+            <option value="<%= categories[i].name %>" <%=selectCategory===categories[i].name ? 'selected' : '' %>>
+              <%= categories[i].name %>
+            </option>
+            <%}%>
+        </select>
+        <select id="priceFilter" class="form-select me-2" style="width: auto;">
+          <option value="">All Prices</option>
+          <option value="lt-500" <%=priceFilter==='lt-500' ? 'selected' : '' %>>Less than ₹500</option>
+          <option value="lt-1000" <%=priceFilter==='lt-1000' ? 'selected' : '' %>>Less than ₹1000</option>
+          <option value="500-1000" <%=priceFilter==='lt-1000' ? 'selected' : '' %>>₹500-₹1000</option>
+          <option value="gt-1000" <%=priceFilter==='gt-1000' ? 'selected' : '' %>>Greater than ₹1000</option>
+        </select>
 
-<button class="btn btn-dark ms-2" onclick="searchProducts()">Search</button>
-<a href="/shop"><button class="btn btn-dark ms-2">clear</button></a>
-</div>
+        <button class="btn btn-dark ms-2" onclick="searchProducts()">Search</button>
+        <a href="/shop"><button class="btn btn-dark ms-2">clear</button></a>
+      </div>
 
-<div id="productCard"></div>
+      <div id="productCard"></div>
 
 
       <!-- Products -->
@@ -193,37 +238,41 @@
           <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex">
             <div class="card w-100">
               <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
-              <div class="card-body">
-                <h5 class="card-title">
-                  <%= products[i].productName %>
-                </h5><p><%=products[i].description%></p>
-                <% if (products[i].offer> 0) { %>
-                  <p class="card-text mb-1">
-                    <s class="text-muted">₹<%= products[i].regularPrice %>
-                    </s>
-                    <span class="text-danger ms-2">-<%= products[i].offer %>%</span>
+              <div class="card-body d-flex flex-column">
+                <div>
+                  <h5 class="card-title">
+                    <%= products[i].productName %>
+                  </h5>
+                  <p>
+                    <%= products[i].description %>
                   </p>
-                  <p class="card-text fw-bold text-dark">₹<%= products[i].variant[0].salePrice  %>
-                  </p>
-                  <% } else { %>
+
+                  <% if (products[i].offer> 0) { %>
+                    <p class="card-text mb-1">
+                      <s class="text-muted">₹<%= products[i].regularPrice %></s>
+                      <span class="text-danger ms-2">-<%= products[i].offer %>%</span>
+                    </p>
                     <p class="card-text fw-bold text-dark">₹<%= products[i].variant[0].salePrice %>
                     </p>
-                    <% } %>
+                    <% } else { %>
+                      <p class="card-text fw-bold text-dark">₹<%= products[i].variant[0].salePrice %>
+                      </p>
+                      <% } %>
+                </div>
 
+                <div class="mt-auto">
+                  <a href="/product-details/<%= products[i]._id %>">
+                    <button class="btn btn-outline-dark btn-sm w-100">View Details</button>
+                  </a>
 
-                      <div>
-                        <a href="/product-details/<%= products[i]._id %>">
-                          <button class="btn btn-outline-dark btn-sm">View Details</button>
-                        </a>
-                      </div>
-                      <% if (products[i].quatity> 0) { %>
-                        <div class="mt-2">
-                          <button class="wishlist-symbol"
-                            onclick="addToWishlist('<%=products[i]._id%>')">&#10084;</button>
-                        </div>
-                        <% } else { %>
-                          <div class="text-danger mt-2"><strong>Out of Stock</strong></div>
-                          <% } %>
+                  <% if (products[i].quatity > 0) { %>
+                  <div class="mt-2 d-flex justify-content-center align-items-center" style="height: 40px;">
+                    <button class="wishlist-symbol" onclick="addToWishlist('<%= products[i]._id %>')">&#10084;</button>
+                  </div>
+                <% } else { %>
+                  <div class="text-danger mt-2 d-flex justify-content-center align-items-center" style="height: 40px;"><strong>Out of Stock</strong></div>
+                <% } %>
+                </div>
               </div>
             </div>
           </div>
@@ -257,22 +306,22 @@
 
 
       <script>
-        function addToWishlist(productId,TotalWhishListCount) {
-          axios.post("/addToWishlist", { productId,TotalWhishListCount })
+        function addToWishlist(productId, TotalWhishListCount) {
+          axios.post("/addToWishlist", { productId, TotalWhishListCount })
             .then(function (responce) {
               console.log(responce.data)
               Swal.fire({
                 title: responce.data.success ? `Added to Wishlist ` : "Error",
                 icon: responce.data.success ? 'success' : 'error',
                 text: responce.data.message || '',
-                text:`${responce.data.TotalWhishlistCount} Products are in your whishalist`,
+                text: `${responce.data.TotalWhishlistCount} Products are in your whishalist`,
                 showConfirmButton: false,
                 timer: 1500
-              }).then(()=>location.reload())
+              }).then(() => location.reload())
             }).catch(() => {
               Swal.fire({
-                title: "Error Occured",
-                icon: "error",
+                title: "Warning",
+                icon:"warning",
                 showConfirmButton: false,
                 text: 'Already exist in wishlist',
                 timer: 1500
@@ -326,26 +375,26 @@
 
 
 
-         function searchProducts() {
-    const query = document.getElementById("searchInput").value.trim();
-    const sort = document.getElementById('sortSelect').value;
-    const selectCategory = document.getElementById('selectCat').value.trim()  
-    const priceFilter = document.getElementById('priceFilter').value;
+        function searchProducts() {
+          const query = document.getElementById("searchInput").value.trim();
+          const sort = document.getElementById('sortSelect').value;
+          const selectCategory = document.getElementById('selectCat').value.trim()
+          const priceFilter = document.getElementById('priceFilter').value;
 
-    const url = new URL(window.location.origin + "/shop");
-    url.searchParams.set("search", query);
-    url.searchParams.set("sort", sort);
-    url.searchParams.set("page", 1); 
-    url.searchParams.set('selectCategory',selectCategory)
-    url.searchParams.set("priceFilter", priceFilter);
-    window.location.href = url.toString();
-  }
+          const url = new URL(window.location.origin + "/shop");
+          url.searchParams.set("search", query);
+          url.searchParams.set("sort", sort);
+          url.searchParams.set("page", 1);
+          url.searchParams.set('selectCategory', selectCategory)
+          url.searchParams.set("priceFilter", priceFilter);
+          window.location.href = url.toString();
+        }
 
       </script>
     </div>
-  </div>
+    </div>
 
-</body>
-<footer>
-  <%-include("../../views/partials/userPartial/footer")%>
-</footer>
+  </body>
+  <footer>
+    <%-include("../../views/partials/userPartial/footer")%>
+  </footer>

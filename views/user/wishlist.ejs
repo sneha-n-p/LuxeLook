@@ -6,12 +6,6 @@
     color: #1a1a1a;
   }
 
-  .banner {
-    background: url('/images/wishlist-banner.jpg') no-repeat center;
-    background-size: cover;
-    height: 250px;
-  }
-
   .banner h1 {
     color: #000;
     padding-top: 160px;
@@ -166,6 +160,30 @@
   .btn-outline-dark:hover {
     background-color: #333;
   }
+  .back-arrow-btn {
+    position: absolute;
+    top: 247px;
+    left: 25px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .back-arrow-btn:hover {
+    background-color: #B5654B;
+    color: white;
+    transform: scale(1.1);
+  }
 </style>
 
 
@@ -177,8 +195,11 @@
 
 
     <section class="hero text-center bg-light p-0 mb-4">
-      <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100"
-        style="height: 600px; object-fit: cover;">
+      <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner"class="img-fluid w-100"
+        style="height: 417; object-fit: cover;">
+        <button onclick="window.history.back()" class="back-arrow-btn">
+            &#8592;
+        </button>
       <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg"
         style="text-shadow: 2px 2px 8px black;">WHISHLIST</h1>
       </h1>

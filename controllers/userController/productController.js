@@ -1,7 +1,6 @@
 const User = require("../../models/userSchema")
 const env = require("dotenv").config()
 const Product = require("../../models/productSchema")
-const category = require("../../models/categorySchema")
 const Category = require("../../models/categorySchema")
 const StatusCode = require("../../statusCode")
 
@@ -50,21 +49,23 @@ const loadShop = async (req, res) => {
     } else if (priceFilter === "lt-1000") {
       query['variant.salePrice'] = { $lt: 1000 };
     } else if (priceFilter === "500-1000") {
-      query['variant.salePrice'] = { $lt: 1000,$gt:500 };
+      query['variant.salePrice'] = { $lt: 1000, $gt: 500 };
     }
-     else if (priceFilter === "gt-1000") {
+    else if (priceFilter === "gt-1000") {
       query['variant.salePrice'] = { $gt: 1000 };
     }
 
 
-    const productData = await Product.find(query)
-    .sort(sortOption)
-    .limit(limit)
-    .skip((page - 1) * limit)
-    .exec();
-    console.log('query:',productData)
+    const productData = await Product.find(query).populate('category')
+      .sort(sortOption)
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec();
+    console.log('query:', productData)
 
-
+    const filteredProducts = productData.filter(
+      (product) => product.category && product.category.status === "Listed"
+    );
 
     const count = await Product.find(query).countDocuments();
     const totalPages = Math.ceil(count / limit);
@@ -75,7 +76,7 @@ const loadShop = async (req, res) => {
     if (req.session.user) {
       const user = await User.findById(req.session.user);
       res.render("shop", {
-        products: productData,
+        products: filteredProducts,
         user,
         totalPages,
         categories,
@@ -88,7 +89,7 @@ const loadShop = async (req, res) => {
       });
     } else {
       res.render("shop", {
-        products: productData,
+        products: filteredProducts,
         user: null,
         totalPages,
         categories,

@@ -119,12 +119,39 @@
     background-color: #f8f9fa;
     padding: 20px;
   }
+  .back-arrow-btn {
+    position: absolute;
+    top: 247px;
+    left: 25px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .back-arrow-btn:hover {
+    background-color: #B5654B;
+    color: white;
+    transform: scale(1.1);
+  }
 </style>
 
 <!-- Banner -->
 <section class="hero text-center bg-light p-0 mb-4">
   <div class="banner">
-    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <button onclick="window.history.back()" class="back-arrow-btn">
+            &#8592;
+        </button>
     <h1>EDIT ADDRESS</h1>
   </div>
 </section>
@@ -155,12 +182,12 @@
       <form id="editAddressForm" action="/edit-address/<%= address._id %>" method="POST" class="row g-3">
         <div class="col-md-6">
           <label class="form-label" for="name">Name</label>
-          <input type="text" id="name" class="form-control" name="name" value="<%= address.name %>" required>
+          <input type="text" id="name" class="form-control" name="name" value="<%= address.name %>" >
           <div id="Error1" class="error-message"></div>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="state">State</label>
-          <select class="form-select" id="state" name="state" required>
+          <select class="form-select" id="state" name="state" >
             <option value="" disabled>Choose a State...</option>
             <% const states = [
               "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
@@ -179,7 +206,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label" for="streetAddress">Street Address</label>
-          <input type="text" id="streetAddress" class="form-control" name="streetAddress" value="<%= address.streetAddress %>" required>
+          <input type="text" id="streetAddress" class="form-control" name="streetAddress" value="<%= address.streetAddress %>" >
           <div id="Error2" class="error-message"></div>
         </div>
         <div class="col-md-6">
@@ -189,17 +216,17 @@
         </div>
         <div class="col-md-6">
           <label class="form-label" for="city">Town / City</label>
-          <input type="text" id="city" class="form-control" name="city" value="<%= address.city %>" required>
+          <input type="text" id="city" class="form-control" name="city" value="<%= address.city %>" >
           <div id="Error4" class="error-message"></div>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="pincode">Pincode / ZIP</label>
-          <input type="text" id="pincode" class="form-control" name="pincode" value="<%= address.pincode %>" required>
+          <input type="text" id="pincode" class="form-control" name="pincode" value="<%= address.pincode %>" >
           <div id="Error5" class="error-message"></div>
         </div>
         <div class="col-md-6">
           <label class="form-label" for="phone">Phone</label>
-          <input type="text" id="phone" class="form-control" name="phone" value="<%= address.phone %>" required>
+          <input type="text" id="phone" class="form-control" name="phone" value="<%= address.phone %>" >
           <div id="Error6" class="error-message"></div>
         </div>
         <div class="col-md-6">
@@ -209,7 +236,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label" for="addressType">Select Address Type</label>
-          <select id="addressType" name="addressType" class="form-select" required>
+          <select id="addressType" name="addressType" class="form-select" >
             <option value="" disabled>Select Address Type</option>
             <% const addressTypes = ["Home", "Work", "Other"]; %>
             <% addressTypes.forEach(type => { %>

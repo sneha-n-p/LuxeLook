@@ -63,6 +63,11 @@
 </style>
 
 <div class="product-form">
+    <button 
+  onclick="window.history.back()" 
+  class="btn btn-secondary" 
+  style= "color: white;">⬅ Go Back
+</button>
     <form name="productForm" action="/admin/edit-product/<%=product._id%>" method="POST" enctype="multipart/form-data">
         <div class="col-12 col-md-6">
             <div class="mb-3">
@@ -108,18 +113,18 @@
     <% if (product.variant && product.variant.length > 0) { %>
       <% product.variant.forEach((v, i) => { %>
         <div class="variant-row mb-3" data-index="<%= i %>">
-          <input type="text" name="variantSize[]" class="form-control d-inline w-25 me-2" value="<%= v.size %>" placeholder="Size" required />
-          <input type="number" name="variantPrice[]" class="form-control d-inline w-25 me-2" value="<%= v.salePrice %>" placeholder="Sales Price" required />
-          <input type="number" name="variantQuantity[]" class="form-control d-inline w-25 me-2" value="<%= v.quantity %>" placeholder="Stock" required />
+          <input type="text" name="variantSize[]" class="form-control d-inline w-25 me-2" value="<%= v.size %>" placeholder="Size"  />
+          <input type="number" name="variantPrice[]" class="form-control d-inline w-25 me-2" value="<%= v.salePrice %>" placeholder="Sales Price"  />
+          <input type="number" name="variantQuantity[]" class="form-control d-inline w-25 me-2" value="<%= v.quantity %>" placeholder="Stock"  />
           <button type="button" class="btn btn-danger" onclick="removeVariant(this)">Remove</button>
         </div>
       <% }) %>
     <% } else { %>
       <!-- If no variants exist -->
       <div class="variant-row mb-3" data-index="0">
-        <input type="text" name="variantSize[]" class="form-control d-inline w-25 me-2" placeholder="Size" required />
-        <input type="number" name="variantPrice[]" class="form-control d-inline w-25 me-2" placeholder="Sales Price" required />
-        <input type="number" name="variantQuantity[]" class="form-control d-inline w-25 me-2" placeholder="Stock" required />
+        <input type="text" name="variantSize[]" class="form-control d-inline w-25 me-2" placeholder="Size"  />
+        <input type="number" name="variantPrice[]" class="form-control d-inline w-25 me-2" placeholder="Sales Price"  />
+        <input type="number" name="variantQuantity[]" class="form-control d-inline w-25 me-2" placeholder="Stock"  />
         <button type="button" class="btn btn-danger" onclick="removeVariant(this)">Remove</button>
       </div>
     <% } %>

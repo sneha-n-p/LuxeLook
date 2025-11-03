@@ -49,38 +49,72 @@ const loadViewDetails = async (req, res) => {
 };
 
 const updateOrderStatus = async (req, res) => {
-    try {
-        const { orderId, newStatus } = req.body;
+  try {
+    const { orderId, newStatus } = req.body;
 
-        if (!['Pending', 'Shipped', 'Out For Delivery', 'Delivered'].includes(newStatus)) {
-            return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid status value' });
-        }
+    const validStatuses = ['Pending', 'Shipped', 'Out For Delivery', 'Delivered'];
 
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Order not found' });
-        }
-
-        if (newStatus === 'Delivered') {
-            if (!order.orderedItems || !Array.isArray(order.orderedItems)) {
-                return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid order items' });
-            }
-            order.orderedItems.forEach((item) => {
-                if (item.status !== 'Cancelled') {
-                    item.status = 'Delivered';
-                }
-            });
-            order.markModified('orderedItems');
-        }
-
-        order.status = newStatus;
-        await order.save();
-
-        return res.json({ success: true, message: 'Order status updated successfully' });
-    } catch (error) {
-        console.error('Update status error:', error);
-        return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
+    if (!validStatuses.includes(newStatus)) {
+      return res
+        .status(StatusCode.BAD_REQUEST)
+        .json({ success: false, message: 'Invalid status value' });
     }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res
+        .status(StatusCode.NOT_FOUND)
+        .json({ success: false, message: 'Order not found' });
+    }
+
+    // ✅ Prevent skipping steps
+    const currentIndex = validStatuses.indexOf(order.status);
+    const newIndex = validStatuses.indexOf(newStatus);
+
+    if (newIndex < currentIndex) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: 'Cannot revert to a previous status',
+      });
+    }
+
+    if (newIndex > currentIndex + 1) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: 'Cannot skip to a later status directly',
+      });
+    }
+
+    // ✅ When updating to Delivered, mark all items delivered
+    if (newStatus === 'Delivered') {
+      if (!Array.isArray(order.orderedItems)) {
+        return res
+          .status(StatusCode.BAD_REQUEST)
+          .json({ success: false, message: 'Invalid order items' });
+      }
+
+      order.orderedItems.forEach((item) => {
+        if (item.status !== 'Cancelled') {
+          item.status = 'Delivered';
+        }
+      });
+      order.markModified('orderedItems');
+    }
+
+    order.status = newStatus;
+    await order.save();
+
+    return res.json({
+      success: true,
+      message: 'Order status updated successfully',
+    });
+  } catch (error) {
+    console.error('Update status error:', error);
+    return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
 };
 
 const verifyRequest = async (req, res) => {

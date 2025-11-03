@@ -57,12 +57,24 @@ const AddAddress = async (req, res) => {
         const userData = await User.findById(userId)
         const { addressType, name, state, streetAddress, apartment, city, pincode, phone, altPhone, isDefault } = req.body
         const apiKey = process.env.GOOGLE_API_KEY;
-
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(streetAddress)}&key=${apiKey}`;
+        const address = `${streetAddress},${city},${state},${pincode}`
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
         const { data } = await axios.get(url);
-        if (data.status !== "OK" || !data.results.length) {
-            console.log('data:',data)
-            return res.json({ success: false, message: "Address not found" });
+        console.log('data:', data)
+        if (data.status !== "OK" || !data.results.length||data.results[0].partial_match) {
+            return res.json({ success: false, message: "Invalid or incomplete address. Please check street, city, or pincode."});
+        }
+        const components = data.results[0].address_components;
+
+        const foundState = components.find(c => c.types.includes("administrative_area_level_1"))?.long_name;
+
+        const isStateMatch = foundState?.toLowerCase() === state.toLowerCase();
+
+        if (!isStateMatch) {
+            return res.json({
+                success: false,
+                message: `Address mismatch: Expected state ${state}, pincode ${pincode}, got ${foundState}`,
+            });
         }
         const userAddress = await Address.findOne({ userId: userData._id })
         console.log(req.body)
@@ -81,7 +93,7 @@ const AddAddress = async (req, res) => {
             userAddress.address.push({ addressType, name, streetAddress, apartment, city, state, pincode, phone, altPhone, isDefault })
             await userAddress.save()
         }
-        res.json({success:true,redirectUrl:'/addresses'})
+        res.json({ success: true, redirectUrl: '/addresses' })
     } catch (error) {
         console.error(error)
 
@@ -95,8 +107,10 @@ const loadEditAddress = async (req, res) => {
         const userId = req.session.user
         const userData = await User.findById(userId)
         const addressData = await Address.findOne({ userId: userId })
+
         const addressId = new mongoose.Types.ObjectId(id)
         for (let add of addressData.address) {
+            console.log('add',add)
             if (add._id.equals(addressId)) {
                 res.render("edit-Address", { user: userData, address: add, activePage: " edit-addresses", currentPath: '/addresses' })
             }
@@ -115,6 +129,26 @@ const editAddress = async (req, res) => {
         const { addressId, addressType, name, state, streetAddress, apartment, city, pincode, phone, altPhone } = req.body;
         const userId = req.session.user;
         console.log(req.body)
+        const apiKey = process.env.GOOGLE_API_KEY;
+        const address = `${streetAddress},${city},${state},${pincode}`
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+        const { data } = await axios.get(url);
+        console.log('data:', data.results[0].address_components)
+        if (data.status !== "OK" || !data.results.length||data.results[0].partial_match) {
+            return res.json({ success: false, message: "Invalid or incomplete address. Please check street, city, or pincode." });
+        }
+        const components = data.results[0].address_components;
+
+        const foundState = components.find(c => c.types.includes("administrative_area_level_1"))?.long_name;
+
+        const isStateMatch = foundState?.toLowerCase() === state.toLowerCase();
+
+        if (!isStateMatch) {
+            return res.json({
+                success: false,
+                message: `Address mismatch: Expected state ${state}, pincode ${pincode}, got ${foundState}`,
+            });
+        }
         const done = await Address.updateOne(
             { "userId": userId, "address._id": addressId },
             {
@@ -175,6 +209,29 @@ const cartAddAddress = async (req, res) => {
         const userId = req.session.user
         const userData = await User.findById(userId)
         const { addressType, name, state, streetAddress, apartment, city, pincode, phone, altPhone, isDefault } = req.body
+        const apiKey = process.env.GOOGLE_API_KEY;
+        const address = `${streetAddress},${city},${state},${pincode}`
+        console.log('address', address)
+
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+        const { data } = await axios.get(url);
+        if (data.status !== "OK" || !data.results.length||data.results[0].partial_match) {
+            console.log('data:', data)
+            return res.json({ success: false, message:  "Invalid or incomplete address. Please check street, city, or pincode." });
+        }
+        const components = data.results[0].address_components;
+
+        const foundState = components.find(c => c.types.includes("administrative_area_level_1"))?.long_name;
+
+        const isStateMatch = foundState?.toLowerCase() === state.toLowerCase();
+
+        if (!isStateMatch) {
+            console.log('i am here')
+            return res.json({
+                success: false,
+                message: `Address mismatch: Expected state ${state}, pincode ${pincode}, got ${foundState}`,
+            });
+        }
         const userAddress = await Address.findOne({ userId: userData._id })
         console.log(req.body)
         if (!userAddress) {
@@ -192,7 +249,7 @@ const cartAddAddress = async (req, res) => {
             userAddress.address.push({ addressType, name, streetAddress, apartment, city, state, pincode, phone, altPhone, isDefault })
             await userAddress.save()
         }
-        res.redirect("/checkout")
+        res.status(StatusCode.CREATED).redirect({ success: true, redirectUrl: "/checkout" })
     } catch (error) {
         console.error(error)
 

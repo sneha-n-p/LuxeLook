@@ -1,142 +1,171 @@
-
 <%- include("../../views/partials/userPartial/header") %>
 
-<style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #FFF8F3;
-  }
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #FFF8F3;
+    }
 
-  .sidebar {
-    background-color: #F2E8DC;
-    padding: 30px 20px;
-    height: auto;
-    color: #6B4C3B;
-    border-radius: 8px;
-  }
+    .sidebar {
+      background-color: #F2E8DC;
+      padding: 30px 20px;
+      height: auto;
+      color: #6B4C3B;
+      border-radius: 8px;
+    }
 
-  .sidebar h5 {
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
+    .sidebar h5 {
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
 
-  .sidebar a {
-    display: flex; 
-    align-items: center; 
-    color: #333;
-    margin-bottom: 10px;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 10px 15px; 
-    border-radius: 5px; 
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      color: #333;
+      margin-bottom: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 10px 15px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-  .sidebar a:hover {
-    color: #B5654B;
-    background-color: rgba(181, 101, 75, 0.1); 
-  }
+    .sidebar a:hover {
+      color: #B5654B;
+      background-color: rgba(181, 101, 75, 0.1);
+    }
 
-  .sidebar a i {
-    margin-right: 10px;
-    font-size: 16px; 
-    width: 20px; 
-    text-align: center;
-    color: #333; 
-    transition: color 0.3s ease; 
-  }
+    .sidebar a i {
+      margin-right: 10px;
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #333;
+      transition: color 0.3s ease;
+    }
 
-  .sidebar a:hover i {
-    color: #B5654B; 
-  }
+    .sidebar a:hover i {
+      color: #B5654B;
+    }
 
-  .form-section {
-    background-color: #FCF4ED;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
+    .form-section {
+      background-color: #FCF4ED;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-  .form-label {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
+    .form-label {
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
 
-  .form-control, .form-select {
-    border-radius: 8px;
-    height: 45px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    font-size: 14px;
-    background-color: #fff;
-  }
+    .form-control,
+    .form-select {
+      border-radius: 8px;
+      height: 45px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      font-size: 14px;
+      background-color: #fff;
+    }
 
-  .submit-btn, .return-btn {
-    background: linear-gradient(90deg, #B5654B, #D17C63);
-    color: white;
-    padding: 10px 30px;
-    border: none;
-    border-radius: 25px;
-    font-size: 15px;
-    transition: 0.3s;
-    width: 100%;
-  }
+    .submit-btn,
+    .return-btn {
+      background: linear-gradient(90deg, #B5654B, #D17C63);
+      color: white;
+      padding: 10px 30px;
+      border: none;
+      border-radius: 25px;
+      font-size: 15px;
+      transition: 0.3s;
+      width: 100%;
+    }
 
-  .submit-btn:hover, .return-btn:hover {
-    opacity: 0.9;
-  }
+    .submit-btn:hover,
+    .return-btn:hover {
+      opacity: 0.9;
+    }
 
-  .banner {
-    position: relative;
-  }
+    .banner {
+      position: relative;
+    }
 
-  .banner img {
-    height: 414px;
-    object-fit: cover;
-    width: 100%;
-  }
+    .banner img {
+      height: 414px;
+      object-fit: cover;
+      width: 100%;
+    }
 
-  .banner h1 {
+    .banner h1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      bottom: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 42px;
+      font-weight: 700;
+      text-shadow: 2px 2px 8px black;
+    }
+
+    .error-message {
+      color: darkred;
+      font-size: 0.75rem;
+      margin-top: 4px;
+      display: none;
+    }
+
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+    .back-arrow-btn {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    bottom: 50%;
-    transform: translate(-50%, -50%);
+    top: 247px;
+    left: 25px;
+    background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    font-size: 42px;
-    font-weight: 700;
-    text-shadow: 2px 2px 8px black;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
   }
 
-  .error-message {
-    color: darkred;
-    font-size: 0.75rem;
-    margin-top: 4px;
-    display: none;
+  .back-arrow-btn:hover {
+    background-color: #B5654B;
+    color: white;
+    transform: scale(1.1);
   }
+  </style>
 
-  footer {
-    background-color: #f8f9fa;
-    padding: 20px;
-  }
-</style>
+  <!-- Banner -->
+  <section class="hero text-center bg-light p-0 mb-4">
+    <div class="banner">
+      <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100">
+       <button onclick="window.history.back()" class="back-arrow-btn">
+            &#8592;
+        </button>
+      <h1>ADD ADDRESS</h1>
+    </div>
+  </section>
 
-<!-- Banner -->
-<section class="hero text-center bg-light p-0 mb-4">
-  <div class="banner">
-    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100">
-    <h1>ADD ADDRESS</h1>
-  </div>
-</section>
-
-<!-- Wrapper -->
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-2 sidebar">
+  <!-- Wrapper -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 sidebar">
         <h5>SETTINGS</h5>
         <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
           <i class="fas fa-shopping-cart"></i> Orders
@@ -152,241 +181,286 @@
         </a>
       </div>
 
-    <!-- Content Area -->
-    <div class="col-md-10 form-section">
-      <h5 class="mb-4 fw-bold">Add Your Address</h5>
-      <form id="addAddressForm" action="/cart-add-address" method="POST" class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label" for="name">Name</label>
-          <input type="text" id="name" class="form-control" name="name" placeholder="Enter Your Name" required>
-          <div id="Error1" class="error-message"></div>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label" for="state">State</label>
-          <select class="form-select" id="state" name="state" required>
-            <option value="+91" data-flag="🇮🇳" selected disabled>Choose a State...</option>
-            <% const states = [
-              "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
-              "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
-              "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
-              "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
-              "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh",
-              "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh",
-              "Lakshadweep", "Puducherry"
-            ]; %>
-            <% states.forEach(state => { %>
-              <option value="<%= state %>"><%= state %></option>
-            <% }) %>
-          </select>
-          <div id="Error9" class="error-message"></div>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label" for="streetAddress">Street Address</label>
-          <input type="text" id="streetAddress" class="form-control" name="streetAddress" placeholder="Enter Your Address" required>
-          <div id="Error2" class="error-message"></div>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label" for="apartment">Apartment, suite, unit etc (optional)</label>
-          <input type="text" id="apartment" class="form-control" name="apartment" placeholder="Enter Your Apartment/suite/unit">
-          <div id="Error3" class="error-message"></div>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label" for="city">Town / City</label>
-          <input type="text" id="city" class="form-control" name="city" placeholder="enter Your City" required>
-          <div id="Error4" class="error-message"></div>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label" for="pincode">Pincode / ZIP</label>
-          <input type="text" id="pincode" class="form-control" name="pincode" placeholder="Enter your Pincode" required>
-          <div id="Error5" class="error-message"></div>
-        </div>
-        <div class="col-md-6">
-  <label class="form-label" for="phone">Phone</label>
-  <input type="text" id="phone" class="form-control" name="phone" required>
-  <div id="Error6" class="error-message"></div>
-</div>
+      <!-- Content Area -->
+      <div class="col-md-10 form-section">
+        <h5 class="mb-4 fw-bold">Add Your Address</h5>
+        <form id="addAddressForm"  class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="name">Name</label>
+            <input type="text" id="name" class="form-control" name="name" placeholder="Enter Your Name" required>
+            <div id="Error1" class="error-message"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="state">State</label>
+            <select class="form-select" id="state" name="state" required>
+              <option value="+91" data-flag="🇮🇳" selected disabled>Choose a State...</option>
+              <% const states=[ "Andhra Pradesh" , "Arunachal Pradesh" , "Assam" , "Bihar" , "Chhattisgarh" , "Goa"
+                , "Gujarat" , "Haryana" , "Himachal Pradesh" , "Jharkhand" , "Karnataka" , "Kerala" , "Madhya Pradesh"
+                , "Maharashtra" , "Manipur" , "Meghalaya" , "Mizoram" , "Nagaland" , "Odisha" , "Punjab" , "Rajasthan"
+                , "Sikkim" , "Tamil Nadu" , "Telangana" , "Tripura" , "Uttar Pradesh" , "Uttarakhand" , "West Bengal"
+                , "Andaman and Nicobar Islands" , "Chandigarh" , "Dadra and Nagar Haveli and Daman and Diu" , "Delhi"
+                , "Jammu and Kashmir" , "Ladakh" , "Lakshadweep" , "Puducherry" ]; %>
+                <% states.forEach(state=> { %>
+                  <option value="<%= state %>">
+                    <%= state %>
+                  </option>
+                  <% }) %>
+            </select>
+            <div id="Error9" class="error-message"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="streetAddress">Street Address</label>
+            <input type="text" id="streetAddress" class="form-control" name="streetAddress"
+              placeholder="Enter Your Address" required>
+            <div id="Error2" class="error-message"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="apartment">Apartment, suite, unit etc (optional)</label>
+            <input type="text" id="apartment" class="form-control" name="apartment"
+              placeholder="Enter Your Apartment/suite/unit">
+            <div id="Error3" class="error-message"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="city">Town / City</label>
+            <input type="text" id="city" class="form-control" name="city" placeholder="enter Your City" required>
+            <div id="Error4" class="error-message"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="pincode">Pincode / ZIP</label>
+            <input type="text" id="pincode" class="form-control" name="pincode" placeholder="Enter your Pincode"
+              required>
+            <div id="Error5" class="error-message"></div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="phone">Phone</label>
+            <input type="text" id="phone" class="form-control" name="phone" required>
+            <div id="Error6" class="error-message"></div>
+          </div>
 
-<div class="col-md-6">
-  <label class="form-label" for="altPhone">Alternative Phone</label>
-  <input type="text" id="altPhone" class="form-control" name="altPhone" placeholder="Alternative Phone">
-  <div id="Error7" class="error-message"></div>
-</div>
-        <div class="col-md-6">
-          <label class="form-label" for="addressType">Select Address Type</label>
-          <select id="addressType" name="addressType" class="form-select" required>
-            <option value="" disabled selected>Select Address Type</option>
-            <option value="Home">Home</option>
-            <option value="Work">Work</option>
-            <option value="Other">Other</option>
-          </select>
-          <div id="Error8" class="error-message"></div>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label d-block">Set as Default Address</label>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="isDefault" id="defaultYes" value="true">
-            <label class="form-check-label" for="defaultYes">Yes</label>
+          <div class="col-md-6">
+            <label class="form-label" for="altPhone">Alternative Phone</label>
+            <input type="text" id="altPhone" class="form-control" name="altPhone" placeholder="Alternative Phone">
+            <div id="Error7" class="error-message"></div>
           </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="isDefault" id="defaultNo" value="false" checked>
-            <label class="form-check-label" for="defaultNo">No</label>
+          <div class="col-md-6">
+            <label class="form-label" for="addressType">Select Address Type</label>
+            <select id="addressType" name="addressType" class="form-select" required>
+              <option value="" disabled selected>Select Address Type</option>
+              <option value="Home">Home</option>
+              <option value="Work">Work</option>
+              <option value="Other">Other</option>
+            </select>
+            <div id="Error8" class="error-message"></div>
           </div>
-        </div>
-        <div class="col-12 mt-3">
-          <button type="submit" class="submit-btn">Add Address</button>
-        </div>
-        <div class="col-12 mt-3">
-          <a href="/checkout" class="return-btn d-block text-center">Return to Checkout</a>
-        </div>
-      </form>
+          <div class="col-md-6">
+            <label class="form-label d-block">Set as Default Address</label>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="isDefault" id="defaultYes" value="true">
+              <label class="form-check-label" for="defaultYes">Yes</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="isDefault" id="defaultNo" value="false" checked>
+              <label class="form-check-label" for="defaultNo">No</label>
+            </div>
+          </div>
+          <div class="col-12 mt-3">
+            <button type="submit" class="submit-btn">Add Address</button>
+          </div>
+          <div class="col-12 mt-3">
+            <a href="/checkout" class="return-btn d-block text-center">Return to Checkout</a>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
+  <script>
 
-  function getFlagEmoji(countryCode) {
-    return countryCode
+    function getFlagEmoji(countryCode) {
+      return countryCode
         .toUpperCase()
         .replace(/./g, char =>
-            String.fromCodePoint(127397 + char.charCodeAt())
+          String.fromCodePoint(127397 + char.charCodeAt())
         );
-}
-
-const phoneInput = document.getElementById('phone')
-const altPhoneInput = document.getElementById('altPhone')
-const selectState = document.getElementById('state').value.trim()
-const addAddressForm = document.getElementById('addAddressForm');
-
-
-//  selectState.addEventListener('change',function(){
-//         const countryCode = this.options[this.selectedIndex].dataset.India;
-//          const code = this.value;
-//           if (countryCode && code) {
-//         const flag = getFlagEmoji(countryCode);
-//         phoneInput.placeholder = `${flag} ${code} XXXXXXXX`;
-//         altPhoneInput.placeholder = `${flag} ${code} XXXXXXXX`;
-//     }
-//       })
-
-      phoneInput.value = "+91 ";
-      
-      phoneInput.addEventListener("input", function () {
-        if (!this.value.startsWith("+91 ")) {
-          this.value = "+91 " + this.value.replace(/[^0-9]/g, "");
-        } else {
-          let digits = this.value.slice(4).replace(/[^0-9]/g, "");
-          if (digits.length > 10) digits = digits.slice(0, 10);
-          this.value = "+91 " + digits;
-        }
-      })
-      
-      altPhoneInput.value = "+91 ";
-altPhoneInput.addEventListener("input", function () {
-  if (!this.value.startsWith("+91 ")) {
-    this.value = "+91 " + this.value.replace(/[^0-9]/g, "");
-  } else {
-    let digits = this.value.slice(4).replace(/[^0-9]/g, "");
-    if (digits.length > 10) digits = digits.slice(0, 10);
-    this.value = "+91 " + digits;
-  }
-})
-
-
-  const showError = (elementId, message) => {
-    const errorElement = document.getElementById(elementId);
-    errorElement.innerHTML = message;
-    errorElement.style.display = 'block';
-  };
-
-  const hideError = (elementId) => {
-    const errorElement = document.getElementById(elementId);
-    errorElement.innerHTML = '';
-    errorElement.style.display = 'none';
-  };
-
-  addAddressForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    let isValid = true;
-
-    const name = document.getElementById('name').value.trim();
-    const phone = document.getElementById('phone').value.trim().replace('+91 ', '')
-    const altPhone = document.getElementById('altPhone').value.trim().replace('+91 ', '')
-    const streetAddress = document.getElementById('streetAddress').value.trim();
-    const apartment = document.getElementById('apartment').value.trim();
-    const city = document.getElementById('city').value.trim();
-    const state = document.getElementById('state').value.trim();
-    const pincode = document.getElementById('pincode').value.trim();
-    const addressType = document.getElementById('addressType').value;
-   
-     
-
-    if (!/^[A-Za-z\s]{3,}$/.test(name)) {
-      showError('Error1', 'Name must be at least 3 characters and contain only alphabets.');
-      isValid = false;
-    } else {
-      hideError('Error1');
     }
 
-    if (streetAddress.length < 5) {
-      showError('Error2', 'Street address must be at least 5 characters.');
-      isValid = false;
-    } else {
-      hideError('Error2');
-    }
+    const phoneInput = document.getElementById('phone')
+    const altPhoneInput = document.getElementById('altPhone')
+    const selectState = document.getElementById('state').value.trim()
+    const addAddressForm = document.getElementById('addAddressForm');
 
-    hideError('Error3');
 
-    if (!/^[A-Za-z\s]{3,}$/.test(city)) {
-      showError('Error4', 'City name must contain only letters and be at least 3 characters.');
-      isValid = false;
-    } else {
-      hideError('Error4');
-    }
+    //  selectState.addEventListener('change',function(){
+    //         const countryCode = this.options[this.selectedIndex].dataset.India;
+    //          const code = this.value;
+    //           if (countryCode && code) {
+    //         const flag = getFlagEmoji(countryCode);
+    //         phoneInput.placeholder = `${flag} ${code} XXXXXXXX`;
+    //         altPhoneInput.placeholder = `${flag} ${code} XXXXXXXX`;
+    //     }
+    //       })
 
-    if (!/^\d{6}$/.test(pincode) || /^(\d)\1{5}$/.test(pincode)) {
-      showError('Error5', 'Pincode must be 6 digits and not all same digits.');
-      isValid = false;
-    } else {
-      hideError('Error5');
-    }
+    phoneInput.value = "+91 ";
+
+    phoneInput.addEventListener("input", function () {
+      if (!this.value.startsWith("+91 ")) {
+        this.value = "+91 " + this.value.replace(/[^0-9]/g, "");
+      } else {
+        let digits = this.value.slice(4).replace(/[^0-9]/g, "");
+        if (digits.length > 10) digits = digits.slice(0, 10);
+        this.value = "+91 " + digits;
+      }
+    })
+
+    altPhoneInput.value = "+91 ";
+    altPhoneInput.addEventListener("input", function () {
+      if (!this.value.startsWith("+91 ")) {
+        this.value = "+91 " + this.value.replace(/[^0-9]/g, "");
+      } else {
+        let digits = this.value.slice(4).replace(/[^0-9]/g, "");
+        if (digits.length > 10) digits = digits.slice(0, 10);
+        this.value = "+91 " + digits;
+      }
+    })
+
+
+    const showError = (elementId, message) => {
+      const errorElement = document.getElementById(elementId);
+      errorElement.innerHTML = message;
+      errorElement.style.display = 'block';
+    };
+
+    const hideError = (elementId) => {
+      const errorElement = document.getElementById(elementId);
+      errorElement.innerHTML = '';
+      errorElement.style.display = 'none';
+    };
+
+    addAddressForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      let isValid = true;
+
+      const name = document.getElementById('name').value.trim();
+      let phone = document.getElementById('phone').value.trim().replace('+91 ', '')
+      const altPhone = document.getElementById('altPhone').value.trim().replace('+91 ', '')
+      const streetAddress = document.getElementById('streetAddress').value.trim();
+      const apartment = document.getElementById('apartment').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const state = document.getElementById('state').value.trim();
+      const pincode = document.getElementById('pincode').value.trim();
+      const addressType = document.getElementById('addressType').value;
+      const isDefault = document.querySelector('input[name="isDefault"]:checked')?.value || null;
+
+
+
+      if (!/^[A-Za-z\s]{3,}$/.test(name)) {
+        showError('Error1', 'Name must be at least 3 characters and contain only alphabets.');
+        isValid = false;
+      } else {
+        hideError('Error1');
+      }
+
+      if (streetAddress.length < 5) {
+        showError('Error2', 'Street address must be at least 5 characters.');
+        isValid = false;
+      } else {
+        hideError('Error2');
+      }
+
+      hideError('Error3');
+
+      if (!/^[A-Za-z\s]{3,}$/.test(city)) {
+        showError('Error4', 'City name must contain only letters and be at least 3 characters.');
+        isValid = false;
+      } else {
+        hideError('Error4');
+      }
+
+      if (!/^\d{6}$/.test(pincode) || /^(\d)\1{5}$/.test(pincode)) {
+        showError('Error5', 'Pincode must be 6 digits and not all same digits.');
+        isValid = false;
+      } else {
+        hideError('Error5');
+      }
+       phone = phone.replace(/\s+/g, '');     // remove all spaces
+      phone = phone.replace(/^\+?91/, '');
 
       if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
-      showError('Error6', 'Phone must be 10 digits and not all same digits.');
-      isValid = false;
+        showError('Error6', 'Phone must be 10 digits and not all same digits.');
+        isValid = false;
+      } else {
+        hideError('Error6');
+      }
+
+      if (altPhone && (!/^\d{10}$/.test(altPhone) || /^(\d)\1{9}$/.test(altPhone) || altPhone === phone)) {
+        showError('Error7', 'Alternate phone must be 10 digits, not all same digits, and different from primary phone.');
+        isValid = false;
+      } else {
+        hideError('Error7');
+      }
+
+      if (!addressType) {
+        showError('Error8', 'Please select an address type.');
+        isValid = false;
+      } else {
+        hideError('Error8');
+      }
+
+      if (!state) {
+        showError('Error9', 'Please select a state.');
+        isValid = false;
+      } else {
+        hideError('Error9');
+      }
+
+      (async function submitForm() {
+  try {
+    const res = await axios.post('/cart-add-address', {
+      addressType,
+      name,
+      state,
+      streetAddress,
+      apartment,
+      city,
+      pincode,
+      phone,
+      altPhone,
+      isDefault
+    });
+
+    console.log(res);
+
+    if (res.data.success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Address Verified',
+        text: res.data.message || 'Address saved successfully.',
+        scrollbarPadding: false
+      });
     } else {
-      hideError('Error6');
+      Swal.fire({
+        icon: 'error',
+        title: 'Please Enter a Valid Address',
+        text: res.data.message || 'Address validation failed.',
+        scrollbarPadding: false
+      });
     }
+  } catch (err) {
+    console.error('Axios error:', err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Something went wrong!',
+      text: err.response?.data?.message || err.message,
+      scrollbarPadding: false
+    });
+  }
+})();
 
-    if (altPhone && (!/^\d{10}$/.test(altPhone) || /^(\d)\1{9}$/.test(altPhone) || altPhone === phone)) {
-      showError('Error7', 'Alternate phone must be 10 digits, not all same digits, and different from primary phone.');
-      isValid = false;
-    } else {
-      hideError('Error7');
-    }
+    });
+  </script>
 
-    if (!addressType) {
-      showError('Error8', 'Please select an address type.');
-      isValid = false;
-    } else {
-      hideError('Error8');
-    }
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    if (!state) {
-      showError('Error9', 'Please select a state.');
-      isValid = false;
-    } else {
-      hideError('Error9');
-    }
-
-    if (isValid) {
-      addAddressForm.submit();
-    }
-  });
-</script>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<%- include("../../views/partials/userPartial/footer") %>
+  <%- include("../../views/partials/userPartial/footer") %>

@@ -161,9 +161,8 @@ const loadProfile = async (req, res) => {
     const userId = req.session.user
     const userData = await User.findById(userId).populate('availableCoupons')
     const orderData = await Order.find({ userId: userId }).sort({ createdOn: -1 }).limit(2)
-    console.log('orderData:', orderData)
+    console.log('orderData:', userData)
     const addressData = await Address.findById(userId)
-    console.log(userData.image[0])
     res.render('profile', {
       user: userData,
       userAddress: addressData,

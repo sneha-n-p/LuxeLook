@@ -14,7 +14,7 @@
   }
 
   .banner img {
-    height: 600px;
+    height: 417px;
     object-fit: cover;
     width: 100%;
   }
@@ -167,12 +167,39 @@
     background-color: #f8f9fa;
     padding: 20px;
   }
+  .back-arrow-btn {
+    position: absolute;
+    top: 247px;
+    left: 25px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .back-arrow-btn:hover {
+    background-color: #B5654B;
+    color: white;
+    transform: scale(1.1);
+  }
 </style>
 
 <!-- Banner -->
 <section class="hero text-center bg-light p-0 mb-4">
   <div class="banner">
-    <img src="/wallpaper/wall4.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100">
+    <button onclick="window.history.back()" class="back-arrow-btn">
+            &#8592;
+        </button>
     <h1>WALLET</h1>
   </div>
 </section>
@@ -205,7 +232,7 @@
         </div>
 
         <form id="walletForm" class="add-amount">
-          <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" required>
+          <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" >
           <button type="button" onclick="addMoney()">Add</button>
         </form>
 
@@ -271,9 +298,11 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
   function addMoney() {
     const amount = parseFloat(document.getElementById("walletAmount").value);
+
     if (!amount || amount <= 0) {
       Swal.fire({
         icon: 'error',
@@ -284,13 +313,20 @@
       return;
     }
 
-    fetch('/wallet/create-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount })
-    })
-      .then(response => response.json())
-      .then(data => {
+    if (amount > 500) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Limit Exceeded',
+        text: 'You can only add up to ₹500 at a time.',
+        confirmButtonColor: '#B5654B'
+      });
+      return;
+    }
+
+    axios.post('/wallet/create-order', { amount })
+      .then((res) => {
+        const data = res.data;
+
         if (!data.success) {
           Swal.fire({
             icon: 'error',
@@ -309,43 +345,42 @@
           name: 'LUXE LOOK',
           description: 'Add Money to Wallet',
           handler: function (response) {
-            fetch('/wallet/payment-success', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                amount,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature
-              })
+            axios.post('/wallet/payment-success', {
+              amount,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature
             })
-              .then(res => res.json())
-              .then(data => {
-                if (data.success) {
-                  document.getElementById('walletBalance').innerText = `₹${data.newBalance}`;
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: 'Money added successfully!',
-                    confirmButtonColor: '#B5654B',
-                    timer: 1500,
-                    showConfirmButton: false
-                  }).then(() => window.location.reload());
-                } else {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: data.message || 'Payment failed',
-                    confirmButtonColor: '#B5654B'
-                  });
-                }
-              })
-              .catch(err => Swal.fire({
+            .then((res2) => {
+              const result = res2.data;
+              if (result.success) {
+                document.getElementById('walletBalance').innerText = `₹${result.newBalance}`;
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success',
+                  text: 'Money added successfully!',
+                  confirmButtonColor: '#B5654B',
+                  timer: 1500,
+                  showConfirmButton: false
+                }).then(() => window.location.reload());
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: result.message || 'Payment failed',
+                  confirmButtonColor: '#B5654B'
+                });
+              }
+            })
+            .catch((err) => {
+              console.error('Payment verification error:', err);
+              Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: 'Server error during payment',
                 confirmButtonColor: '#B5654B'
-              }));
+              });
+            });
           },
           prefill: {
             name: '<%= user.username %>',
@@ -358,12 +393,15 @@
         const rzp = new Razorpay(options);
         rzp.open();
       })
-      .catch(err => Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to initiate payment',
-        confirmButtonColor: '#B5654B'
-      }));
+      .catch((err) => {
+        console.error('Create order error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to initiate payment',
+          confirmButtonColor: '#B5654B'
+        });
+      });
   }
 
   const walletForm = document.getElementById('walletForm');
@@ -372,5 +410,6 @@
     addMoney();
   });
 </script>
+
 
 <%- include("../../views/partials/userPartial/footer") %>
