@@ -549,7 +549,7 @@
         if (result.isConfirmed) {
             downloadExcel(orderId);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            window.location.href = `/downloadInvoice?orderId=${orderId}`;
+            window.location.href = `/orders/downloadInvoice?orderId=${orderId}`;
         }
     });
 }

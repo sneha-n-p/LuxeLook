@@ -17,12 +17,13 @@ const upload = require("../helpers/multer")
 
 //user Controller//
 
+
 router.get("/pageNotFound",userController.pageNotFound)
 router.get("/",userController.loadHomePage)
 router.get("/signup",userAuthCheck,userController.loadSignup)
 router.post("/signup",userController.postSignup)
-router.post("/verify-otp",userController.verifyOtp)
-router.post("/resend-otp",userController.resendOtp)
+router.post("/signup/verify-otp",userController.verifyOtp)
+router.post("/signup/resend-otp",userController.resendOtp)
 router.post("/sample",userController.sample)
 router.get('/login',userAuthCheck,userController.loadLogin)
 router.post('/login',userController.postLogin)
@@ -42,14 +43,16 @@ router.get('/auth/google/callback', passport.authenticate('google', { failureRed
     }
 });
 
+//login forgotpassword
+router.get("/login/forgot-password",userAuthCheck,profileController.loadForgotPassword)
+router.post("/login/forgot-password",profileController.forgotEmailValid)
+router.post("/login/verifying-forgetpass-otp",profileController.verifyOtp)
+router.post("/login/send-otp",profileController.resendOtp)
+router.get("/login/reset-password",userAuthCheck,profileController.loadResetPassword)
+router.post("/login/reset-password",profileController.confirmPassword)
+
 //profile Controller//
 
-router.get("/forgot-password",userAuthCheck,profileController.loadForgotPassword)
-router.post("/forgot-password",profileController.forgotEmailValid)
-router.post("/verifying-forgetpass-otp",profileController.verifyOtp)
-router.post("/send-otp",profileController.resendOtp)
-router.get("/reset-password",userAuthCheck,profileController.loadResetPassword)
-router.post("/reset-password",profileController.confirmPassword)
 router.get ("/profile",userAuth,profileController.loadProfile)
 router.get ("/profile/edit",userAuth,profileController.loadEditProfile)
 router.post ("/profile/edit",upload.single('profileImage'),profileController.updateProfile)
@@ -57,47 +60,47 @@ router.post ("/profile/edit",upload.single('profileImage'),profileController.upd
 router.get("/profile/change-email",userAuth,profileController.loadChangeEmail)
 router.post("/profile/change-email",userAuth,profileController.changeEmailValidation)
 // router.get("/change-email-otp",userAuth,profileController.loadEmailVerifyOtp)
-router.post("/verifying-changeEmail-otp",profileController.EmailVerifyOtp)
-router.get("/reset-email",userAuth,profileController.loadResetEmail)
-router.post("/reset-email",profileController.resetEmail)
+router.post("/profile/verifying-changeEmail-otp",profileController.EmailVerifyOtp)
+router.get("/profile/reset-email",userAuth,profileController.loadResetEmail)
+router.post("/profile/reset-email",profileController.resetEmail)
 
 router.get("/profile/change-password",userAuth,profileController.changePassword)
 router.post("/profile/change-password",userAuth,profileController.changePasswordValid)
-router.get("/verifying-changePassword-otp",userAuth,profileController.loadPasswordVerifyingOtp)
-router.post("/changePassword-otp",profileController.PasswordVerifyingOtp)
+router.get("/profile/changePassword-otp",userAuth,profileController.loadPasswordVerifyingOtp)
+router.post("/profile/changePassword-otp",profileController.PasswordVerifyingOtp)
 router.get("/profile/reset-password",userAuth,profileController.loadresetPassword)
 router.post("/profile/reset-password",userAuth,profileController.resetPassword) 
-router.post('/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
+router.post('/profile/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
 
 //product Controller//
 
 router.get("/shop",productController.loadShop)
-router.get("/product-details/:id",productController.loadProductDetails)
+router.get("/shop/product-details/:id",productController.loadProductDetails)
 
 //address Controller//
 
 router.get("/addresses",userAuth,addressController.loadAddress)
-router.get('/add-address',userAuth,addressController.loadAddAddress)
-router.post('/add-address',userAuth,addressController.AddAddress)
-router.get('/edit-address/:id',userAuth,addressController.loadEditAddress)
-router.post('/edit-address',addressController.editAddress)
-router.post("/delete-address",addressController.deleteAddress)
-router.get("/cart-add-address",userAuth,addressController.loadcartAddAddress)
-router.post("/cart-add-address",userAuth,addressController.cartAddAddress)
+router.get('/addresses/add-address',userAuth,addressController.loadAddAddress)
+router.post('/addresses/add-address',userAuth,addressController.AddAddress)
+router.get('/addresses/edit-address/:id',userAuth,addressController.loadEditAddress)
+router.post('/addresses/edit-address',addressController.editAddress)
+router.post("/addresses/delete-address",addressController.deleteAddress)
 
 //wishlist Controller//
 
 router.get("/wishlist",userAuth,wishlistController.loadwishlist)
-router.post("/addToWishlist",wishlistController.addToWishlist)
-router.post("/removeFromWishlist",wishlistController.removeProduct)
+router.post("/wishlist/addToWishlist",wishlistController.addToWishlist)
+router.post("/wishlist/removeFromWishlist",wishlistController.removeProduct)
 
 //cart Controller//
 
 router.get("/cart",userAuth,cartController.loadcart)
 router.post("/cart",cartController.procedToCheckOut)
-router.post("/addToCart",cartController.addToCart)
-router.post("/removeFromCart",cartController.removeProductCart)
-router.get("/checkout",userAuth,cartController.loadCheckOut)
+router.post("/cart/addToCart",cartController.addToCart)
+router.post("/cart/removeFromCart",cartController.removeProductCart)
+router.get("/cart/checkout",userAuth,cartController.loadCheckOut)
+router.get("/cart/add-address",userAuth,addressController.loadcartAddAddress)
+router.post("/cart/add-address",userAuth,addressController.cartAddAddress)
 
 //coupon Controller//
 router.post("/apply-coupon",couponController.applyCoupon)
@@ -106,17 +109,18 @@ router.post("/apply-coupon",couponController.applyCoupon)
 
 router.post('/placeOrder',orderController.placeOrder)
 router.get("/orderSuccess",userAuth,orderController.loadOrderSuccess)
+
 router.get("/orders",userAuth,orderController.loadOrders)
-router.get('/order/details/:id',userAuth, orderController.viewOrderDetails);
+router.get('/orders/details/:id',userAuth, orderController.viewOrderDetails);
 router.post('/orders/cancel-item',orderController.cancelSingleProduct) 
 router.post('/orders/cancel',orderController.cancelOrders)
 router.patch('/orders/return',orderController.returnOrder)
 router.patch('/orders/single-Product-Return',orderController.singleProductReturn)
-router.post('/create-razorpay-order',orderController.razorpay)
-router.get('/orderFailure',orderController.loadFailure)
-router.get('/retry-Checkout',orderController.loadRetryCheckout)
-router.post('/retry-PlaceOrder',orderController.loadRetryPlaceOrder)
-router.get('/downloadInvoice',orderController.generateInvoice)
+router.post('/orders/create-razorpay-order',orderController.razorpay)
+router.get('/orders/orderFailure',orderController.loadFailure)
+router.get('/orders/retry-Checkout',orderController.loadRetryCheckout)
+router.post('/orders/retry-PlaceOrder',orderController.loadRetryPlaceOrder)
+router.get('/orders/downloadInvoice',orderController.generateInvoice)
 
 //wallet Controller//
 

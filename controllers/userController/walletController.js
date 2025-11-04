@@ -4,6 +4,7 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 require("dotenv").config()
 const StatusCode = require('../../statusCode')
+const logger = require('../../helpers/logger')
 
 const loadWallet = async (req, res) => {
   try {
@@ -93,7 +94,7 @@ const loadWallet = async (req, res) => {
       currentPath:'/wallet'
     });
   } catch (error) {
-    console.error('Error loading wallet:', error.message, error.stack);
+    logger.error(`Error loading wallet: ${error.message}, ${error.stack}`);
     res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound');
   }
 };
@@ -139,7 +140,7 @@ const addAmountToWallet = async (req, res) => {
 
     res.status(StatusCode.OK).json({ message: 'Money added successfully', wallet })
   } catch (error) {
-    console.error('error occur while loadWallet', error)
+    logger.error(`error occur while loadWallet ${error}`)
     return res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
   }
 }
@@ -151,13 +152,13 @@ const createRazorpayOrder = async (req, res) => {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid or missing amount' })
     }
 
-    console.log('orderAmount:', orderAmount)
+    logger.debug(`orderAmount: ${orderAmount}`)
     const order = await razorpayInstance.orders.create({
       amount: Math.round(orderAmount * 100),
       currency: 'INR',
       payment_capture: 1,
     })
-    console.log('order:', order)
+    logger.debug(`order: ${order}`)
 
     res.status(StatusCode.OK).json({
       success: true,
@@ -166,14 +167,13 @@ const createRazorpayOrder = async (req, res) => {
       currency: order.currency,
     })
   } catch (error) {
-    console.error('Error creating Razorpay order:', error)
+    logger.error(`Error creating Razorpay order: ${error}`)
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message })
   }
 }
 
 const razorpayPaymentSuccess = async (req, res) => {
   try {
-    console.log('hii')
     const userId = req.session.user
     const { amount, razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body
 
@@ -215,11 +215,10 @@ const razorpayPaymentSuccess = async (req, res) => {
     }
 
     await wallet.save()
-    console.log('done')
 
     return res.status(StatusCode.OK).json({ success: true, newBalance: wallet.balance })
   } catch (error) {
-    console.error('Error in payment success:', error)
+    logger.error(`Error in payment success: ${error}`)
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Server error' })
   }
 }

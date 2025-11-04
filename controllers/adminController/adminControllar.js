@@ -5,6 +5,7 @@ const Category = require('../../models/categorySchema')
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 const StatusCode = require('../../statusCode')
+const logger = require('../../helpers/logger')
 
 
 
@@ -21,7 +22,7 @@ const loadLogin = async (req, res) => {
         req.session.message = null
         res.render('admin-login', { message })
     } catch (error) {
-        console.error(error)
+        logger.error(error)
     }
 }
 
@@ -42,7 +43,7 @@ const postLogin = async (req, res) => {
             return res.redirect('/admin/login')
         }
     } catch (error) {
-        console.log('login error', error)
+        logger.error(`login error ${error}`)
         return res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
 
     }
@@ -54,13 +55,13 @@ const logout = async (req, res) => {
     try {
         req.session.destroy(err => {
             if (err) {
-                console.log("Error destroy session", err)
+                logger.error(`Error destroy session ${err}`)
                 return res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
             }
             res.redirect("/admin/login")
         })
     } catch (error) {
-        console.log("unexpected error during logout", error)
+        logger.error(`unexpected error during logout ${error}`)
         res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
     }
 }

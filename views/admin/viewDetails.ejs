@@ -295,7 +295,7 @@
 
             if (status) {
                 try {
-                    const response = await fetch('/admin/update-order-status', {
+                    const response = await fetch('/admin/orders/update-order-status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ orderId, newStatus: status })
@@ -326,7 +326,7 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.patch('/admin/verify-return', {
+                axios.patch('/admin/orders/verify-return', {
                     orderId,
                     action: 'Returned'
                 })
@@ -358,7 +358,7 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.patch('/admin/verify-return', {
+                axios.patch('/admin/orders/verify-return', {
                     orderId,
                     action: 'Delivered'
                 })
@@ -392,7 +392,7 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.patch('/admin/verify-single-return', {
+                axios.patch('/admin/orders/verify-single-return', {
                     productId,
                     orderId,
                     action: 'Returned'
@@ -425,7 +425,7 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.patch('/admin/verify-single-return', {
+                axios.patch('/admin/orders/verify-single-return', {
                     productId,
                     orderId,
                     action: 'Delivered'

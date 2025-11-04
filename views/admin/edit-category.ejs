@@ -159,7 +159,7 @@
         if (!isValid) return;
 
         try {
-          const response = await axios.patch(`/admin/edit-categories/${categoryId}`, {
+          const response = await axios.patch(`/admin/categories/edit-category/${categoryId}`, {
             name,
             description,
             offer,

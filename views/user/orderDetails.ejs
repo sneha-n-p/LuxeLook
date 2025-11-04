@@ -329,7 +329,7 @@
                         </button>
                       </div>
                       <% } else if( order.status.trim()==='payment Failed' ) {%>
-                        <a href="/retry-Checkout?orderId=<%= order._id %>" class="action-btn btn-return">RETRY</a>
+                        <a href="/orders/retry-Checkout?orderId=<%= order._id %>" class="action-btn btn-return">RETRY</a>
                         <%}else if (['Pending', 'Shipped' , 'Out For Delivery' ,'Confirmed'
                           ].includes(order.status.trim())) { %>
                           <button class="action-btn btn-cancel" onclick="fullCancellation('<%= order._id %>')">
@@ -341,7 +341,7 @@
                   <td style="display: flex; gap: 5px; justify-content: center;">
                     <% order.orderedItems.slice(0, 2).forEach(item=> { %>
                       <% if (item.product && item.product.productImage && item.product.productImage.length> 0) { %>
-                        <a href="/order/details/<%= order._id %>"><img src="<%= item.product.productImage[0] %>"
+                        <a href="/orders/details/<%= order._id %>"><img src="<%= item.product.productImage[0] %>"
                             alt="Product Image" style="width:50px; height:65px; object-fit:cover;"></a>
                         <% } else { %>
                           <img src="/images/no-image.png" alt="No Image"

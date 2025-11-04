@@ -259,7 +259,7 @@
 
   async function updateCoupon() {
     try {
-      const response = await axios.patch('/admin/updateCoupon', {
+      const response = await axios.patch('/admin/Coupons/updateCoupon', {
         couponId: document.getElementById("coupon-id").value,
         couponName: document.getElementById("coupon-name").value,
         startDate: document.getElementById("startingDate").value,

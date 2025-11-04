@@ -261,7 +261,7 @@
                 </div>
 
                 <div class="mt-auto">
-                  <a href="/product-details/<%= products[i]._id %>">
+                  <a href="/shop/product-details/<%= products[i]._id %>">
                     <button class="btn btn-outline-dark btn-sm w-100">View Details</button>
                   </a>
 
@@ -307,7 +307,7 @@
 
       <script>
         function addToWishlist(productId, TotalWhishListCount) {
-          axios.post("/addToWishlist", { productId, TotalWhishListCount })
+          axios.post("/wishlist/addToWishlist", { productId, TotalWhishListCount })
             .then(function (responce) {
               console.log(responce.data)
               Swal.fire({

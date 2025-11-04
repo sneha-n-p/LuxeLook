@@ -217,7 +217,7 @@
               <% } %>
             </div>
             <div>
-              <a href="/edit-address/<%= address._id %>" class="edit-btn">Edit</a>
+              <a href="/addresses/edit-address/<%= address._id %>" class="edit-btn">Edit</a>
               <button type="button" class="delete-btn" onclick="confirmRemove('<%= address._id %>')">Delete</button>
             </div>
           </div>
@@ -237,7 +237,7 @@
       <% } %>
 
       <div>
-        <a href="/add-address" class="add-btn">+ Add Address</a>
+        <a href="/addresses/add-address" class="add-btn">+ Add Address</a>
       </div>
     </div>
   </div>
@@ -255,7 +255,7 @@
       confirmButtonText: "Yes, remove it!"
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.post('/delete-address/', { addressId })
+        axios.post('/addresses/delete-address/', { addressId })
           .then(function (response) {
             if (response.data.success) {
               Swal.fire({

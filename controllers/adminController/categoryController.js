@@ -3,6 +3,7 @@ const category = require('../../models/categorySchema')
 const mongoose = require('mongoose')
 const Product = require('../../models/productSchema')
 const StatusCode = require('../../statusCode')
+const logger = require('../../helpers/logger')
 
 const categoryInfo = async (req, res) => {
   try {
@@ -28,11 +29,9 @@ const categoryInfo = async (req, res) => {
       totalPages: totalPage,
       totalCategory: totalCategories,
       search,
-
-
     })
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     res.status(StatusCode.BAD_REQUEST).redirect("/admin/pageError")
   }
 }
@@ -42,7 +41,7 @@ const loadAddCategory = async (req, res) => {
     const categories = await category.find().sort({ createdAt: -1 });
     res.render("addCategory", { categories });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError");
   }
 };
@@ -67,7 +66,7 @@ const addCategory = async (req, res) => {
     return res.status(StatusCode.CREATED).json({ success: true, message: "Category added successfully" })
 
   } catch (error) {
-    console.error("Error adding category:", error)
+    logger.error(`Error adding category: ${error}`)
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" })
   }
 };
@@ -84,10 +83,10 @@ const unlistCategory = async (req, res) => {
       res.status(StatusCode.CREATED).json({ success: true })
     }
     else {
-      console.error(error)
+      logger.error(error)
     }
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
@@ -101,10 +100,10 @@ const listCategory = async (req, res) => {
 
       res.status(StatusCode.CREATED).json({ success: true })
     } else {
-      console.error(error)
+      logger.error(error)
     }
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
@@ -112,10 +111,13 @@ const listCategory = async (req, res) => {
 const loadEditCategory = async (req, res) => {
   try {
     const id = req.params.id
+console.log(id)
     const mongooseId = new mongoose.Types.ObjectId(id)
+
     const Category = await category.findById(mongooseId)
     res.render("edit-category", { Category: Category })
   } catch (error) {
+    logger.error(error)
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
@@ -175,7 +177,7 @@ const editCategory = async (req, res) => {
       res.status(StatusCode.BAD_REQUEST).json({ error: "Failed to update category" });
     }
   } catch (error) {
-    console.error("Edit category error:", error);
+    logger.error(`Edit category error: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal Server Error" });
   }
 }
@@ -200,8 +202,7 @@ const addCategoryOffer = async (req, res) => {
       const productOffer = product.productOffer || 0;
       let bestOffer = Math.max(productOffer, offer);
       product.offer = bestOffer;
-      console.log('bestOffer:',bestOffer)
-
+      logger.debug('bestOffer',bestOffer)
     
       if(productOffer<offer){
         if (Array.isArray(product.variant)) {
@@ -224,7 +225,7 @@ const addCategoryOffer = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Error in addCategoryOffer:', err);
+    logger.error(`Error in addCategoryOffer: ${err}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error'
@@ -290,7 +291,7 @@ const removeCategoryOffer = async (req, res) => {
       message: 'Category offer removed and variants updated correctly.',
     });
   } catch (error) {
-    console.error('Error removing category offer:', error);
+    logger.error(`Error removing category offer:${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
   }
 };
@@ -298,7 +299,7 @@ const removeCategoryOffer = async (req, res) => {
 const editCategoryOffer = async (req, res) => {
   try {
     const { id, offer } = req.body;
-    console.log('req.body:', req.body)
+    logger.debug('req.body',req.body)
 
     // const updatedCategory = await category.findByIdAndUpdate(id, { offer }, { new: true });
     // if (!updatedCategory) return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Category not found' });
@@ -310,7 +311,7 @@ const editCategoryOffer = async (req, res) => {
     const products = await Product.find({ category: id });
 
     let previousCategoryOffer = Category.offer || 0
-    console.log('previousactegoryOffer:', previousCategoryOffer)
+    logger.debug('previousCategoryOffer',previousCategoryOffer)
 
     for (const product of products) {
       let productOffer = product.productOffer || 0
@@ -323,9 +324,9 @@ const editCategoryOffer = async (req, res) => {
 
       let bestOffer = Math.max(productOffer, offer)
       product.variant = product.variant.map(item => {
-        console.log('item.salePrice:',item.salePrice)
+        logger.debug('item.salePrice:',item.salePrice)
         const newSalePrice = Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)));
-        console.log('newSalePrice:',newSalePrice)
+        logger.debug('newSalePrice:',newSalePrice)
         return { ...item, salePrice: newSalePrice }
       })
       product.offer = bestOffer
@@ -338,7 +339,7 @@ const editCategoryOffer = async (req, res) => {
 
     res.json({ success: true, message: "Category offer updated and products refreshed" });
   } catch (err) {
-    console.error('Error in editCategoryOffer:', err);
+    logger.error(`Error in editCategoryOffer ${err}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
   }
 };
@@ -348,7 +349,7 @@ const getCategoryEdit = async (req, res) => {
     const Category = await category.findById(req.params.id);
     res.json({ offer: Category.offer });
   } catch (err) {
-    console.log(err)
+    logger.error(err)
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Server error' });
   }
 }

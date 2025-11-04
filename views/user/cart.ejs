@@ -232,7 +232,7 @@
                         %>
                         <tr>
                             <td>
-                                <a href="/product-details/<%= product.productId._id %>">
+                                <a href="/shop/product-details/<%= product.productId._id %>">
                                     <img src="<%= product.productId.productImage[0] %>" class="cart-product-img"
                                         alt="Product Image">
                                 </a>
@@ -330,7 +330,7 @@
                 confirmButtonText: "Yes, remove it!"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('/removeFromCart', { productId })
+                    axios.post('/cart/removeFromCart', { productId })
                         .then(response => {
                             if (response.data.success) {
                                 Swal.fire({
@@ -460,7 +460,7 @@
             axios.post('/cart', { cartItems })
                 .then(response => {
                     if (response.data.success) {
-                        window.location.href = "/checkout";
+                        window.location.href = "/cart/checkout";
                     } else {
                         Swal.fire({
                             icon: "warning",

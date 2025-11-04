@@ -203,7 +203,7 @@
       document.querySelectorAll('.viewDetail').forEach(button => {
         button.addEventListener('click', function () {
           const orderId = this.dataset.id;
-          window.location.href = `/admin/orderDetails/${orderId}`;
+          window.location.href = `/admin/orders/orderDetails/${orderId}`;
         });
       });
 

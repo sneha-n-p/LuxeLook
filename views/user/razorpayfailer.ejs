@@ -108,10 +108,10 @@
     <% order.orderedItems.forEach(item => { %>
       <img src="<%= item.product.productImage%>" style="width:60px;">
     <% }) %>
-    <% } %>
     <div>
       <a href="/orders" class="btn btn-secondary">Go to Orders</a>
-      <a href=`/retry-Checkout?orderId=${order.orderId}` class="btn btn-primary">Retry Payment</a>
+      <a href="/orders/retry-Checkout?orderId=<%= order._id %>" class="btn btn-primary">Retry Payment</a>
+      <% } %>
     </div>
   </div>
 </div>

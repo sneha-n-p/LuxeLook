@@ -318,7 +318,7 @@
                 <% if (recentOrders &&recentOrders.length> 0) { %>
                   <% recentOrders.forEach(order=> { %>
                     <tr>
-                      <td><a href="/admin/orderDetails/<%= order._id %>" class="text-primary">#<%= order.orderId %></a>
+                      <td><a href="/admin/orders/orderDetails/<%= order._id %>" class="text-primary">#<%= order.orderId %></a>
                       </td>
                       <td>
                         <%= order.userId.name %>

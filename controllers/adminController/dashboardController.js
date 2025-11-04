@@ -3,6 +3,7 @@ const Product = require('../../models/productSchema')
 const Address = require('../../models/addressSchema')
 const Order = require('../../models/orderSchema')
 const StatusCode = require('../../statusCode')
+const logger = require('../../helpers/logger')
 
 
 const loadDashboard = async (req, res) => {
@@ -71,7 +72,7 @@ const loadDashboard = async (req, res) => {
             const chartData = salesByMonth.map((s) => s.total);
 
             const salesData = await getSalesDataHelper("monthly")
-            console.log(salesData)
+            logger.debug('salesData:',salesData)
             const orderStatusCounts = await getOrderStatusCounts()
 
             res.render("dashboard", {
@@ -90,7 +91,7 @@ const loadDashboard = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error("Dashboard error:", error);
+        logger.error(`Dashboard error: ${error}`);
         res.status(500).redirect("/admin/pageError");
     }
 };
@@ -102,7 +103,7 @@ const getSalesData = async (req, res) => {
         const salesData = await getSalesDataHelper(period)
         res.status(StatusCode.OK).json(salesData)
     } catch (error) {
-        console.error("Error in getSalesData API:", error)
+        logger.error( `Error in getSalesData API: ${error}`)
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error" })
     }
 }
@@ -174,7 +175,7 @@ const getSalesDataHelper = async (period = "yearly") => {
 
         return { labels, data }
     } catch (error) {
-        console.error("Error getting sales data:", error)
+        logger.error( `Error getting sales data: ${error}`)
         return { labels: [], data: [] }
     }
 }
@@ -202,7 +203,7 @@ const getOrderStatusCounts = async () => {
 
         return statusCounts
     } catch (error) {
-        console.error("Error getting order status counts:", error)
+        logger.error(`Error getting order status counts: ${error}`)
         return { Delivered: 0, Pending: 0, Shipped: 0, Cancelled: 0, Returned: 0 }
     }
 }
@@ -211,7 +212,7 @@ const getOrderStatusCounts = async () => {
 const getTopSelling = async (req, res) => {
     try {
         const { type } = req.query
-        console.log('type:', type)
+        logger.debug('type:',type)
 
         let topCategories
         let topProducts
@@ -257,7 +258,7 @@ const getTopSelling = async (req, res) => {
                 .sort((a, b) => b.soldCount - a.soldCount)
                 .slice(0, 5);
 
-            console.log("Top Categories:", topCategories);
+            logger.debug('topCategories:',topCategories);
         } else {
             let productMap = {};
             const orders = await Order.find({ status: "Delivered" });
@@ -298,7 +299,7 @@ const getTopSelling = async (req, res) => {
 
 
     } catch (error) {
-        console.log('error in topselling datas fetching in admin', error)
+        logger.error( `error in topselling datas fetching in admin: ${error}`)
     }
 }
 

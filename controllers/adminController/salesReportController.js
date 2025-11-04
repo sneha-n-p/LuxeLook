@@ -9,12 +9,13 @@ const ExcelJS = require('exceljs');
 const PDFDocument = require('pdfkit');
 const moment = require('moment');
 const StatusCode = require("../../statusCode")
+const logger = require('../../helpers/logger')
 
 
 const getFilteredSales = async (reportType, startDate, endDate) => {
   let filter = {};
 
-  console.log('filter')
+  logger.debug(`filter`)
   if (reportType === 'custom' && startDate && endDate) {
     filter.date = {
       $gte: moment(startDate).startOf('day').toDate(),
@@ -134,14 +135,14 @@ const loadSalesPage = async (req, res) => {
       totalPage,
     });
   } catch (error) {
-    console.error('Error loading sales page:', error);
+    logger.error('Error loading sales page:', error);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).render('pageError', { message: 'Server Error' });
   }
 };
 
 const downloadPDF = async (req, res) => {
   try {
-    console.log('orders.length:', orders)
+    logger.debug('orders.length',orders)
     const { reportType, startDate, endDate } = req.query;
     let query = { status: "Delivered" };
 
@@ -199,7 +200,7 @@ const downloadPDF = async (req, res) => {
       })
     }
 
-    console.log("salesData:", salesData)
+    logger.debug('salesData:',salesData)
     const pdfBuffer = await PDFDocument(salesData);
 
     res.setHeader("Content-Type", "application/pdf");
@@ -207,7 +208,7 @@ const downloadPDF = async (req, res) => {
     res.send(pdfBuffer);
 
   } catch (err) {
-    console.error("PDF generation error:", err);
+    logger.error( `PDF generation error: ${err}`);
     res.status(500).send("Error generating PDF");
   }
 };

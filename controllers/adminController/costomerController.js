@@ -1,6 +1,7 @@
 const User = require("../../models/userSchema")
 const mongoose = require('mongoose')
 const StatusCode = require('../../statusCode')
+const logger = require('../../helpers/logger')
 
 
 const customerInfo = async (req, res) => {
@@ -35,15 +36,15 @@ const customerInfo = async (req, res) => {
         const totalPages = Math.ceil(count / limit);
         res.render('users', { users: userData, currentPage: page, totalUsers: count, totalPages, search });
     } catch (error) {
-        console.error(error)
+        logger.error(error)
     }
 }
 
 const userBlocked = async (req, res) => {
     try {
-        console.log(req.body)
+        logger.debug(req.body)
         let id = req.body.id
-        console.log(id)
+        logger.debug(id)
         const mongooseId = new mongoose.Types.ObjectId(id)
         const update = await User.updateOne({ _id: mongooseId }, { $set: { isBlocked: true } })
         if (update) {
@@ -53,10 +54,10 @@ const userBlocked = async (req, res) => {
             res.status(StatusCode.OK).json({ success: true })
         }
         else {
-            console.error(error)
+            logger.error(error)
         }
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
     }
 }
@@ -70,10 +71,10 @@ const userUnblocked = async (req, res) => {
 
             res.status(StatusCode.OK).json({ success: true })
         } else {
-            console.error(error)
+            logger.error(error)
         }
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
     }
 }

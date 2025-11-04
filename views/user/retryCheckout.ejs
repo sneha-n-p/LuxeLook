@@ -226,7 +226,7 @@
           <% } else { %>
             <p class="text-muted">No addresses available. Please add one.</p>
           <% } %>
-          <a href="/cart-add-address" class="add-address-btn mb-4 d-inline-block">+ Add New Address</a>
+          <a href="/cart/add-address" class="add-address-btn mb-4 d-inline-block">+ Add New Address</a>
 
           <h5 class="fw-bold mb-4 mt-4">Apply Coupon</h5>
           <div class="input-group mb-3">
@@ -363,7 +363,7 @@ if (!form) {
         text: 'Please add a delivery address before placing the order.',
         confirmButtonText: 'Add Address',
       }).then(() => {
-        window.location.href = '/cart-add-address';
+        window.location.href = '/cart/add-address';
       });
       return;
     }
@@ -385,7 +385,7 @@ if (!form) {
       const finalAmount = document.getElementById('hiddenFinalTotal').value;
 
       try {
-        const res = await fetch('/create-razorpay-order', {
+        const res = await fetch('/orders/create-razorpay-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: finalAmount * 100 })
@@ -414,7 +414,7 @@ if (!form) {
 
 
               let plainObject = {...Object.fromEntries(formData),orderId:"<%= order._id %>"}
-              const placeOrderRes = await fetch('/retry-PlaceOrder', {
+              const placeOrderRes = await fetch('/orders/retry-PlaceOrder', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -433,7 +433,7 @@ if (!form) {
                   timer: 2000,
                   showConfirmButton: false
                 }).then(() => {
-                  window.location.href = '/checkout';
+                  window.location.href = '/cart/checkout';
                 });
               }
             } catch (err) {
@@ -445,7 +445,7 @@ if (!form) {
                 timer: 2000,
                 showConfirmButton: false
               }).then(() => {
-                window.location.href = '/checkout';
+                window.location.href = '/cart/checkout';
               });
             }
           },
@@ -458,7 +458,7 @@ if (!form) {
                 timer: 2000,
                 showConfirmButton: false
               }).then(() => {
-                window.location.href = '/checkout';
+                window.location.href = '/cart/checkout';
               });
             }
           },
@@ -477,7 +477,7 @@ if (!form) {
             timer: 2000,
             showConfirmButton: false
           }).then(() => {
-            window.location.href = `/orderFailure?error=${encodeURIComponent(response.error.description)}&&data=${JSON.stringify(plainObject)}`;
+            window.location.href = `/orders/orderFailure?error=${encodeURIComponent(response.error.description)}&&data=${JSON.stringify(plainObject)}`;
           });
         });
 
@@ -491,7 +491,7 @@ if (!form) {
           timer: 2000,
           showConfirmButton: false
         }).then(() => {
-          window.location.href = '/checkout';
+          window.location.href = '/cart/checkout';
         });
       }
     } else {
@@ -502,7 +502,7 @@ if (!form) {
           console.log('COD:',Object.fromEntries(formData))
         let plainObject = {...Object.fromEntries(formData),orderId: "<%= order._id %>"}
         console.log(plainObject)
-        const res = await fetch('/retry-PlaceOrder', {
+        const res = await fetch('/orders/retry-PlaceOrder', {
           method: 'POST',
           headers: {
     'Content-Type': 'application/json'
@@ -526,7 +526,7 @@ if (!form) {
               showConfirmButton: false
             })
             .then(() => {
-              window.location.href = '/checkout';
+              window.location.href = '/cart/checkout';
             });
           }
         }
@@ -540,7 +540,7 @@ if (!form) {
           showConfirmButton: false
         })
         .then(() => {
-          window.location.href = '/checkout';
+          window.location.href = '/cart/checkout';
         });
       }
     }

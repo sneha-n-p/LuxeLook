@@ -6,11 +6,13 @@ const Product = require("../../models/productSchema")
 const Category = require('../../models/categorySchema')
 const Coupon = require('../../models/couponSchema')
 const StatusCode = require('../../statusCode')
+const logger =  require('../../helpers/logger')
 
 const pageNotFound = async (req, res) => {
     try {
         res.render("pageNotFound")
     } catch (error) {
+        logger.error(error)
         res.redirect("/pageNotFound")
     }
 }
@@ -54,7 +56,7 @@ const loadHomePage = async (req, res) => {
             };
         });
 
-console.log('processedProducts',filteredProducts)
+logger.debug(`processedProducts: ${filteredProducts}`)
         if (user) {
             const userData = await User.findById(user);
             return res.render("home", { user: userData, products: processedProducts, categorys, activePage: "home" });
@@ -63,7 +65,7 @@ console.log('processedProducts',filteredProducts)
         }
 
     } catch (error) {
-        console.log("homePage not found", error);
+        logger.error(`homePage not found ${error}`);
         res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Server error");
     }
 };
@@ -72,7 +74,7 @@ const loadSignup = async (req, res) => {
     try {
         return res.render("signup", { message: null })
     } catch (error) {
-        console.log('signup page is not loading', error)
+        logger.error(`signup page is not loading ${error}`)
         req.status(StatusCode.INTERNAL_SERVER_ERROR).send('Server Error')
 
     }
@@ -103,7 +105,7 @@ async function sendVerificationEmail(email, otp) {
         })
         return info.accepted.length > 0
     } catch (error) {
-        console.error("Error sending email ", error)
+        logger.error(`Error sending email  ${error}`)
         return false
     }
 }
@@ -135,10 +137,10 @@ const postSignup = async (req, res) => {
         req.session.userData = { name, phone, email, password, referalCode }
 
         res.render('signupOtp')
-        console.log("OTP sent", otp)
+        logger.debug(`OTP sent ${otp}`)
 
     } catch (error) {
-        console.error('signup error', error)
+        logger.error(`signup error ${error}`)
         res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
     }
 }
@@ -168,7 +170,7 @@ const loadShopping = async (req, res) => {
 
             const bestOffer = Math.max(productOffer, categoryOffer);
 
-            console.log(`[${product.productName}] -> Product: ${productOffer}%, Category: ${categoryOffer}% → Best: ${bestOffer}%`);
+            logger.debug(`[${product.productName}] -> Product: ${productOffer}%, Category: ${categoryOffer}% → Best: ${bestOffer}%`);
 
             const salePrice = bestOffer > 0
                 ? Math.round(product.regularPrice - (product.regularPrice * bestOffer / 100))
@@ -191,7 +193,7 @@ const loadShopping = async (req, res) => {
         });
 
     } catch (error) {
-        console.log('Shopping page not loading', error);
+        logger.error(`Shopping page not loading ${error}`);
         res.status(500).send('Server Error');
     }
 }
@@ -201,12 +203,13 @@ const securePassword = async (password) => {
         const passwordHash = await bcrypt.hash(password, 10)
         return passwordHash
     } catch (error) {
+        logger.error(error)
     }
 }
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
-        console.log(otp);
+        logger.error(`${otp}`);
         if (otp === req.session.userOtp) {
             const user = req.session.userData;
             let availableCoupons = [];
@@ -269,7 +272,7 @@ const verifyOtp = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error("Error Verifying OTP", error);
+        logger.error(`Error Verifying OTP ${error}`);
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "An error occurred" });
     }
 };
@@ -284,13 +287,13 @@ const resendOtp = async (req, res) => {
         req.session.userOtp = newOtp
         const emailSent = await sendVerificationEmail(email, newOtp)
         if (emailSent) {
-            console.log("Resend OTP:", newOtp)
+            logger.debug(`Resend OTP: ${newOtp}`)
             res.status(StatusCode.OK).json({ success: true, message: "OTP Resend successfully" })
         } else {
             res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "failed to resend OTP .please try again" })
         }
     } catch (error) {
-        console.error("Error resending OTP ", error)
+        logger.error(`Error resending OTP  ${error}`)
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error.please try again" })
     }
 }
@@ -303,6 +306,7 @@ const loadLogin = async (req, res) => {
             res.redirect("/")
         }
     } catch (error) {
+        logger.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
     }
 }
@@ -325,7 +329,7 @@ const postLogin = async (req, res) => {
         res.redirect('/')
 
     } catch (error) {
-        console.error("login error:", error)
+        logger.error(`login error: ${error}`)
         res.status(StatusCode.BAD_REQUEST).render('login', { message: "login failed.Please try again later" })
     }
 }
@@ -334,13 +338,13 @@ const logout = async (req, res) => {
     try {
         req.session.destroy((error) => {
             if (error) {
-                console.log('Session destruction error', error)
+                logger.error(`Session destruction error ${error}`)
                 return res.redirect("/pageNotFound")
             }
             return res.redirect("/login")
         })
     } catch (error) {
-        console.log('logout error', error)
+        logger.error(`logout error ${error}`)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
     }
 }
@@ -349,7 +353,7 @@ const sample = async (req, res) => {
 
         res.send("haaai")
     } catch (error) {
-        console.log('logout error', error)
+        logger.error(`logout error ${error}`)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
     }
 }

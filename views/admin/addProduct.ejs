@@ -84,7 +84,7 @@
   class="btn btn-secondary" 
   style= "color: white;">⬅ Go Back
 </button>
-    <form name="productForm" id="add-productForm" action="/admin/add-product" method="POST"
+    <form name="productForm" id="add-productForm" action="/admin/Products/add-product" method="POST"
       enctype="multipart/form-data">
       <div class="row mb-4">
         <div class="col-12 col-md-6">
@@ -329,7 +329,7 @@
           }
 
           try {
-            const resp = await axios.post("/admin/add-product", formData, {
+            const resp = await axios.post("/admin/Products/add-product", formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },

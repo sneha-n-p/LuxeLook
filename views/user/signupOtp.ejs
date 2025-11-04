@@ -92,7 +92,7 @@
     <div class="otp-container">
     <h5>Please enter the otp in the mail:</h5>
 
-    <form id="otpForm" action="/verify-otp" method="POST" onsubmit="return validateOTPform()">
+    <form id="otpForm" action="/signup/verify-otp" method="POST" onsubmit="return validateOTPform()">
       <input type="text" id="otpInput" maxlength="6" name="otp" class="otp-input" placeholder="Enter OTP" />
       <button type="submit" class="btn btn-submit">Submit</button>
     </form>
@@ -140,7 +140,7 @@
           text: "Please enter an OTP!",
         });
       } else {
-        axios.post('/verify-otp', { otp: otpInput })
+        axios.post('/signup/verify-otp', { otp: otpInput })
           .then(function (response) {
             if (response.data.success) {
               Swal.fire({
@@ -193,7 +193,7 @@
         }
       }, 1000);
       // clearInterval(timer)
-      axios.post("/resend-otp")
+      axios.post("/signup/resend-otp")
         .then(function (response) {
 
           console.log("resend otp response:", response);

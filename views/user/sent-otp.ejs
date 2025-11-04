@@ -89,15 +89,22 @@
         .text-small a:hover {
             text-decoration: underline;
         }
+        .wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
     </style>
 </head>
 
 <body>
-
+ <div class="wrapper">
     <div class="verify-container">
+        
         <h4>Please enter the OTP in the mail:</h4>
 
-        <form id="otpForm" action="/verifying-forgetpass-otp" method="post" onsubmit="return validateOTPform()">
+        <form id="otpForm" action="/login/verifying-forgetpass-otp" method="post" onsubmit="return validateOTPform()">
             <input type="text" name="otp" id="otpInput" class="form-control" placeholder="Enter OTP" required>
             <div id="timer" class="timer-text">Please wait <span id="countdown">60</span> seconds before requesting
                 another code.</div>
@@ -110,6 +117,7 @@
             </div>
         </form>
 
+    </div>
     </div>
     <script>
         let countdown = 60;
@@ -148,7 +156,7 @@
                 return false;
             }
 
-            axios.post('/verifying-forgetpass-otp', { otp: otpValue })
+            axios.post('/login/verifying-forgetpass-otp', { otp: otpValue })
                 .then(function (response) {
                     if (response.data.success) {
                         Swal.fire({
@@ -189,7 +197,7 @@
             if (timer) clearInterval(timer);
             timer = setInterval(updateTimer, 1000);
 
-            axios.post("/send-otp")
+            axios.post("/login/send-otp")
                 .then(function (response) {
                     if (response.data.success) {
                         Swal.fire({

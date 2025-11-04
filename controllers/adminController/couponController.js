@@ -6,6 +6,7 @@ const Coupon = require('../../models/couponSchema')
 const Wallet = require('../../models/walletSchema')
 const moment = require('moment')
 const StatusCode = require('../../statusCode')
+const logger = require('../../helpers/logger')
 
 
 const loadCoupon = async (req, res) => {
@@ -33,35 +34,50 @@ const loadCoupon = async (req, res) => {
       search
     })
   } catch (error) {
-    console.error('coupon pageee:', error)
+    logger.error( `coupon pageee:${error}`)
     res.status(StatusCode.NOT_FOUND).redirect('/admin/pageError')
   }
 }
 
 const createCoupon = async (req, res) => {
   try {
-    const data = {
-      couponName: req.body.couponName,
-      startDate: new Date(req.body.startDate + 'T00:00:00'),
-      endDate: new Date(req.body.endDate + "T00:00:00"),
-      offerPrice: parseInt(req.body.offerPrice),
-      minimumPrice: parseInt(req.body.minimumPrice)
+    const { couponName, startDate, endDate, offerPrice, minimumPrice } = req.body;
+
+    const existingCoupon = await Coupon.findOne({
+      name: { $regex: new RegExp(`^${couponName}$`, 'i') }
+    });
+
+    if (existingCoupon) {
+      return res.json({
+        success: false,
+        message: 'Coupon name already exists. Please use a different name.'
+      });
     }
-    console.log(data.startDate)
+
     const newCoupon = new Coupon({
-      name: data.couponName,
-      createdOn: data.startDate,
-      expiredOn: data.endDate,
-      offerPrice: data.offerPrice,
-      minimumPrice: data.minimumPrice
-    })
-    await newCoupon.save()
-    return res.redirect("/admin/coupons")
+      name: couponName.trim(),
+      createdOn: new Date(startDate + 'T00:00:00'),
+      expiredOn: new Date(endDate + 'T00:00:00'),
+      offerPrice: parseInt(offerPrice),
+      minimumPrice: parseInt(minimumPrice)
+    });
+
+    await newCoupon.save();
+
+    return res.json({
+      success: true,
+      message: 'Coupon created successfully.'
+    });
+
   } catch (error) {
-    console.error('coupon pageee:', error)
-    res.status(StatusCode.NOT_FOUND).redirect("/pageError")
+    logger.error(`Error creating coupon: ${error}`);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while creating the coupon.'
+    });
   }
-}
+};
+
 
 const loadEditCoupon = async (req, res) => {
   try {
@@ -80,7 +96,7 @@ const loadEditCoupon = async (req, res) => {
       findCoupon: formattedCouponData,
     });
   } catch (error) {
-    console.log("edit coupon error:", error);
+    logger.error( `edit coupon error:${error}`);
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageerror");
   }
 };
@@ -118,7 +134,7 @@ const updateCoupon = async (req, res) => {
       res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Coupon update failed");
     }
   } catch (error) {
-    console.error("Update coupon error:", error);
+    logger.error( `Update coupon error: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Server error");
   }
 };
@@ -132,10 +148,10 @@ const listCoupon = async (req, res) => {
 
       res.json({ success: true })
     } else {
-      console.error(error)
+      logger.error(error)
     }
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
@@ -152,10 +168,10 @@ const unlistCoupon = async (req, res) => {
       res.status(StatusCode.OK).json({ success: true })
     }
     else {
-      console.error(error)
+      logger.error(error)
     }
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }

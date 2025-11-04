@@ -8,6 +8,7 @@ const Coupon = require("../../models/couponSchema")
 const env = require("dotenv").config()
 const mongoose = require('mongoose')
 const StatusCode = require("../../statusCode")
+const logger = require('../../helpers/logger')
 
 const loadcart = async (req, res) => {
     try {
@@ -41,12 +42,12 @@ const loadcart = async (req, res) => {
             const cart = await Cart.findOne({ userId: id }).populate("items.productId")
 
             const items = cart ? cart.items : []
-            console.log('items:', items)
+            logger.debug('items:',items)
             const subTotal = items.reduce((acc, curr) => {
                 return acc + (curr.totalPrice || 0);
             }, 0);
 
-            console.log("subTotal:", subTotal)
+            logger.debug('subTotal:',subTotal)
 
             res.render("cart", {
                 cart: items,
@@ -59,7 +60,7 @@ const loadcart = async (req, res) => {
             })
         }
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
     }
 }
@@ -68,7 +69,6 @@ const procedToCheckOut = async (req, res) => {
     try {
         const userId = req.session.user;
         const cartItems = req.body.cartItems;
-        console.log('cartItems:', cartItems)
         cartItems.map((item) => {
             if (item.quantity === 0) {
                 return res.json({ success: false, message: 'The product Out of stock' })
@@ -76,7 +76,6 @@ const procedToCheckOut = async (req, res) => {
         })
         for (let item of cartItems) {
             const product = await Product.findById(item.productId)
-            console.log('Product', product)
             for (let variants of product.variant) {
                 if (variants.size === item.size) {
                     if (variants.quantity < item.quantity) {
@@ -101,7 +100,7 @@ const procedToCheckOut = async (req, res) => {
         return res.status(StatusCode.OK).json({ success: true });
 
     } catch (error) {
-        console.error("Error updating cart quantities:", error);
+        logger.error( `Error updating cart quantities: ${error}`);
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
     }
 };
@@ -190,7 +189,7 @@ const addToCart = async (req, res) => {
             cart.items.push(newCartItem);
             await cart.save();
             cartLength = cart.items.length 
-            console.log("cartLength:",cartLength) 
+            logger.debug('cartLength:',cartLength) 
 
             return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart" ,cartLength});
         }
@@ -199,12 +198,12 @@ const addToCart = async (req, res) => {
             userId,
             items: [newCartItem]
         });
-        console.log("newCart:",newCart)
+        logger.debug('newCart:',newCart)
         cartLength = newCart.items.length
         return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart",cartLength });
 
     } catch (error) {
-        console.error("Add to cart error:", error);
+        logger.error("Add to cart error:", error);
         return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" });
     }
 };
@@ -215,13 +214,13 @@ const removeProductCart = async (req, res) => {
         const userId = req.session.user
         const cart = await Cart.findOne({ userId: userId })
         const index = cart.items.findIndex(item => item.productId.toString() === productId);
-        console.log('index:', index);
+        logger.debug('index:',index);
         await cart.items.splice(index, 1)
         await cart.save()
         return res.status(StatusCode.OK).json({ success: true, cartCount: cart.items.length });
 
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" })
     }
 }
@@ -252,8 +251,8 @@ const loadCheckOut = async (req, res) => {
         }
         if (address) {
             const addresses = address.address
-            console.log('Address:', addresses)
-            console.log('cartItems:', cartItems)
+            logger.debug( 'addresses:',addresses)
+            logger.debug( 'cartItems:', cartItems)
             const delivery = 0
             const discount = 0
             const finalTotal = subtotal + delivery - discount;
@@ -311,7 +310,7 @@ const loadCheckOut = async (req, res) => {
         }
 
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound');
     }
 }

@@ -5,6 +5,7 @@ const Category = require("../../models/categorySchema")
 const { connect } = require("mongoose")
 const env = require("dotenv").config()
 const StatusCode = require('../../statusCode')
+const logger = require('../../helpers/logger')
 
 
 
@@ -45,18 +46,16 @@ const loadwishlist = async (req, res) => {
             res.render("wishlist", { wishlist: products, user, totalPages, categories, currentPage: page, search, productData, activePage: 'wishlist' })
         } else {
             res.redirect("/login", { products, productData, user: null, totalPages, currentPage: page, search, categories })
-            console.log(products)
+            logger.debug(`${products}`)
         }
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
     }
 }
 
 const addToWishlist = async (req, res) => {
     try {
-        console.log("add to whishlist is working ")
-
         const productId = req.body.productId
         const userId = req.session.user
         if (!userId) {
@@ -74,7 +73,7 @@ const addToWishlist = async (req, res) => {
         return res.status(StatusCode.OK).json({ success: true, message: "Product Added To Wishlist",TotalWhishlistCount:whishListCount })
 
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" })
     }
 }
@@ -89,7 +88,7 @@ const removeProduct = async (req, res) => {
         return res.status(StatusCode.OK).json({ success: true, wishlistCount: user.wishlist.length });
 
     } catch (error) {
-        console.error(error)
+        logger.error(error)
         return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server Error" })
     }
 }

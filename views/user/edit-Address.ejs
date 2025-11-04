@@ -179,7 +179,7 @@
     <!-- Content Area -->
     <div class="col-md-10 form-section">
       <h5 class="mb-4 fw-bold">Edit Address</h5>
-      <form id="editAddressForm" action="/edit-address/<%= address._id %>" method="POST" class="row g-3">
+      <form id="editAddressForm" action="/addresses/edit-address/<%= address._id %>" method="POST" class="row g-3">
         <div class="col-md-6">
           <label class="form-label" for="name">Name</label>
           <input type="text" id="name" class="form-control" name="name" value="<%= address.name %>" >
@@ -379,7 +379,7 @@ altPhoneInput.addEventListener("input", function () {
 
     if (isValid) {
       const addressId = '<%= address._id %>';
-      axios.post('/edit-address', {
+      axios.post('/addresses/edit-address', {
         addressId,
         name,
         phone,

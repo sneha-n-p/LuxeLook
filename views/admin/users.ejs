@@ -60,7 +60,7 @@
         <tbody>
           <% users.forEach(user=> { %>
             <tr>
-              <td><img src="<%= user.image %>" alt="User Image" style="height: 50px; border-radius: 5px; color:#000;">
+              <td><img src="<%= user.image && user.image.length > 0 ? user.image[0] : '/wallpaper/banner.png' %>"  alt="User Image" style="height: 50px; border-radius: 5px; color:#000;">
               </td>
               <td style="color: #000;">
                 <%= user.name %>
@@ -143,7 +143,7 @@
         showCancelButton: true
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.patch("/admin/blockUser", { id })
+          axios.patch("/admin/users/blockUser", { id })
             .then(function (response) {
               if (response.data.success) {
                 Swal.fire({
@@ -181,7 +181,7 @@
         showCancelButton: true
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.patch("/admin/UnblockUser", { id })
+          axios.patch("/admin/users/UnblockUser", { id })
             .then(function (response) {
               if (response.data.success) {
                 Swal.fire({

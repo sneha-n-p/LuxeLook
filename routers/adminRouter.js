@@ -22,62 +22,62 @@ router.post("/logout", adminControllar.logout)
 //customer Controller//
 
 router.get("/users", adminAuth, customerController.customerInfo)
-router.patch("/blockUser", adminAuth, customerController.userBlocked)
-router.patch("/UnblockUser", adminAuth, customerController.userUnblocked)
+router.patch("/users/blockUser", adminAuth, customerController.userBlocked)
+router.patch("/users/UnblockUser", adminAuth, customerController.userUnblocked)
 
 //category Controller//
 
 router.get("/categories", adminAuth, categoryController.categoryInfo)
-router.get("/add-category", categoryController.loadAddCategory)
-router.post("/add-category", categoryController.addCategory)
-router.patch("/list-category", adminAuth, categoryController.listCategory)
-router.patch("/Unlist-category", adminAuth, categoryController.unlistCategory)
-router.get("/edit-category/:id", categoryController.loadEditCategory)
-router.patch("/edit-categories/:id", categoryController.editCategory)
-router.post('/add-category-offer', categoryController.addCategoryOffer)
-router.post('/remove-category-offer', categoryController.removeCategoryOffer)
-router.get('/get-category-offer/:id', adminAuth, categoryController.getCategoryEdit);
-router.patch('/edit-category-offer', categoryController.editCategoryOffer)
+router.get("/categories/add-category", categoryController.loadAddCategory)
+router.post("/categories/add-category", categoryController.addCategory)
+router.patch("/categories/list-category", adminAuth, categoryController.listCategory)
+router.patch("/categories/Unlist-category", adminAuth, categoryController.unlistCategory)
+router.get("/categories/edit-category/:id", categoryController.loadEditCategory)
+router.patch("/categories/edit-category/:id", categoryController.editCategory)
+router.post('/categories/add-category-offer', categoryController.addCategoryOffer)
+router.post('/categories/remove-category-offer', categoryController.removeCategoryOffer)
+router.get('/categories/get-category-offer/:id', adminAuth, categoryController.getCategoryEdit)
+router.patch('/categories/edit-category-offer', categoryController.editCategoryOffer)
 
 //product Controller//
 
 router.get("/Products", adminAuth, productController.productInfo)
-  .get("/add-product", adminAuth, productController.loadAddProduct)
-  .post("/add-product", upload.any(), productController.addproduct)
-  .get("/edit-product/:id", adminAuth, productController.editProduct)
-  .post('/edit-product/:id', upload.fields([
+  .get("/Products/add-product", adminAuth, productController.loadAddProduct)
+  .post("/Products/add-product", upload.any(), productController.addproduct)
+  .get("/Products/edit-product/:id", adminAuth, productController.editProduct)
+  .post('/Products/edit-product/:id', upload.fields([
     { name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }
   ]), productController.postEditProduct)
-  .post('/blockProduct', productController.blockProduct)
-  .post('/unblockProduct', productController.unblockProduct)
-  .post("/deleteImage", productController.deleteSingleImage)
-  .post('/add-product-offer', productController.addProductOffer)
-  .post('/remove-product-offer', productController.removeProductOffer)
-  .get('/get-product-offer/:id', adminAuth, productController.getProductEdit)
-  .patch('/edit-product-offer', productController.editProductOffer)
+  .post('/Products/blockProduct', productController.blockProduct)
+  .post('/Products/unblockProduct', productController.unblockProduct)
+  .post("/Products/deleteImage", productController.deleteSingleImage)
+  .post('/Products/add-product-offer', productController.addProductOffer)
+  .post('/Products/remove-product-offer', productController.removeProductOffer)
+  .get('/Products/get-product-offer/:id', adminAuth, productController.getProductEdit)
+  .patch('/Products/edit-product-offer', productController.editProductOffer)
 
 //order Controller//
 
 router.get('/orders', adminAuth, orderController.loadOrder)
-router.get("/orderDetails/:id", adminAuth, orderController.loadViewDetails)
-router.post('/update-order-status', orderController.updateOrderStatus)
-router.patch('/verify-return', orderController.verifyRequest)
-router.patch('/verify-single-return', orderController.verifySingleRequest)
+router.get("/orders/orderDetails/:id", adminAuth, orderController.loadViewDetails)
+router.post('/orders/update-order-status', orderController.updateOrderStatus)
+router.patch('/orders/verify-return', orderController.verifyRequest)
+router.patch('/orders/verify-single-return', orderController.verifySingleRequest)
 
 //coupon Controller//
 
 router.get("/Coupons", adminAuth, couponController.loadCoupon)
-router.post("/createCoupon", adminAuth, couponController.createCoupon)
-router.get('/editCoupon/:id', adminAuth, couponController.loadEditCoupon)
-router.patch("/updateCoupon", adminAuth, couponController.updateCoupon)
-router.patch("/list-Coupon", adminAuth, couponController.listCoupon)
-router.patch("/Unlist-Coupon", adminAuth, couponController.unlistCoupon)
+router.post("/Coupons/createCoupon", adminAuth, couponController.createCoupon)
+router.get('/Coupons/editCoupon/:id', adminAuth, couponController.loadEditCoupon)
+router.patch("/Coupons/updateCoupon", adminAuth, couponController.updateCoupon)
+router.patch("/Coupons/list-Coupon", adminAuth, couponController.listCoupon)
+router.patch("/Coupons/Unlist-Coupon", adminAuth, couponController.unlistCoupon)
 
 //salesRepoart Controller//
 
 router.get("/sales", adminAuth, salesRepoartController.loadSalesPage)
-router.get('/sales/download/pdf', adminAuth, salesRepoartController.downloadPDF);
-router.get('/sales/download/excel', adminAuth, salesRepoartController.downloadExcel);
+router.get('/sales/download/pdf', adminAuth, salesRepoartController.downloadPDF)
+router.get('/sales/download/excel', adminAuth, salesRepoartController.downloadExcel)
 
 //dashboard Condroller
 

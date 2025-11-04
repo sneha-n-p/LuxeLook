@@ -93,7 +93,7 @@
 </button>
 </div>
 <div class="d-flex justify-content-end mb-3">
-  <a href="/admin/add-product" class="btn btn-add" style="background-color: #06b6d4;">ADD PRODUCT +</a>
+  <a href="/admin/Products/add-product" class="btn btn-add" style="background-color: #06b6d4;">ADD PRODUCT +</a>
 </div>
 
             <div class="mb-4">
@@ -164,7 +164,7 @@
                             <td>
 
                                 <button class="btn btn-sm btn-outline-light"><a class="bi bi-pencil"
-                                        href="/admin/edit-product/<%=product._id%>"></a></button>
+                                        href="/admin/Products/edit-product/<%=product._id%>"></a></button>
                                 <%if(product.isBlocked===false){%>
                                     <button class="btn btn-danger">
                                         <a href="#"
@@ -243,7 +243,7 @@
                     confirmButtonText: "Yes, Block!",
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`/admin/blockProduct?id=${productId}`, {
+                        fetch(`/admin/Products/blockProduct?id=${productId}`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ id: productId })
@@ -292,7 +292,7 @@
                     confirmButtonText: "Yes, Unblock!",
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`/admin/unblockProduct?id=${productId}`, {
+                        fetch(`/admin/Products/unblockProduct?id=${productId}`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ id: productId })
@@ -337,7 +337,7 @@
     confirmButtonText: "Yes, remove it"
   }).then((result) => {
     if (result.isConfirmed) {
-      axios.post("/admin/remove-product-offer", { id: categoryId })
+      axios.post("/admin/Products/remove-product-offer", { id: categoryId })
         .then(response => {
           if (response.data.success) {
             Swal.fire({
@@ -377,7 +377,7 @@ async function addOffer(productId) {
 
   if (offer) {
     try {
-      const response = await axios.post('/admin/add-product-offer', {
+      const response = await axios.post('/admin/Products/add-product-offer', {
         id: productId,
         offer: offer
       });
@@ -404,7 +404,7 @@ async function addOffer(productId) {
 
   async function editOffer(categoryId) {
   try {
-    const response = await axios.get(`/admin/get-product-offer/${categoryId}`);
+    const response = await axios.get(`/admin/Products/get-product-offer/${categoryId}`);
     const currentOffer = response.data.offer || 0;
 
     const { value: newOffer } = await Swal.fire({
@@ -429,7 +429,7 @@ async function addOffer(productId) {
     });
 
     if (newOffer !== undefined) {
-      const updateRes = await axios.patch('/admin/edit-product-offer', {
+      const updateRes = await axios.patch('/admin/Products/edit-product-offer', {
         id: categoryId,
         offer: newOffer
       });

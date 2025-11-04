@@ -164,7 +164,7 @@
           if (!isValid) return;
 
           try {
-            const response = await axios.post('/admin/add-category', {
+            const response = await axios.post('/admin/categories/add-category', {
               name,
               description,
               offer,

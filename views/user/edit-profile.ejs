@@ -259,7 +259,7 @@
     formData.append('profileImage', file);
 
     try {
-      const response = await fetch(`/upload-profile-pic/<%= user._id %>`, {
+      const response = await fetch(`/profile/upload-profile-pic/<%= user._id %>`, {
         method: 'POST',
         body: formData
       });

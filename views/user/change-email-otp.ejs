@@ -81,7 +81,7 @@
   <!-- OTP Box -->
   <div class="otp-box" style="background-color: #F2E8DC;">
     <div class="otp-title">Enter the OTP sent to your email</div>
-    <form  id="otpForm" action="/verifying-changeEmail-otp" method="POST" onsubmit="return validateOTPform()">
+    <form  id="otpForm" action="/profile/verifying-changeEmail-otp" method="POST" onsubmit="return validateOTPform()">
       <input type="text" name="otp" maxlength="6" class="form-control otp-input mb-3" id="otpInput" placeholder="------" required>
      
       <button type="submit" class="submit-btn" id="btn-submit">Verify OTP</button>
@@ -138,7 +138,7 @@
           text: "Please enter an OTP!",
         });
       } else {
-        axios.post('/verifying-changeEmail-otp', { otp: otpInput })
+        axios.post('/profile/verifying-changeEmail-otp', { otp: otpInput })
           .then(function (response) {
             if (response.data.success) {
               Swal.fire({
@@ -192,7 +192,7 @@
       }, 1000);
       // clearInterval(timer)
       console.log("axios Send")
-      axios.post("/send-otp")
+      axios.post("/login/send-otp")
         .then(function (response) {
           
           console.log("resend otp response:", response);

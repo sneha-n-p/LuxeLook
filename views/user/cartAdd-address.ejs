@@ -267,7 +267,7 @@
             <button type="submit" class="submit-btn">Add Address</button>
           </div>
           <div class="col-12 mt-3">
-            <a href="/checkout" class="return-btn d-block text-center">Return to Checkout</a>
+            <a href="/cart/checkout" class="return-btn d-block text-center">Return to Checkout</a>
           </div>
         </form>
       </div>
@@ -416,7 +416,7 @@
 
       (async function submitForm() {
   try {
-    const res = await axios.post('/cart-add-address', {
+    const res = await axios.post('/cart/add-address', {
       addressType,
       name,
       state,

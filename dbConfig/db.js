@@ -1,12 +1,13 @@
 const mongoose = require('mongoose')
 const env = require("dotenv").config()
+const logger = require('../helpers/logger')
 
 
 const connectDB = async () => {
     try {
 
       await mongoose.connect('mongodb://0.0.0.0:27017/LuxeLook');
-      console.log('MongoDB Connected');
+      logger.http('MongoDB Connected');
 
     } catch (err) {
 

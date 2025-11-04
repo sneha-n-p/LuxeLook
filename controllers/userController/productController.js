@@ -3,19 +3,20 @@ const env = require("dotenv").config()
 const Product = require("../../models/productSchema")
 const Category = require("../../models/categorySchema")
 const StatusCode = require("../../statusCode")
+const logger = require('../../helpers/logger')
 
 
 
 const loadShop = async (req, res) => {
-  console.log('Reached Shop');
+  logger.debug('Reached Shop');
   try {
     let search = req.query.search || "";
     let sort = req.query.sort || "";
     let page = parseInt(req.query.page) || 1;
     let selectCategory = req.query.selectCategory || ''
     const priceFilter = req.query.priceFilter || "";
-    console.log('selected category is:', selectCategory)
-    console.log('priceFilter:', priceFilter)
+    logger.debug( 'selected category is:', selectCategory)
+    logger.debug('priceFilter:',priceFilter)
     const limit = 8;
 
     const query = {
@@ -61,7 +62,7 @@ const loadShop = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
-    console.log('query:', productData)
+    logger.debug('productData:',productData)
 
     const filteredProducts = productData.filter(
       (product) => product.category && product.category.status === "Listed"
@@ -102,7 +103,7 @@ const loadShop = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
 };
@@ -144,7 +145,7 @@ const loadProductDetails = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
 };

@@ -7,6 +7,7 @@ const Address = require("../../models/addressSchema")
 const Coupon = require("../../models/couponSchema")
 const StatusCode = require("../../statusCode")
 const env = require("dotenv").config()
+const logger = require('../../helpers/logger')
 
 const applyCoupon = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const applyCoupon = async (req, res) => {
     const userId = req.session.user;
 
     const validCoupon = await Coupon.findOne({ name: coupon, islist: true });
-    console.log(validCoupon)
+    logger.debug(validCoupon)
 
     if (!validCoupon) {
       return res.status(400).json({ success: false, message: 'Invalid coupon' });
@@ -35,7 +36,7 @@ const applyCoupon = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Coupon apply error:', error);
+    logger.error( `Coupon apply error: ${error}`);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };

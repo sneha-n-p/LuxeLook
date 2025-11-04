@@ -15,6 +15,7 @@ const adminRouter = require('./routers/adminRouter')
 const db = require("./dbConfig/db")
 const MongoStore = require("connect-mongo")
 const cartCountMiddleware = require('./middlewares/cart');
+const logger = require('./helpers/logger');
 db()
 
 app.use(express.json())
@@ -50,9 +51,17 @@ app.set("views", [path.join(__dirname, 'views/user'), path.join(__dirname, 'view
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(cartCountMiddleware);
-app.use("/", userRouter)
-app.use('/admin', adminRouter)
+app.use('/admin', adminRouter);
+app.use('/', userRouter);
 
-app.listen(process.env.PORT, () => console.log("http://localhost:3000"))
+app.all(/^\/admin(\/.*)?$/, (req, res) => {
+  res.status(404).render('pageError');
+});
+
+app.all(/^\/(?!admin).*$/, (req, res) => {
+  res.status(404).render('pageNotFound');
+});
+
+app.listen(process.env.PORT, () => logger.http("http://localhost:3000"))
 
 module.exports = app

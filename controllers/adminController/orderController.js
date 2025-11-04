@@ -5,6 +5,7 @@ const Order = require("../../models/orderSchema");
 const mongoose = require('mongoose');
 const Wallet = require('../../models/walletSchema');
 const StatusCode = require('../../statusCode');
+const logger = require('../../helpers/logger')
 
 const loadOrder = async (req, res) => {
     try {
@@ -32,7 +33,7 @@ const loadOrder = async (req, res) => {
             search
         });
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(StatusCode.NOT_FOUND).redirect('/admin/pageError');
     }
 };
@@ -43,7 +44,7 @@ const loadViewDetails = async (req, res) => {
         const order = await Order.findById(orderId);
         return res.render('viewDetails', { order });
     } catch (error) {
-        console.error(error);
+        logger.error(error);
         res.status(StatusCode.NOT_FOUND).redirect('/admin/pageError');
     }
 };
@@ -67,7 +68,6 @@ const updateOrderStatus = async (req, res) => {
         .json({ success: false, message: 'Order not found' });
     }
 
-    // ✅ Prevent skipping steps
     const currentIndex = validStatuses.indexOf(order.status);
     const newIndex = validStatuses.indexOf(newStatus);
 
@@ -85,7 +85,6 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // ✅ When updating to Delivered, mark all items delivered
     if (newStatus === 'Delivered') {
       if (!Array.isArray(order.orderedItems)) {
         return res
@@ -109,7 +108,7 @@ const updateOrderStatus = async (req, res) => {
       message: 'Order status updated successfully',
     });
   } catch (error) {
-    console.error('Update status error:', error);
+    logger.error( `Update status error: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error',
@@ -120,7 +119,6 @@ const updateOrderStatus = async (req, res) => {
 const verifyRequest = async (req, res) => {
     try {
         const { orderId, action } = req.body;
-        console.log('action:',action)
         const order = await Order.findById(orderId).populate('orderedItems.product');
         if (!order) {
             return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Order not found' });
@@ -129,7 +127,7 @@ const verifyRequest = async (req, res) => {
         if (!['Returned', 'Delivered'].includes(action)) {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid action' });
         }
-        console.log('order:',order)
+        logger.debug('order:',order)
            
         order.orderedItems.forEach(item => {
             if (item.status !== 'Cancelled') {
@@ -138,7 +136,6 @@ const verifyRequest = async (req, res) => {
 
             }
         });
-
         
         if (action === 'Returned') {
             let totalRefund = 0;
@@ -187,7 +184,7 @@ const verifyRequest = async (req, res) => {
         await order.save();
         return res.status(StatusCode.OK).json({ success: true, message: `Return request ${action === 'Returned' ? 'accepted' : 'rejected'} successfully.` });
     } catch (error) {
-        console.error('Return verification error:', error);
+        logger.error( `Return verification error: ${error}`);
         return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
     }
 };
@@ -199,7 +196,6 @@ const verifySingleRequest = async(req,res)=>{
         const product = await Product.findById(productId)
         let itemTotal = 0
         let refundAmount = 0;
-        console.log(req.body)
 
         order.orderedItems.forEach(items=>{
             if(items.product.toString()===productId){
@@ -227,7 +223,7 @@ const verifySingleRequest = async(req,res)=>{
             const discountAmount = order.discount
             const itemDiscountShare = (itemTotal / originalTotal) * discountAmount;
             refundAmount = itemTotal - itemDiscountShare;
-            console.log('discountAmount:',order)
+            logger.debug('discountAmount:',order)
         }
         
         let wallet = await Wallet.findOne({userId:order.userId})
@@ -262,7 +258,7 @@ const verifySingleRequest = async(req,res)=>{
         return res.status(StatusCode.OK).json({success:true})
 
     } catch (error) {
-        console.log('error in return single product:',error)
+        logger.error(`error in return single product: ${error}`)
     }
 }
 

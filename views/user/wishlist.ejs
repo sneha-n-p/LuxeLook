@@ -240,7 +240,7 @@
                 </td>
 
                 <td>
-                  <a href="/product-details/<%= product._id %>">
+                  <a href="/shop/product-details/<%= product._id %>">
                     <button class="add-cart-btn">
                       View Details
                     </button>
@@ -331,7 +331,7 @@
             //     console.error("Remove Wishlist Error:", error);
             //   });
 
-            axios.post('/removeFromWishlist', { productId })
+            axios.post('/wishlist/removeFromWishlist', { productId })
               .then(response => {
                 if (response.data.success) {
                   Swal.fire({

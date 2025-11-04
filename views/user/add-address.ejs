@@ -191,7 +191,7 @@
       <!-- Content Area -->
       <div class="col-md-10 form-section">
         <h5 class="mb-4 fw-bold">Add your Address</h5>
-        <form id="addAddressForm" action="/add-address" method="POST" class="row g-3">
+        <form id="addAddressForm" action="/addresses/add-address" method="POST" class="row g-3">
           <div class="col-md-6">
             <label class="form-label" for="name">Name</label>
             <input type="text" id="name" class="form-control" name="name" >
@@ -428,7 +428,7 @@
 
   if (isValid) {
     (async function submitForm() {
-      const res = await axios.post('/add-address', {
+      const res = await axios.post('/addresses/add-address', {
         addressType, name, state, streetAddress, apartment, city, pincode, phone, altPhone, isDefault
       });
       if (res.data.success) {

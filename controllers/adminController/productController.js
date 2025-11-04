@@ -7,6 +7,7 @@ const sharp = require("sharp")
 const mongoose = require("mongoose")
 const StatusCode = require("../../statusCode")
 const multer = require('multer')
+const logger = require('../../helpers/logger')
 
 
 const productInfo = async (req, res) => {
@@ -36,7 +37,7 @@ const productInfo = async (req, res) => {
 
     })
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     res.redirect("/admin/pageError")
   }
 }
@@ -46,7 +47,7 @@ const loadAddProduct = async (req, res) => {
     const categories = await Category.find();
     res.render("addProduct", { categories });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError");
   }
 };
@@ -121,9 +122,9 @@ const addproduct = async (req, res) => {
         quantity: parseInt(variantQuantity),
       });
     }
-    console.log(errors)
+    logger.error(errors)
     if (Object.keys(errors).length > 0) {
-      console.log('Error in validation', error)
+      logger.error(`Error in validation : ${error}`)
       return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
         message: "Validation errors occurred",
         errors,
@@ -146,7 +147,7 @@ const addproduct = async (req, res) => {
     }
 
     if (!categoryDoc || !mongoose.Types.ObjectId.isValid(categoryDoc._id)) {
-      console.log('Error in category')
+      logger.debug(`Error in category`)
       errors.category = "Invalid category";
       return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
         message: "Invalid category",
@@ -176,7 +177,7 @@ const addproduct = async (req, res) => {
 
             imagesPaths.push(`/uploads/products/${fileName}`);
           } catch (err) {
-            console.error("Image processing error:", err);
+            logger.error(`Image processing error: ${err}`);
             errors[i] = "Failed to process image";
           }
         }
@@ -188,8 +189,7 @@ const addproduct = async (req, res) => {
     }
 
     if (Object.keys(errors).length > 0) {
-      console.log('Erroreed')
-      console.log(errors)
+      logger.error(errors)
       return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
         message: "Validation errors occurred",
         errors,
@@ -211,10 +211,9 @@ const addproduct = async (req, res) => {
     });
 
     await newProduct.save();
-    console.log("Product saved successfully!");
     return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });
   } catch (error) {
-    console.log("Error adding product:", error);
+    logger.error(`Error adding product: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("addProduct", {
       message: "Failed to add product. Please try again.",
       errors: {},
@@ -232,7 +231,7 @@ const editProduct = async (req, res) => {
     const categories = await Category.find();
     res.render("editProduct", { categories, product })
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     res.redirect("/admin/pageError")
   }
 }
@@ -262,15 +261,15 @@ const deleteSingleImage = async (req, res) => {
     await product.save()
     res.status(StatusCode.OK).json({ success: true, message: "Image deleted successfully" })
   } catch (error) {
-    console.error(error)
+    logger.error(error)
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" })
   }
 }
 
 const postEditProduct = async (req, res) => {
   try {
-    console.log('Received body:', req.body);
-    console.log('Received files:', req.files);
+    logger.debug('Received body:', req.body);
+    logger.debug('Received files:',req.files)
 
     const productId = req.params.id;
     const {
@@ -290,7 +289,7 @@ const postEditProduct = async (req, res) => {
 
     const product = await Product.findById(productId)
     const findCategory = await Category.findById(category)
-    console.log('findCategory:', findCategory)
+    logger.debug('findCategory:',findCategory)
 
     if (!name || !description || !category || !price || !variantSize || !variantQuantity) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'All required fields must be provided' });
@@ -335,7 +334,6 @@ const postEditProduct = async (req, res) => {
     if (Array.isArray(variant)) {
       variant = variant.map(item => {
         const originalPrice = item.salePrice / (1 - (previousBestOffer / 100))
-        console.log("originalPrice:", originalPrice)
         const RoundtheOgPrice = Math.round(originalPrice)
         return { ...item, salePrice: RoundtheOgPrice }
       })
@@ -378,7 +376,7 @@ const postEditProduct = async (req, res) => {
 
     res.json({ success: true, message: 'Product updated successfully', product: updatedProduct });
   } catch (error) {
-    console.error('Error updating product:', error);
+    logger.error(`Error updating product: ${error}`);
     if (error instanceof multer.MulterError) {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `File upload error: ${error.message}` });
     }
@@ -392,16 +390,11 @@ const postEditProduct = async (req, res) => {
 const blockProduct = async (req, res) => {
   try {
     const { id } = req.body
-    console.log("Product ID:", id)
-
     const isProduct = await Product.findOne({ _id: id })
-    console.log("Found Product:", isProduct)
 
     if (!isProduct) {
       return res.json({ success: false, message: "Product not found. Try again." })
     }
-
-    console.log("Blocking product...")
     const blocked = await Product.findByIdAndUpdate(id, { isBlocked: true }, { new: true })
 
     if (blocked) {
@@ -410,7 +403,7 @@ const blockProduct = async (req, res) => {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Error occurred while blocking product. Please try again." })
     }
   } catch (error) {
-    console.error("Error blocking product:", error)
+    logger.error(`Error blocking product: ${error}`)
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
@@ -418,16 +411,12 @@ const blockProduct = async (req, res) => {
 const unblockProduct = async (req, res) => {
   try {
     const id = req.body.id
-    console.log("Product ID:", id)
-
     const isProduct = await Product.findOne({ _id: id })
-    console.log("Found Product:", isProduct)
+    loggerinfo.log(`Found Product: ${isProduct}`)
 
     if (!isProduct) {
       return res.json({ success: false, message: "Product not found. Try again." })
     }
-
-    console.log("Blocking product...")
     const blocked = await Product.findByIdAndUpdate(id, { isBlocked: false }, { new: true })
 
     if (blocked) {
@@ -436,7 +425,7 @@ const unblockProduct = async (req, res) => {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Error occurred while blocking product. Please try again." })
     }
   } catch (error) {
-    console.error("Error blocking product:", error)
+    logger.error(`Error blocking product: ${error}`)
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
   }
 }
@@ -444,12 +433,11 @@ const unblockProduct = async (req, res) => {
 const addProductOffer = async (req, res) => {
   try {
     const { id, offer } = req.body;
-    console.log('req.body', req.body)
     const product = await Product.findById(id);
     if (!product) {
       return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
     }
-    console.log('product', product)
+    logger.debug('product:',product)
 
     const category = await Category.findById(product.category);
     const categoryOffer = category.offer
@@ -471,15 +459,15 @@ const addProductOffer = async (req, res) => {
     }
 
     await product.save();
-    console.log('product', product)
+    logger.debug('product:',product)
     res.status(StatusCode.CREATED).json({
       success: true,
-      message: "Product offer applied.", finalOffer,salePrice:product.variant[0].salePrice
+      message: "Product offer applied.", finalOffer, salePrice: product.variant[0].salePrice
     });
 
 
   } catch (err) {
-    console.error('Error in addProductOffer:', err);
+    logger.error(`Error in addProductOffer: ${err}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
   }
 };
@@ -489,7 +477,7 @@ const getProductEdit = async (req, res) => {
     const product = await Product.findById(req.params.id);
     res.json({ offer: product.offer });
   } catch (err) {
-    console.log(err)
+    logger.error(err)
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Server error' });
   }
 }
@@ -531,7 +519,7 @@ const editProductOffer = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Offer update error:", error);
+    logger.error(`Offer update error: ${error}`);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -584,7 +572,7 @@ const removeProductOffer = async (req, res) => {
       finalOffer: bestOffer
     });
   } catch (error) {
-    console.error('Error removing product offer:', error);
+    logger.error(`Error removing product offer: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error'

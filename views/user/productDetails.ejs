@@ -285,7 +285,7 @@
                 </h6>
                 <p class="price-tag">₹<%= recommended.variant[0].salePrice || recommended.regularPrice %>
                 </p>
-                <a href="/product-details/<%= recommended._id %>" class="btn-view w-100 text-center">View</a>
+                <a href="/shop/product-details/<%= recommended._id %>" class="btn-view w-100 text-center">View</a>
               </div>
             </div>
             <% }) %>
@@ -326,7 +326,7 @@
         return;
       }
 
-      axios.post("/addToWishlist", { productId, size })
+      axios.post("/wishlist/addToWishlist", { productId, size })
         .then(function (response) {
           if (response.data.success) {
             Swal.fire({
@@ -380,7 +380,7 @@
         return;
       }
 
-      axios.post("/addToCart", { productId, quantity, size })
+      axios.post("/cart/addToCart", { productId, quantity, size })
         .then(function (response) {
           if (response.data.success) {
             Swal.fire({

@@ -201,7 +201,7 @@
         <div class="col-lg-4">
           <div class="card" id="coupon-form">
             <div class="card-body">
-              <form method="post" action="/admin/createCoupon" onsubmit="return Validateform(event)">
+              <form method="post" action="/admin/Coupons/createCoupon" onsubmit=" createCoupon(event)">
 
                 <body onload="setDefaultStartDate()"></body>
                 <div class="mb-4">
@@ -284,7 +284,7 @@
                               <% } %>
                         </td>
                         <td>
-                          <a href="/admin/editCoupon/<%= coupons[i]._id %>" class="btn btn-sm btn-warning me-1">
+                          <a href="/admin/Coupons/editCoupon/<%= coupons[i]._id %>" class="btn btn-sm btn-warning me-1">
                             <i class="material-icons">edit</i>
                           </a>
                         </td>
@@ -325,6 +325,8 @@
   </div>
 
   <!-- JavaScript -->
+   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     function Validateform() {
       document.querySelectorAll(".error-message").forEach((element) => (element.innerHTML = ""));
@@ -370,6 +372,48 @@
       return true;
     }
 
+    async function createCoupon(event) {
+    event.preventDefault(); 
+
+    if (!Validateform()) {
+      return; 
+    }
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    try {
+      const response = await axios.post('/admin/Coupons/createCoupon', Object.fromEntries(formData));
+
+      if (response.data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: response.data.message,
+          confirmButtonColor: '#6c63ff'
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Duplicate Coupon',
+          text: response.data.message,
+          confirmButtonColor: '#6c63ff'
+        });
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Something went wrong',
+        text: 'Please try again later.',
+        confirmButtonColor: '#6c63ff'
+      });
+    }
+  }
+
     function setDefaultStartDate() {
       const today = new Date();
       const year = today.getFullYear();
@@ -387,7 +431,7 @@
         showCancelButton: true
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.patch("/admin/Unlist-Coupon", { id })
+          axios.patch("/admin/Coupons/Unlist-Coupon", { id })
             .then(function (responce) {
               if (responce.data.success) {
                 Swal.fire({
@@ -413,7 +457,7 @@
         showCancelButton: true
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.patch("/admin/list-Coupon", { id })
+          axios.patch("/admin/Coupons/list-Coupon", { id })
             .then(function (responce) {
               if (responce.data.success) {
                 Swal.fire({

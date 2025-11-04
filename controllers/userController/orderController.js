@@ -12,12 +12,13 @@ const path = require('path');
 const ejs = require('ejs');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const logger = require('../../helpers/logger')
 
 const placeOrder = async (req, res) => {
   try {
     const userId = req.session.user;
     const { addressId, paymentMethod, coupon,Total, couponId } = req.body;
-    console.log('req.body:',req.body)
+    logger.debug('req.body',req.body)
 
     if (!userId) {
       return res.status(StatusCode.UNAUTHORIZED).json({
@@ -94,8 +95,8 @@ const placeOrder = async (req, res) => {
 
     const totalPrice = orderedItems.reduce((acc, item) => acc +=item.price, 0);
 
-    console.log('orderedItems:',orderedItems)
-    console.log('totalPrice:',totalPrice)
+    logger.debug('orderedItems:',orderedItems)
+    logger.debug('totalPrice:',totalPrice)
 
     let discount = 0;
     let appliedCoupon = null;
@@ -185,7 +186,7 @@ const placeOrder = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error placing order:', error);
+    logger.error('Error placing order:', error);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Something went wrong.',
@@ -206,7 +207,7 @@ const loadOrderSuccess = async (req, res) => {
       .populate("orderedItems.product");
     res.render('orderSuccess', { user, orders: order[0] });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound');
   }
 };
@@ -243,7 +244,7 @@ const loadOrders = async (req, res) => {
       currentPath: '/orders'
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
 };
@@ -260,10 +261,10 @@ const viewOrderDetails = async (req, res) => {
       return res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
     }
 
-    console.log(order)
+    logger.debug(order)
     res.render("orderDetailsView", { order, user, activePage: "orderDetailsView", currentPath: '/orders' });
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
   }
 };
@@ -345,7 +346,7 @@ if (itemInOrder) {
 
     res.json({ success: true, message: 'Product cancelled successfully' });
   } catch (error) {
-    console.error('Cancel error:', error);
+    logger.error( `Cancel error: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
@@ -353,7 +354,7 @@ if (itemInOrder) {
 const cancelOrders = async (req, res) => {
   try {
     const { orderId, reason } = req.body;
-    console.log(req.body)
+    logger.debug(req.body)
     const order = await Order.findById(orderId);
     if (!order) return res.status(StatusCode.NOT_FOUND).json({ message: 'Order not found' });
 
@@ -424,7 +425,7 @@ const cancelOrders = async (req, res) => {
 
     return res.status(StatusCode.OK).json({ success: true, message: 'Order cancelled successfully' });
   } catch (error) {
-    console.error("Cancel order error:", error);
+    logger.error( `Cancel order error: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
   }
 };
@@ -461,7 +462,7 @@ const returnOrder = async (req, res) => {
 
     res.status(StatusCode.CREATED).json({ success: true, message: 'Return request submitted successfully' });
   } catch (error) {
-    console.error('Return request error:', error);
+    logger.error( `Return request error: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
   }
 };
@@ -482,7 +483,7 @@ const singleProductReturn = async (req, res) => {
     res.status(StatusCode.OK).json({ success: true })
 
   } catch (error) {
-    console.error('single product return,error is there: ', error)
+    logger.error( `single product return,error is there: ${error}`)
   }
 }
 
@@ -503,7 +504,7 @@ const razorpay = async (req, res) => {
     const order = await razorpayInstance.orders.create(options);
     res.status(StatusCode.OK).json({ success: true, order });
   } catch (error) {
-    console.error('Razorpay order creation failed:', error);
+    logger.error( `Razorpay order creation failed: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to create order' });
   }
 };
@@ -562,7 +563,7 @@ const loadFailure = async (req, res) => {
 
       // variant.quantity -= item.quantity;
     }
-    console.log('cart', cart)
+    logger.debug( 'cart:',cart)
 
     const totalPrice = orderedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
 
@@ -638,7 +639,7 @@ const loadFailure = async (req, res) => {
 
     res.render('razorpayfailer', { order: newOrder, error: error || '' });
   } catch (error) {
-    console.error("Error occur while loadFailure:", error);
+    logger.error( `Error occur while loadFailure: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).redirect('/pageNotFound');
   }
 };
@@ -665,7 +666,7 @@ const loadRetryCheckout = async (req, res) => {
       usedBy: { $ne: userId }
     });
 
-    console.log(order)
+    logger.debug(order)
     return res.status(StatusCode.OK).render('retryCheckout', {
       user: user,
       order: order,
@@ -680,7 +681,7 @@ const loadRetryCheckout = async (req, res) => {
       activePage: 'checkout'
     })
   } catch (error) {
-    console.log('error in retry:', error)
+    logger.error( `error in retry: ${error}`)
     res.status(StatusCode.INTERNAL_SERVER_ERROR).redirect('/pageNotFound')
   }
 }
@@ -706,7 +707,7 @@ const loadRetryPlaceOrder = async (req, res) => {
 
     res.status(StatusCode.CREATED).json({ success: true })
   } catch (error) {
-    console.log("loadRetryPlaceOrder error:", error)
+    logger.error( `loadRetryPlaceOrder error: ${error}`)
   }
 }
 
@@ -736,7 +737,7 @@ const generateInvoice = async (req, res) => {
     })
     order.orderedItems = newOrder
 
-    console.log('newOrder:',newOrder)
+    logger.debug('newOrder:',newOrder)
 
     const templatePath = path.join(__dirname, "../../views/user/invoice_template.ejs");
     const html = await ejs.renderFile(templatePath, { order });
@@ -770,12 +771,12 @@ const generateInvoice = async (req, res) => {
 
     res.download(filePath, fileName, (err) => {
       if (err) {
-        console.error("Error sending file:", err);
+        logger.error(`Error sending file  ${err}`);
         res.status(StatusCode.BAD_REQUEST).send("Error generating invoice");
       }
     });
   } catch (error) {
-    console.error("Error generating invoice:", error);
+    logger.error(`Error generating invoice: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Error generating invoice");
   }
 };
