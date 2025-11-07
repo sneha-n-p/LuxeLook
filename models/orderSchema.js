@@ -43,7 +43,7 @@ const orderSchema = new Schema({
       },
       status: {
         type: String,
-        enum: ["Ordered", "Cancelled", "Delivered", "Return Request", "Returned"],
+        enum: ['Pending','Confirmed',"Ordered", "Cancelled", "Delivered", "Return Request",'Payment Failed', "Returned"],
         default: "Ordered",
       },
       returnReason: String,
@@ -111,7 +111,7 @@ const orderSchema = new Schema({
       "Delivered",
       "Confirmed",
       "Cancelled",
-      'payment Failed',
+      'Payment Failed',
       "Out For Delivery",
       "Return Request",
       "Returned",

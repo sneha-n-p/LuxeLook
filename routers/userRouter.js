@@ -96,6 +96,7 @@ router.post("/wishlist/removeFromWishlist",wishlistController.removeProduct)
 
 router.get("/cart",userAuth,cartController.loadcart)
 router.post("/cart",cartController.procedToCheckOut)
+router.patch('/cart/Quantity',cartController.changeCartQuantity)
 router.post("/cart/addToCart",cartController.addToCart)
 router.post("/cart/removeFromCart",cartController.removeProductCart)
 router.get("/cart/checkout",userAuth,cartController.loadCheckOut)

@@ -16,6 +16,7 @@
             align-items: center;
             justify-content: center;
         }
+
         .cart-table {
             background: #F2E8DC;
             border-radius: 12px;
@@ -175,30 +176,31 @@
         .table td {
             vertical-align: middle !important;
         }
-        .back-arrow-btn {
-    position: absolute;
-    top: 247px;
-    left: 25px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-  }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
-    color: white;
-    transform: scale(1.1);
-  }
+        .back-arrow-btn {
+            position: absolute;
+            top: 247px;
+            left: 25px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-arrow-btn:hover {
+            background-color: #B5654B;
+            color: white;
+            transform: scale(1.1);
+        }
     </style>
     <section class="hero text-center bg-light p-0 mb-4">
         <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100 "
@@ -239,6 +241,7 @@
                             </td>
                             <td>
                                 <strong>
+
                                     <%= product.productId.productName %>
                                 </strong><br>
                                 <small>
@@ -252,18 +255,15 @@
                                 <%= product.size %>
                             </td>
                             <td>
-                                <% if (available <=0) { %>
-                                    <input type="number" value="0" class="quantity-input" max="<%= available %>"
-                                        data-id="<%= product.productId._id %>"
-                                        data-name="<%=product.productId.productName%>">
-                                    <div class="text-danger small mt-1">Out of stock! Max available: 0</div>
-                                    <% } else { %>
-                                        <input type="number" value="<%= quantity %>" min="1" max="<%= available %>"
-                                            class="quantity-input no-typing" data-id="<%= product.productId._id %>"
-                                            data-price="<%= price %>" data-size="<%= product.size %>" data-max="5">
-                                        <% } %>
-
+                                <button
+                                    onclick="QuantityDecrement('<%= product.productId._id %>', '<%= product.size %>')">-</button>
+                                <input type="number" value="<%= quantity %>" class="quantity-input" data-name="<%=product.productId.productName%>"
+                                    data-id="<%= product.productId._id %>" data-size="<%= product.size %>"
+                                    data-price="<%= price %>" readonly />
+                                <button
+                                    onclick="QuantityIncreament('<%= product.productId._id %>', '<%= product.size %>')">+</button>
                             </td>
+
                             <td class="product-total">
                                 ₹<span class="price-text">
                                     <%= price * quantity %>
@@ -315,6 +315,115 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+
+        function QuantityIncreament(productId, size) {
+            axios.patch("/cart/Quantity", { productId, size, Action: "increment" })
+                .then((res) => {
+                    if (res.data.success) {
+                        const updatedCart = res.data.data;
+                        console.log('updatedCart',updatedCart)
+                        updatedCart.items.forEach((item) => {
+                            const id = item.productId._id || item.productId;
+                            const sizeKey = item.size;
+
+                            const qtyElement = document.querySelector(
+                                `[data-id="${id}"][data-size="${sizeKey}"]`
+                            );
+                            const priceText = qtyElement
+                                ?.closest("tr")
+                                ?.querySelector(".price-text");
+
+                            if (qtyElement) {
+                                qtyElement.value = item.quantity;
+                            }
+
+                            if (priceText) {
+                                priceText.textContent = item.totalPrice;
+                            }
+                            if (item.quantity === 0 && item.productId===productId) {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Out of stock",
+                                    text: "product is out of stock",
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            } else if (item.quantity >= 5) {
+                                Swal.fire({
+                                    icon: "warning",
+                                    title: "Limit Exceeded",
+                                    text:  "Only 5 quantity per product allowed at a time.",
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            }else{
+                                if(res.data.message){
+                                   Swal.fire({
+                                    icon: "warning",
+                                    title: "Limit Exceeded",
+                                    text:res.data.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }); 
+                                }
+                            }
+                        });
+
+                        const subtotal = updatedCart.items.reduce(
+                            (sum, item) => sum + item.totalPrice,
+                            0
+                        );
+                        document.getElementById("subTotal").textContent = `₹${subtotal}`;
+                        document.getElementById("finalTotal").textContent = `₹${subtotal}`;
+                        console.log('updated CArt:', updatedCart)
+                    }
+                })
+
+                .catch((err) => {
+                    console.error('error in cart Quantity incesing:', err);
+                });
+        }
+
+        function QuantityDecrement(productId, size) {
+            axios.patch("/cart/Quantity", { productId, size, Action: 'decrement' })
+                .then((res) => {
+                    if (res.data.success) {
+                        const updatedCart = res.data.data
+
+                        updatedCart.items.forEach((item) => {
+                            const id = item.productId._id || item.productId;
+                            const sizeKey = item.size;
+
+                            const qtyElement = document.querySelector(
+                                `[data-id="${id}"][data-size="${sizeKey}"]`
+                            );
+                            const priceText = qtyElement
+                                ?.closest("tr")
+                                ?.querySelector(".price-text");
+
+                            if (qtyElement) {
+                                qtyElement.value = item.quantity;
+                            }
+
+                            if (priceText) {
+                                priceText.textContent = item.totalPrice;
+                            }
+                        });
+
+                        const subtotal = updatedCart.items.reduce(
+                            (sum, item) => sum + item.totalPrice,
+                            0
+                        );
+                        document.getElementById("subTotal").textContent = `₹${subtotal}`;
+                        document.getElementById("finalTotal").textContent = `₹${subtotal}`;
+
+                    }
+                }).catch((err) => {
+                    console.error('error in Cart Quantity decrement: ', err);
+                });
+        }
+
+
         document.addEventListener("DOMContentLoaded", () => {
             recalculateSubtotal();
         });
@@ -360,68 +469,6 @@
             });
         }
 
-        document.querySelectorAll(".quantity-input").forEach(input => {
-            input.addEventListener('keydown', e => e.preventDefault());
-            input.addEventListener("input", function () {
-                const row = this.closest("tr");
-                const price = parseInt(this.getAttribute('data-price'));
-                const max = parseInt(this.getAttribute('data-max'));
-                const available = parseInt(this.getAttribute('max'));
-                console.log(available)
-                let quantity = parseInt(this.value);
-
-                const limit = max < 5 ? max : 5;
-                if (available == 0) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Out of stock",
-                        text: "product is out of stock",
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                } else if (quantity > limit) {
-                    this.value = limit;
-                    quantity = limit;
-
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Limit Exceeded",
-                        text: max < 5
-                            ? `Only ${max} item(s) available in stock.`
-                            : "Only 5 quantity per product allowed at a time.",
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-                } else if (quantity < 1 || isNaN(quantity)) {
-                    this.value = 1;
-                    quantity = 1;
-                }
-
-                const productTotal = price * quantity;
-                row.querySelector(".price-text").textContent = productTotal;
-
-                recalculateSubtotal();
-            });
-        });
-
-
-        function recalculateSubtotal() {
-            let subtotal = 0;
-            document.querySelectorAll(".cart-table tbody tr").forEach(row => {
-                const input = row.querySelector(".quantity-input");
-                if (!input || input.disabled) return;
-
-                const qty = parseInt(input.value);
-                const price = parseInt(input.getAttribute("data-price"));
-
-                if (!isNaN(qty) && !isNaN(price)) {
-                    subtotal += price * qty;
-                }
-            });
-
-            document.getElementById("subTotal").textContent = `₹${subtotal}`;
-            document.getElementById("finalTotal").textContent = `₹${subtotal}`;
-        }
 
         document.getElementById("proceedCheckout")?.addEventListener("click", function () {
             const cartItems = [];
@@ -436,20 +483,14 @@
                 const maxAvailable = parseInt(input.getAttribute("data-max"));
                 const name = input.getAttribute("data-name")
 
-                if (quantity > maxAvailable) {
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Stock limit reached!",
-                        text: `Only ${maxAvailable} item available for this size.`,
-                    })
-                    return;
-                }
                 if (quantity == 0) {
                     Swal.fire({
                         icon: "warning",
                         title: "Out of stock",
                         text: `${name} Product Out Of Stock`,
-                        timer: 2000
+                        showConfirmButton: false,
+                        confirmButtonText: "OK",
+                        timer: 4000
                     })
                     return;
                 }
@@ -465,16 +506,22 @@
                         Swal.fire({
                             icon: "warning",
                             title: "Info!",
-                            text: response.data.message
-                        })
-                            .then(window.location.reload())
+                            text: response.data.message,
+                            showConfirmButton: true,
+                            confirmButtonText: "OK",
+                            timer: 4000
+                        }).then(() => window.location.reload())
+
                     }
                 })
                 .catch(error => {
                     Swal.fire({
                         icon: "error",
                         title: "Oops...",
-                        text: "Something went wrong!"
+                        text: "Something went wrong!",
+                        showConfirmButton: false,
+                        confirmButtonText: "OK",
+                        timer: 4000
                     });
                 });
         });

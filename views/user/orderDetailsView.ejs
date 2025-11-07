@@ -303,7 +303,7 @@
                                                             </h6>
                                                             <p>Quantity: <%= item.quantity %> | Price: ₹<%=
                                                                         item.price %> | Status: <%=
-                                                                            item.status %> | size : <%=item.size%>
+                                                                            item.status.trim() %> | size : <%=item.size%>
                                                             </p>
                                                         </div>
                                                     </div>
@@ -311,7 +311,7 @@
                                                         <% if (item.status.trim()==='Delivered' ) { %>
                                                             <button class="submit-btn btn-return"
                                                                 onclick="singleReturned('<%= order._id %>', '<%= item.product._id %>','<%=item.size%>')">RETURN</button>
-                                                            <% } else if (item.status.trim()==='Ordered' ) { %>
+                                                            <% } else if (item.status.trim()==='Confirmed' ) { %>
                                                                 <button class="submit-btn btn-cancel"
                                                                     onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>','<%= item.size%>')">CANCEL</button>
                                                                 <% } else if(item.status.trim()==='Return Request' ) {

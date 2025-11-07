@@ -42,12 +42,13 @@ const loadcart = async (req, res) => {
             const cart = await Cart.findOne({ userId: id }).populate("items.productId")
 
             const items = cart ? cart.items : []
-            logger.debug('items:',items)
+            
+            logger.debug(`items:,${items}`)
             const subTotal = items.reduce((acc, curr) => {
                 return acc + (curr.totalPrice || 0);
             }, 0);
 
-            logger.debug('subTotal:',subTotal)
+            logger.debug('subTotal:', subTotal)
 
             res.render("cart", {
                 cart: items,
@@ -69,18 +70,23 @@ const procedToCheckOut = async (req, res) => {
     try {
         const userId = req.session.user;
         const cartItems = req.body.cartItems;
+        logger.debug('cartItems', cartItems)
         cartItems.map((item) => {
             if (item.quantity === 0) {
                 return res.json({ success: false, message: 'The product Out of stock' })
             }
         })
         for (let item of cartItems) {
-            const product = await Product.findById(item.productId)
+            const product = await Product.findById(item.productId).populate('category')
+            logger.debug(`product.category:${product.category.status}`)
+
+            if(item.isBlocked||product.category.status=='Unlisted') return res.json({success:false,message:`${product.productName} is Blocked By Admin`})
+                
             for (let variants of product.variant) {
                 if (variants.size === item.size) {
                     if (variants.quantity < item.quantity) {
                         return res.status(StatusCode.OK).json({ success: false, message: `In ${product.productName} ,Only ${variants.quantity} item available for this size.` })
-                    } else if(item.quantity === 0){
+                    } else if (item.quantity === 0) {
                         return res.status(StatusCode.OK).json({ success: false, message: `In ${product.productName} ,Only ${variants.quantity} item available for this size.` })
 
                     }
@@ -100,10 +106,61 @@ const procedToCheckOut = async (req, res) => {
         return res.status(StatusCode.OK).json({ success: true });
 
     } catch (error) {
-        logger.error( `Error updating cart quantities: ${error}`);
+        logger.error(`Error updating cart quantities: ${error}`);
         res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
     }
 };
+
+const changeCartQuantity = async (req, res) => {
+    try {
+        const { productId, size, Action } = req.body
+        const userId = req.session.user
+        const cart = await Cart.findOne({ userId })
+        const product = await Product.findById(productId)
+        let maxLimit;
+        product.variant.forEach(v => {
+            if (v.size === size) {
+
+                maxLimit = v.quantity < 5 ? v.quantity : 5
+            }
+        })
+        if (maxLimit === 0) {
+            cart.items.forEach(item => {
+                if (item.productId.toString() === productId && item.size === size) {
+                    item.quantity = 0
+                }
+            })
+            await cart.save()
+            return res.status(StatusCode.OK).json({ success: true, data: cart })
+        }
+
+        logger.debug(`product:,${product}`)
+
+        logger.debug(`maxLimit:,${maxLimit}`)
+        cart.items.forEach(item => {
+            if (item.productId.toString() === productId && item.size === size) {
+                if (Action === 'increment' && item.quantity < maxLimit) {
+                    item.quantity++
+                    item.totalPrice = (item.quantity * item.price)
+                } else if (Action === 'decrement' && item.quantity > 1) {
+                    item.quantity--
+                    item.totalPrice = (item.quantity * item.price)
+                } else {
+                    if (Action === 'increment' && item.quantity == maxLimit) {
+                       return res.status(StatusCode.OK).json({ success: true, data: cart,message:maxLimit!==5? `Only ${maxLimit} Stock Is Available `:`Limit Exeeded` })
+                    }
+                }
+            }
+        })
+        logger.debug(`cart:${cart}`)
+        await cart.save()
+        res.status(StatusCode.OK).json({ success: true, data: cart })
+
+
+    } catch (error) {
+        logger.error(`error in Cart quantity changing:${error}`)
+    }
+}
 
 const addToCart = async (req, res) => {
     try {
@@ -121,7 +178,7 @@ const addToCart = async (req, res) => {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid product variant" });
         }
 
-        const maxAllowed = stock <= 5 ? stock : 5; 
+        const maxAllowed = stock <= 5 ? stock : 5;
 
         if (CarQquantity > maxAllowed) {
             return res.status(StatusCode.BAD_REQUEST).json({
@@ -160,7 +217,7 @@ const addToCart = async (req, res) => {
             totalPrice: totalPrice
         };
 
-        let cartLength 
+        let cartLength
 
         if (cart) {
             const existingItem = cart.items.find(item =>
@@ -183,24 +240,24 @@ const addToCart = async (req, res) => {
                 existingItem.totalPrice = totalQuantity * existingItem.price;
                 await cart.save();
                 cartLength = cart.items.length
-                return res.status(StatusCode.OK).json({ success: true, message: "Product quantity updated in cart",cartLength });
+                return res.status(StatusCode.OK).json({ success: true, message: "Product quantity updated in cart", cartLength });
             }
 
             cart.items.push(newCartItem);
             await cart.save();
-            cartLength = cart.items.length 
-            logger.debug('cartLength:',cartLength) 
+            cartLength = cart.items.length
+            logger.debug('cartLength:', cartLength)
 
-            return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart" ,cartLength});
+            return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart", cartLength });
         }
 
-        const newCart =await Cart.create({
+        const newCart = await Cart.create({
             userId,
             items: [newCartItem]
         });
-        logger.debug('newCart:',newCart)
+        logger.debug('newCart:', newCart)
         cartLength = newCart.items.length
-        return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart",cartLength });
+        return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart", cartLength });
 
     } catch (error) {
         logger.error("Add to cart error:", error);
@@ -214,7 +271,7 @@ const removeProductCart = async (req, res) => {
         const userId = req.session.user
         const cart = await Cart.findOne({ userId: userId })
         const index = cart.items.findIndex(item => item.productId.toString() === productId);
-        logger.debug('index:',index);
+        logger.debug('index:', index);
         await cart.items.splice(index, 1)
         await cart.save()
         return res.status(StatusCode.OK).json({ success: true, cartCount: cart.items.length });
@@ -251,8 +308,8 @@ const loadCheckOut = async (req, res) => {
         }
         if (address) {
             const addresses = address.address
-            logger.debug( 'addresses:',addresses)
-            logger.debug( 'cartItems:', cartItems)
+            logger.debug('addresses:', addresses)
+            logger.debug('cartItems:', cartItems)
             const delivery = 0
             const discount = 0
             const finalTotal = subtotal + delivery - discount;
@@ -318,6 +375,7 @@ const loadCheckOut = async (req, res) => {
 module.exports = {
     loadcart,
     procedToCheckOut,
+    changeCartQuantity,
     addToCart,
     removeProductCart,
     loadCheckOut

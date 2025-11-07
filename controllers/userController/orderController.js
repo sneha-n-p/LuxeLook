@@ -17,8 +17,8 @@ const logger = require('../../helpers/logger')
 const placeOrder = async (req, res) => {
   try {
     const userId = req.session.user;
-    const { addressId, paymentMethod, coupon,Total, couponId } = req.body;
-    logger.debug('req.body',req.body)
+    const { addressId, paymentMethod, coupon, Total, couponId } = req.body;
+    logger.debug('req.body', req.body)
 
     if (!userId) {
       return res.status(StatusCode.UNAUTHORIZED).json({
@@ -53,6 +53,7 @@ const placeOrder = async (req, res) => {
     }
 
     const orderedItems = [];
+    const orderedStatus = 'Payment Failed'
     for (const item of cart.items) {
       const selectedSize = item.size;
       const product = item.productId;
@@ -77,6 +78,9 @@ const placeOrder = async (req, res) => {
           success: false,
           message: `Not enough stock for ${product.productName} in size ${selectedSize}`,
         });
+
+
+
       }
 
       orderedItems.push({
@@ -86,17 +90,18 @@ const placeOrder = async (req, res) => {
         price: item.totalPrice,
         productName: product.productName,
         productImage: product.productImage[0],
+        status: paymentMethod === 'COD' ? 'Pending' : 'Confirmed'
       });
 
       variant.quantity -= item.quantity;
-      product.quatity-= item.quantity
+      product.quatity -= item.quantity
     }
 
 
-    const totalPrice = orderedItems.reduce((acc, item) => acc +=item.price, 0);
+    const totalPrice = orderedItems.reduce((acc, item) => acc += item.price, 0);
 
-    logger.debug('orderedItems:',orderedItems)
-    logger.debug('totalPrice:',totalPrice)
+    logger.debug(`orderedItems: ${orderedItems}`)
+    logger.debug(`totalPrice: ${totalPrice}`)
 
     let discount = 0;
     let appliedCoupon = null;
@@ -271,7 +276,7 @@ const viewOrderDetails = async (req, res) => {
 
 const cancelSingleProduct = async (req, res) => {
   try {
-    const { productId, orderId, reason ,size} = req.body;
+    const { productId, orderId, reason, size } = req.body;
     const order = await Order.findById(orderId).populate('orderedItems.product');
 
     if (!order) return res.status(StatusCode.NOT_FOUND).json({ message: 'Order not found' });
@@ -298,15 +303,15 @@ const cancelSingleProduct = async (req, res) => {
     // itemInOrder.status = 'Cancelled';
     // itemInOrder.cancelReason = reason;
     const itemInOrder = order.orderedItems.find(
-  (item) =>
-    item.product.toString() === itemToCancel.product.toString() &&
-    item.size === size
-);
+      (item) =>
+        item.product.toString() === itemToCancel.product.toString() &&
+        item.size === size
+    );
 
-if (itemInOrder) {
-  itemInOrder.status = "Cancelled";
-  itemInOrder.cancelReason = reason;
-}
+    if (itemInOrder) {
+      itemInOrder.status = "Cancelled";
+      itemInOrder.cancelReason = reason;
+    }
 
     const activeItems = order.orderedItems.filter(item => item.status !== 'Cancelled');
     const originalTotal = order.orderedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -317,7 +322,7 @@ if (itemInOrder) {
     const itemDiscountShare = (itemTotal / originalTotal) * discountAmount;
     const refundAmount = itemTotal - itemDiscountShare;
 
-    order.totalPrice = activeItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    order.totalPrice = activeItems.reduce((sum, item) => sum += item.price, 0);
     order.finalAmount = order.totalPrice - (
       (order.totalPrice / originalTotal) * discountAmount
     );
@@ -346,7 +351,7 @@ if (itemInOrder) {
 
     res.json({ success: true, message: 'Product cancelled successfully' });
   } catch (error) {
-    logger.error( `Cancel error: ${error}`);
+    logger.error(`Cancel error: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
   }
 };
@@ -368,7 +373,7 @@ const cancelOrders = async (req, res) => {
         const variant = product.variant.find(v => v.size === item.size);
         if (variant) {
           variant.quantity += item.quantity
-          product.quatity+=item.quantity
+          product.quatity += item.quantity
           await product.save();
         }
       }
@@ -425,7 +430,7 @@ const cancelOrders = async (req, res) => {
 
     return res.status(StatusCode.OK).json({ success: true, message: 'Order cancelled successfully' });
   } catch (error) {
-    logger.error( `Cancel order error: ${error}`);
+    logger.error(`Cancel order error: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
   }
 };
@@ -462,14 +467,14 @@ const returnOrder = async (req, res) => {
 
     res.status(StatusCode.CREATED).json({ success: true, message: 'Return request submitted successfully' });
   } catch (error) {
-    logger.error( `Return request error: ${error}`);
+    logger.error(`Return request error: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
   }
 };
 
 const singleProductReturn = async (req, res) => {
   try {
-    const { orderId, productId, reason,size } = req.body
+    const { orderId, productId, reason, size } = req.body
 
     const order = await Order.findById(orderId)
 
@@ -483,7 +488,7 @@ const singleProductReturn = async (req, res) => {
     res.status(StatusCode.OK).json({ success: true })
 
   } catch (error) {
-    logger.error( `single product return,error is there: ${error}`)
+    logger.error(`single product return,error is there: ${error}`)
   }
 }
 
@@ -504,7 +509,7 @@ const razorpay = async (req, res) => {
     const order = await razorpayInstance.orders.create(options);
     res.status(StatusCode.OK).json({ success: true, order });
   } catch (error) {
-    logger.error( `Razorpay order creation failed: ${error}`);
+    logger.error(`Razorpay order creation failed: ${error}`);
     res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ error: 'Failed to create order' });
   }
 };
@@ -513,7 +518,7 @@ const loadFailure = async (req, res) => {
   try {
     const userId = req.session.user
     const data = JSON.parse(req.query.data);
-    const { addressId, coupon, paymentMethod, Total, size } = data
+    const { addressId, coupon, paymentMethod, Total, size,couponId } = data
     const { error } = req.query
 
     const addId = new mongoose.Types.ObjectId(addressId)
@@ -526,6 +531,7 @@ const loadFailure = async (req, res) => {
     const cart = await Cart.findOne({ userId }).populate('items.productId');
 
     const orderedItems = [];
+    const orderStatus = 'Payment Failed'
     for (const item of cart.items) {
       const selectedSize = item.size;
       const product = item.productId;
@@ -559,13 +565,15 @@ const loadFailure = async (req, res) => {
         price: item.totalPrice,
         productName: product.productName,
         productImage: product.productImage[0],
+        status: orderStatus,
       });
 
       // variant.quantity -= item.quantity;
     }
-    logger.debug( 'cart:',cart)
+    logger.debug('cart:', cart)
 
-    const totalPrice = orderedItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
+    const totalPrice = orderedItems.reduce((acc, item) => acc += item.price, 0);
+    logger.info(`orderedIems:${orderedItems}`)
 
     let discount = 0;
     let appliedCoupon = null;
@@ -630,7 +638,7 @@ const loadFailure = async (req, res) => {
           altPhone: address.altPhone,
         },
       ],
-      status: 'payment Failed',
+      status: orderStatus,
       couponApplied: couponName,
       paymentMethod,
     });
@@ -639,7 +647,7 @@ const loadFailure = async (req, res) => {
 
     res.render('razorpayfailer', { order: newOrder, error: error || '' });
   } catch (error) {
-    logger.error( `Error occur while loadFailure: ${error}`);
+    logger.error(`Error occur while loadFailure: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).redirect('/pageNotFound');
   }
 };
@@ -681,7 +689,7 @@ const loadRetryCheckout = async (req, res) => {
       activePage: 'checkout'
     })
   } catch (error) {
-    logger.error( `error in retry: ${error}`)
+    logger.error(`error in retry: ${error}`)
     res.status(StatusCode.INTERNAL_SERVER_ERROR).redirect('/pageNotFound')
   }
 }
@@ -697,17 +705,37 @@ const loadRetryPlaceOrder = async (req, res) => {
       order.couponApplied = coupon
     }
 
+    order.orderedItems.forEach(async (item) => {
+      if (item.status == 'Payment Failed') {
+        if (paymentMethod === "COD") {
+          item.status = 'Pending'
+        } else {
+          item.status = 'Confirmed'
+        }
+        const product = await Product.findById(item.product)
+        product.variant.forEach(v=>{
+          if(v.size===item.size){
+            v.quantity-=item.quantity
+          }
+        })
+        product.quatity-=item.quantity
+        await product.save()
+      }
+    })
+
+    logger.debug(`order: ${order}`)
     if (paymentMethod === "COD") {
       order.status = 'Pending'
     } else {
       order.status = 'Confirmed'
     }
+
     order.paymentMethod = paymentMethod
     await order.save()
 
     res.status(StatusCode.CREATED).json({ success: true })
   } catch (error) {
-    logger.error( `loadRetryPlaceOrder error: ${error}`)
+    logger.error(`loadRetryPlaceOrder error: ${error}`)
   }
 }
 
@@ -730,14 +758,14 @@ const generateInvoice = async (req, res) => {
       await order.save();
     }
     let newOrder = []
-    order.orderedItems.forEach(item=>{
-      if(item.status === 'Delivered' || item.status === 'Returened'){
+    order.orderedItems.forEach(item => {
+      if (item.status === 'Delivered' || item.status === 'Returened') {
         newOrder.push(item)
       }
     })
     order.orderedItems = newOrder
 
-    logger.debug('newOrder:',newOrder)
+    logger.debug('newOrder:', newOrder)
 
     const templatePath = path.join(__dirname, "../../views/user/invoice_template.ejs");
     const html = await ejs.renderFile(templatePath, { order });

@@ -328,7 +328,7 @@
                           RETURN
                         </button>
                       </div>
-                      <% } else if( order.status.trim()==='payment Failed' ) {%>
+                      <% } else if( order.status.trim()==='Payment Failed' ) {%>
                         <a href="/orders/retry-Checkout?orderId=<%= order._id %>" class="action-btn btn-return">RETRY</a>
                         <%}else if (['Pending', 'Shipped' , 'Out For Delivery' ,'Confirmed'
                           ].includes(order.status.trim())) { %>
