@@ -412,7 +412,7 @@ const unblockProduct = async (req, res) => {
   try {
     const id = req.body.id
     const isProduct = await Product.findOne({ _id: id })
-    loggerinfo.log(`Found Product: ${isProduct}`)
+    logger.debug(`Found Product: ${isProduct}`)
 
     if (!isProduct) {
       return res.json({ success: false, message: "Product not found. Try again." })
