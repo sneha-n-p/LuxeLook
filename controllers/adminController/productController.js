@@ -64,7 +64,7 @@ const addproduct = async (req, res) => {
       variantSalePrice,
       variantQuantity
     } = req.body;
-    const errors = {};
+    let errors = {};
 
     // Validation 
     if (!ProductName || !/^[A-Za-z ]+$/.test(ProductName)) {
@@ -124,13 +124,14 @@ const addproduct = async (req, res) => {
     }
     logger.error(errors)
     if (Object.keys(errors).length > 0) {
-      logger.error(`Error in validation : ${error}`)
-      return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
-        message: "Validation errors occurred",
-        errors,
-        categories: await Category.find(),
-        formData: req.body
-      });
+      logger.error(`Error in validation : ${errors}`)
+      return res.status(StatusCode.BAD_REQUEST).json({
+  success: false,
+  message: "Validation errors occurred",
+  errors,
+  formData: req.body,
+  categories: await Category.find()
+});
     }
 
     const categoryDoc = await Category.findOne({ name: category });
@@ -147,15 +148,15 @@ const addproduct = async (req, res) => {
     }
 
     if (!categoryDoc || !mongoose.Types.ObjectId.isValid(categoryDoc._id)) {
-      logger.debug(`Error in category`)
-      errors.category = "Invalid category";
-      return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
-        message: "Invalid category",
-        errors,
-        categories: await Category.find(),
-        formData: req.body
-      });
-    }
+  errors.category = "Invalid category";
+  return res.status(StatusCode.BAD_REQUEST).json({
+    success: false,
+    message: "Invalid category",
+    errors,
+    formData: req.body,
+    categories: await Category.find()
+  });
+}
 
     let imagesPaths = [];
 
@@ -189,14 +190,14 @@ const addproduct = async (req, res) => {
     }
 
     if (Object.keys(errors).length > 0) {
-      logger.error(errors)
-      return res.status(StatusCode.BAD_REQUEST).render("addProduct", {
-        message: "Validation errors occurred",
-        errors,
-        categories: await Category.find(),
-        formData: req.body
-      });
-    }
+  return res.status(StatusCode.BAD_REQUEST).json({
+    success: false,
+    message: "Image validation failed",
+    errors,
+    formData: req.body,
+    categories: await Category.find()
+  });
+}
     const newProduct = new Product({
       productName: ProductName,
       description,
@@ -211,12 +212,11 @@ const addproduct = async (req, res) => {
     });
 
     await newProduct.save();
-    return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });
-  } catch (error) {
+return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });  } catch (error) {
     logger.error(`Error adding product: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("addProduct", {
       message: "Failed to add product. Please try again.",
-      errors: {},
+      errors:{},
       categories: await Category.find(),
       formData: req.body
     });

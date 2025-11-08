@@ -1,11 +1,29 @@
 <%-include("../../views/partials/adminPartial/header")%>
 
   <style>
-    body {
-      background-color: #0f172a;
-      color: #f1f5f9;
-      font-family: 'Segoe UI', sans-serif;
-    }
+    /* Center the entire form section */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0f172a;
+  color: #f1f5f9;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+}
+
+/* Adjust container alignment */
+.product-form {
+  max-width: 900px;
+  width: 100%;
+  background-color: #1e293b;
+  padding: 49px 147px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  margin-left: 189px;
+}
+
 
     .form-control {
       background-color: #f8fafc;
@@ -56,10 +74,10 @@
       background-color: #94a3b8;
     }
 
-    .product-form {
+    /* .product-form {
       max-width: 900px;
       margin: 0 auto;
-    }
+    } */
 
     .image-preview {
       max-width: 150px;
@@ -82,7 +100,7 @@
      <button 
   onclick="window.history.back()" 
   class="btn btn-secondary" 
-  style= "color: white;">⬅ Go Back
+  style= "color: white;margin-left: -129px;margin-bottom: 54px;">⬅ Go Back
 </button>
     <form name="productForm" id="add-productForm" action="/admin/Products/add-product" method="POST"
       enctype="multipart/form-data">
@@ -91,21 +109,21 @@
           <div class="mb-3">
             <label class="form-label">Product Name:</label>
             <div id="name-error" class="error-message"></div>
-            <input type="text" class="form-control" id="name" name="ProductName" required pattern="/^[A-Za-z ,.-]+$/" maxlength="100"
+            <input type="text" class="form-control" id="name" name="ProductName"  pattern="/^[A-Za-z ,.-]+$/" maxlength="100"
               title="Only alphabets and spaces allowed." />
           </div>
 
           <div class="mb-3">
             <label class="form-label">Product Description:</label>
             <div id="description-error" class="error-message"></div>
-            <textarea class="form-control" id="description" name="description" rows="3" required pattern="/^[A-Za-z ,.-]+$/"
+            <textarea class="form-control" id="description" name="description" rows="3"  pattern="/^[A-Za-z ,.-]+$/"
               title="Only alphabets and spaces allowed." maxlength="100"></textarea>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Product Category:</label>
             <div id="category-error" class="error-message"></div>
-            <select class="form-select" id="category" name="category" required>
+            <select class="form-select" id="category" name="category" >
               <option value="" selected disabled>Select categories</option>
               <% categories.forEach(category=> { %>
                 <option value="<%= category.name %>">
@@ -125,7 +143,7 @@
             <label class="form-label">Price</label>
             <div id="price-error" class="error-message"></div>
             <input type="number" class="form-control" id="price" name="price" min="0"
-              placeholder="Greater than SalesPrice" required /> 
+              placeholder="Greater than SalesPrice"  /> 
           </div>
 
           <!-- <div class="mb-3">
@@ -142,17 +160,17 @@
                 <div>
                   <div id="variantSize-error-0" class="error-message"></div>
                   <input type="text" id="variant-size" name="variantSize[]" class="form-control" placeholder="Size"
-                    required />
+                     />
                 </div>
                 <div>
                   <div id="variantSalePrice-error-0" class="error-message"></div>
                   <input type="number" id="variant-salePrice" name="variantSalePrice[]" class="form-control"
-                    placeholder="Sale Price" required />
+                    placeholder="Sale Price"  />
                 </div>
                 <div>
                   <div id="variantQuantity-error-0" class="error-message"></div>
                   <input type="number" id="variant-quantity" name="variantQuantity[]" class="form-control"
-                    placeholder="Quantity" required />
+                    placeholder="Quantity"  />
                 </div>
                 <button type="button" class="btn btn-danger" onclick="removeVariant(this)">✖</button>
               </div>
@@ -200,6 +218,7 @@
 
     function displayErrorMessage(elementId, message) {
       const errorElement = document.getElementById(elementId);
+      console.log(errorElement)
       if (errorElement) {
         errorElement.textContent = message;
         errorElement.style.display = "block";
@@ -313,57 +332,63 @@
     document.addEventListener("DOMContentLoaded", function () {
       const form = document.getElementById("add-productForm")
       form.addEventListener("submit", async function (event) {
-        event.preventDefault();
+  event.preventDefault();
 
-        if (validateForm()) {
-          const formData = new FormData(form);
+  if (validateForm()) {
+    const formData = new FormData(form);
 
-          for (let i = 1; i <= 4; i++) {
-            const croppedInput = document.getElementById(`cropped-image-${i}`);
-            if (croppedInput && croppedInput.value) {
-              formData.delete(`image${i}`);
+    for (let i = 1; i <= 4; i++) {
+      const croppedInput = document.getElementById(`cropped-image-${i}`);
+      if (croppedInput && croppedInput.value) {
+        formData.delete(`image${i}`);
+        const blob = dataURLtoBlob(croppedInput.value);
+        formData.append(`image${i}`, blob, `cropped-${Date.now()}-${i}.jpg`);
+      }
+    }
 
-              const blob = dataURLtoBlob(croppedInput.value);
-              formData.append(`image${i}`, blob, `cropped-${Date.now()}-${i}.jpg`);
-            }
-          }
-
-          try {
-            const resp = await axios.post("/admin/Products/add-product", formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            });
-
-            const data = resp.data
-            if (data.success) {
-              Swal.fire({
-                title: "Success!",
-                text: data.message,
-                icon: "success",
-                confirmButtonText: "OK",
-              }).then((result) => {
-                window.location.href = data.url;
-              });
-            } else {
-              Swal.fire({
-                title: "Error!",
-                text: data.message || "Something went wrong",
-                icon: "error",
-                confirmButtonText: "OK",
-              });
-            }
-          } catch (err) {
-            console.error("Axios Error:", err);
-            Swal.fire({
-              title: "Error!",
-              text: "Failed to add product. Please try again.",
-              icon: "error",
-              confirmButtonText: "OK",
-            });
-          }
-        }
+    try {
+      const resp = await axios.post("/admin/Products/add-product", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
+
+      const data = resp.data;
+      if (data.success) {
+        Swal.fire({
+          title: "Success!",
+          text: data.message,
+          icon: "success",
+          confirmButtonText: "OK",
+        }).then(() => {
+          window.location.href = data.url;
+        });
+      } else {
+        Swal.fire({
+          title: "Error!",
+          text: data.message || "Something went wrong",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (err) {
+      console.error("Axios Error:", err);
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to add product. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  } else {
+    // 🔹 Add this else block
+    Swal.fire({
+      icon: "warning",
+      title: "Invalid Form",
+      text: "Please correct the highlighted errors before submitting.",
+      confirmButtonText: "OK",
+    });
+  }
+});
+
     });
 
     function dataURLtoBlob(dataURL) {
