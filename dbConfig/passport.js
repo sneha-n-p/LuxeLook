@@ -12,35 +12,41 @@ passport.use(new GoogleStrategy({
     async (accessToken, refersToken, profile, done) => {
         try {
             let user = await User.findOne({ googleId: profile.id })
-            if (user) {
-                return done(null, user)
-            } else {
-                user = new User({
-                    name: profile.displayName,
-                    email: profile.emails[0].value,
-                    googleId: profile.id
-                })
-                await user.save()
-                return done(null, user)
+            if (user) return done(null, user)
+
+
+            const existingEmailUser = await User.findOne({ email: profile.emails[0].value });
+            if (existingEmailUser) {
+                // Reject Google sign-in attempt for existing user
+                return done(null, false, { message: "User already exists. Please log in manually." });
             }
+
+            user = new User({
+                name: profile.displayName,
+                email: profile.emails[0].value,
+                googleId: profile.id
+            })
+            await user.save()
+            return done(null, user)
+
         } catch (error) {
             return done(error, null)
         }
     }
 ))
 
-passport.serializeUser((user,done)=>{
-    done(null,user.id)
+passport.serializeUser((user, done) => {
+    done(null, user.id)
 })
 
-passport.deserializeUser((id,done)=>{
+passport.deserializeUser((id, done) => {
     User.findById(id)
-    .then(user=>{
-        done(null,user)
-    })
-    .catch(error =>{
-        done(error,null)
-    })
+        .then(user => {
+            done(null, user)
+        })
+        .catch(error => {
+            done(error, null)
+        })
 })
 
 

@@ -6,7 +6,7 @@ const Product = require("../../models/productSchema")
 const Category = require('../../models/categorySchema')
 const Coupon = require('../../models/couponSchema')
 const StatusCode = require('../../statusCode')
-const logger =  require('../../helpers/logger')
+const logger = require('../../helpers/logger')
 
 const pageNotFound = async (req, res) => {
     try {
@@ -56,7 +56,7 @@ const loadHomePage = async (req, res) => {
             };
         });
 
-logger.debug(`processedProducts: ${filteredProducts}`)
+        logger.debug(`processedProducts: ${filteredProducts}`)
         if (user) {
             const userData = await User.findById(user);
             return res.render("home", { user: userData, products: processedProducts, categorys, activePage: "home" });
@@ -226,6 +226,7 @@ const verifyOtp = async (req, res) => {
             });
 
             await saveUserData.save();
+            logger.debug(`userId :${saveUserData._id}`)
 
             if (user.referalCode) {
                 const referrer = await User.findOne({ referalCode: user.referalCode });
@@ -244,20 +245,22 @@ const verifyOtp = async (req, res) => {
                     if (!referrer.availableCoupons) referrer.availableCoupons = [];
                     if (!referrer.redeemedUsers) referrer.redeemedUsers = [];
                     referrer.availableCoupons.push(referrerCoupon._id);
-                    // referrer.redeemedUsers.push(saveUserData._id);
+                    referrer.redeemedUsers.push(saveUserData._id);
                     await referrer.save();
 
                     // const refereeCoupon = new Coupon({
                     //     name: "NEW" + Math.random().toString(36).substr(2, 8).toUpperCase(),
                     //     offerPrice: 50,
                     //     minimumPrice: 300,
+                    //     restricted: true,
+                    //     refferedUserId:saveUserData._id,
                     //     expiredOn: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
                     //     isList: false,
                     // });
                     // await refereeCoupon.save();
 
                     // saveUserData.availableCoupons = [refereeCoupon._id];
-                    // await saveUserData.save();
+                    await saveUserData.save();
                 }
             }
 
@@ -316,17 +319,17 @@ const postLogin = async (req, res) => {
         const { email, password } = req.body
         const findUser = await User.findOne({ isAdmin: 0, email: email })
         if (!findUser) {
-            return res.render('login', { message: "User not found" })
+            return res.status(StatusCode.BAD_REQUEST).json({success:false, message: "User not found" })
         }
         if (findUser.isBlocked) {
-            return res.render("login", { message: "User blocked by admin" })
+            return res.status(StatusCode.BAD_REQUEST).json({success:false, message: "User blocked by admin" })
         }
         const passwordMatch = await bcrypt.compare(password, findUser.password)
         if (!passwordMatch) {
-            return res.render("login", { message: "Incorrect password" })
+            return res.status(StatusCode.BAD_REQUEST).json({success:false, message: "Incorrect password" })
         }
         req.session.user = findUser._id
-        res.redirect('/')
+        return res.status(StatusCode.OK).json({ success: true, message: "Login successful" });
 
     } catch (error) {
         logger.error(`login error: ${error}`)

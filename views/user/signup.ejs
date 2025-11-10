@@ -164,11 +164,6 @@
           <div id="signupError6" class="Error-message"></div>
           <input id="referalCode" type="text" class="form-control" name="referalCode" placeholder="referalCode(optional)" />
           <div class="form-check mb-3">
-            <%if(message){%>
-              <div class="alert alert-danger text-center">
-                  <%=message%>
-              </div>
-            <% } %>
           </div>
           <button type="submit" class="btn btn-signup w-100">Signup</button>
         </form>
@@ -227,7 +222,7 @@
 
   function emailValidateChecking() {
     const emailValue = emailID.value.trim();
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+@gmail\.com$/;
+    const emailPattern =/^[^\s@]+@gmail\.com$/;
     if (!emailValue) {
       signupError2.textContent = "Email is required";
       signupError2.style.display = "block";
@@ -310,14 +305,6 @@
     }
   }
 
-  function termsValidation() {
-    if (!termsCheckbox.checked) {
-      alert("Please accept the terms & policy");
-      return false;
-    }
-    return true;
-  }
-
   document.addEventListener("DOMContentLoaded", function () {
     nameID.addEventListener("blur", nameValidateChecking);
     emailID.addEventListener("blur", emailValidateChecking);
@@ -332,9 +319,8 @@
       const isPhoneValid = phoneValidateChecking();
       const isPasswordValid = passwordValidateChecking();
       const isReferralValid = referralCodeValidateChecking();
-      const isTermsChecked = termsValidation();
 
-      if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid || !isReferralValid || !isTermsChecked) {
+      if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid || !isReferralValid) {
         e.preventDefault();
       }
     });

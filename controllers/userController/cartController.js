@@ -320,9 +320,10 @@ const loadCheckOut = async (req, res) => {
                 minimumPrice: { $lte: finalTotal },
                 $or: [
                     { restricted: false },
-                    { restricted: true, userId: userId }
+                    { restricted: true, userId: userId },
+            //         {restricted:true , refferedUserId: userId}
                 ],
-                usedBy: { $ne: userId }
+                usedBy: { $ne: userId },
             });
 
             res.render('checkout', {

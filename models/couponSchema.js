@@ -36,6 +36,10 @@ const couponSchema = new Schema({
         type:Schema.Types.ObjectId,
         ref:"User"
     },
+    refferedUserId:{
+        type:Schema.Types.ObjectId,
+        ref:"User"
+    },
     usedBy:[{
         type:Schema.Types.ObjectId,
         ref:"User"

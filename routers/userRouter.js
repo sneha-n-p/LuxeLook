@@ -12,7 +12,7 @@ const walletController = require("../controllers/userController/walletController
 const couponController = require("../controllers/userController/couponController")
 const {userAuth,userAuthCheck} = require('../middlewares/auth')
 const upload = require("../helpers/multer")
-
+const User = require('../models/userSchema')
 
 
 //user Controller//
