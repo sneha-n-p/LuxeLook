@@ -248,21 +248,22 @@ const verifyOtp = async (req, res) => {
                     referrer.redeemedUsers.push(saveUserData._id);
                     await referrer.save();
 
-                    // const refereeCoupon = new Coupon({
-                    //     name: "NEW" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                    //     offerPrice: 50,
-                    //     minimumPrice: 300,
-                    //     restricted: true,
-                    //     refferedUserId:saveUserData._id,
-                    //     expiredOn: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-                    //     isList: false,
-                    // });
-                    // await refereeCoupon.save();
+                    const refereeCoupon = new Coupon({
+                        name: "NEW" + Math.random().toString(36).substr(2, 8).toUpperCase(),
+                        offerPrice: 50,
+                        minimumPrice: 300,
+                        restricted: true,
+                        refferedUserId:saveUserData._id,
+                        expiredOn: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+                        isList: false,
+                    });
+                    await refereeCoupon.save();
 
-                    // saveUserData.availableCoupons = [refereeCoupon._id];
+                    saveUserData.availableCoupons = [refereeCoupon._id];
                     await saveUserData.save();
                 }
             }
+                        logger.debug(`availableCoupons:${availableCoupons}`)
 
             req.session.user = saveUserData._id;
             req.session.userData = null;

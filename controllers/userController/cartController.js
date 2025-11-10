@@ -42,7 +42,7 @@ const loadcart = async (req, res) => {
             const cart = await Cart.findOne({ userId: id }).populate("items.productId")
 
             const items = cart ? cart.items : []
-            
+
             logger.debug(`items:,${items}`)
             const subTotal = items.reduce((acc, curr) => {
                 return acc + (curr.totalPrice || 0);
@@ -80,8 +80,8 @@ const procedToCheckOut = async (req, res) => {
             const product = await Product.findById(item.productId).populate('category')
             logger.debug(`product.category:${product.category.status}`)
 
-            if(item.isBlocked||product.category.status=='Unlisted') return res.json({success:false,message:`${product.productName} is Blocked By Admin`})
-                
+            if (item.isBlocked || product.category.status == 'Unlisted') return res.json({ success: false, message: `${product.productName} is Blocked By Admin` })
+
             for (let variants of product.variant) {
                 if (variants.size === item.size) {
                     if (variants.quantity < item.quantity) {
@@ -147,7 +147,7 @@ const changeCartQuantity = async (req, res) => {
                     item.totalPrice = (item.quantity * item.price)
                 } else {
                     if (Action === 'increment' && item.quantity == maxLimit) {
-                       return res.status(StatusCode.OK).json({ success: true, data: cart,message:maxLimit!==5? `Only ${maxLimit} Stock Is Available `:`Limit Exeeded` })
+                        return res.status(StatusCode.OK).json({ success: true, data: cart, message: maxLimit !== 5 ? `Only ${maxLimit} Stock Is Available ` : `Limit Exeeded` })
                     }
                 }
             }
@@ -321,10 +321,12 @@ const loadCheckOut = async (req, res) => {
                 $or: [
                     { restricted: false },
                     { restricted: true, userId: userId },
-            //         {restricted:true , refferedUserId: userId}
+                    { restricted: true, refferedUserId: userId }
                 ],
                 usedBy: { $ne: userId },
-            });
+            })
+            logger.debug(`availableCoupons:${coupons}`)
+
 
             res.render('checkout', {
                 user,
@@ -348,7 +350,9 @@ const loadCheckOut = async (req, res) => {
                 minimumPrice: { $lte: finalTotal },
                 $or: [
                     { restricted: false },
-                    { restricted: true, userId: userId }
+                    { restricted: true, userId: userId },
+                    { restricted: true, refferedUserId: userId }
+
                 ],
                 usedBy: { $ne: userId }
             });
