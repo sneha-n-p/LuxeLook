@@ -33,15 +33,42 @@ router.get('/logout',userAuth,userController.logout)
 //google Auth//
 
 router.get("/auth/google",passport.authenticate('google',{scope:['profile','email']}))
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), async (req, res) => {
-    try {
-        req.session.user = req.user._id;
-        res.redirect('/');
-    } catch (error) {
-        console.log("Google login error:", error);
-        res.redirect('/signup');
-    }
-});
+// router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), async (req, res) => {
+//     try {
+//         req.session.user = req.user._id;
+//         res.redirect('/');
+//     } catch (error) {
+//         console.log("Google login error:", error);
+//         res.redirect('/signup');
+//     }
+// });
+
+router.get(
+  '/auth/google/callback',
+  (req, res, next) => {
+    passport.authenticate('google', async (err, user) => {
+      if (err) {
+        console.log('Google login error:', err);
+
+        // If user is blocked
+        if (err.message === 'User Blocked By Admin') {
+          return res.redirect('/login?error=User+Blocked+By+Admin');
+        }
+
+        // Generic failure
+        return res.redirect('/signup?error=Something+went+wrong');
+      }
+
+      if (!user) {
+        return res.redirect('/signup?error=Google+login+failed');
+      }
+
+      req.session.user = user._id;
+      res.redirect('/');
+    })(req, res, next);
+  }
+);
+
 
 //login forgotpassword
 router.get("/login/forgot-password",userAuthCheck,profileController.loadForgotPassword)

@@ -12,23 +12,24 @@ passport.use(new GoogleStrategy({
     async (accessToken, refersToken, profile, done) => {
         try {
             let user = await User.findOne({ googleId: profile.id })
-            if (user) return done(null, user)
+            if (user) {
+                if (user) {
+                    if (user.isBlocked) {
+                        return done({ message: 'User Blocked By Admin' }, null);
+                    }
+                    return done(null, user);
+                }
 
-
-            const existingEmailUser = await User.findOne({ email: profile.emails[0].value });
-            if (existingEmailUser) {
-                // Reject Google sign-in attempt for existing user
-                return done(null, false, { message: "User already exists. Please log in manually." });
+                return done(null, user)
+            } else {
+                user = new User({
+                    name: profile.displayName,
+                    email: profile.emails[0].value,
+                    googleId: profile.id
+                })
+                await user.save()
+                return done(null, user)
             }
-
-            user = new User({
-                name: profile.displayName,
-                email: profile.emails[0].value,
-                googleId: profile.id
-            })
-            await user.save()
-            return done(null, user)
-
         } catch (error) {
             return done(error, null)
         }

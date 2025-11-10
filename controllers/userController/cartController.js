@@ -291,6 +291,7 @@ const loadCheckOut = async (req, res) => {
         let cartItems = [];
         let subtotal = 0;
         let razorpayKey = process.env.RAZORPAY_KEY_ID
+        // let walletPayment 
         if (cart && cart.items.length > 0) {
             cartItems = cart.items.map(item => {
                 const totalPrice = item.totalPrice;

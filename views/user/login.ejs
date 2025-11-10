@@ -198,15 +198,12 @@
                         <label>Password</label> <a href="/login/forgot-password" class="forgot-link">forgot password</a>
                         <div id="LoginError2" class="Error-message"></div>
                         <input id="password" type="password" name="password" class="form-control"
-                        placeholder="Password">
+                            placeholder="Password">
                     </div>
                     <% if (message) { %>
-                        <div >
-                            <%= message %>
-                        </div>
-                                <% } %>
-
-                    <button onclick="Login(event)"class="btn btn-login w-100">Login</button>
+                        <div style="color:red;"></div>
+                        <% } %>
+                            <button onclick="Login(event)" class="btn btn-login w-100">Login</button>
                 </form>
 
                 <div class="divider">or</div>
@@ -229,112 +226,127 @@
         </div>
     </div>
     </div>
-    
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-  const loginForm = document.getElementById('loginForm');
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const error1 = document.getElementById('LoginError1');
-  const error2 = document.getElementById('LoginError2');
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  // ✅ Email validation
-  function validateEmailField() {
-    const emailValue = emailInput.value.trim();
-    const emailPattern = /^[^\s@]+@gmail\.com$/;
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const error1 = document.getElementById('LoginError1');
+        const error2 = document.getElementById('LoginError2');
 
-    if (!emailValue) {
-      error1.textContent = "Email is required";
-      error1.style.display = "block";
-      return false;
-    } else if (!emailPattern.test(emailValue)) {
-      error1.textContent = "Invalid email format (only Gmail allowed)";
-      error1.style.display = "block";
-      return false;
-    } else {
-      error1.style.display = "none";
-      return true;
-    }
-  }
+        // ✅ Email validation
+        function validateEmailField() {
+            const emailValue = emailInput.value.trim();
+            const emailPattern = /^[^\s@]+@gmail\.com$/;
 
-  // ✅ Password validation
-  function validatePasswordField() {
-    const passwordValue = passwordInput.value.trim();
-    if (!passwordValue) {
-      error2.textContent = "Password is required";
-      error2.style.display = "block";
-      return false;
-    } else {
-      error2.style.display = "none";
-      return true;
-    }
-  }
-
-  // ✅ Realtime validation
-  emailInput.addEventListener("input", validateEmailField);
-  passwordInput.addEventListener("input", validatePasswordField);
-
-  // ✅ Final Login Function
-  async function Login(e) {
-    e.preventDefault(); // stop default form submission
-    const isEmailValid = validateEmailField();
-    const isPasswordValid = validatePasswordField();
-    
-    if (!isEmailValid || !isPasswordValid) {
-        return;
-    }
-    
-    try {
-        axios.post('/login', {
-            email: emailInput.value.trim(),
-            password: passwordInput.value.trim()
-        }).then((response)=>{
-            console.log('res',response.response)
-            if (response.data.success) {
-            Swal.fire({
-                icon: "success",
-                title: "Login successful!",
-                showConfirmButton: false,
-                timer: 1500
-            });
-            setTimeout(() => {
-                window.location.href = "/";
-            }, 1500);
-        }else{
-            Swal.fire({
-                icon:'error',
-                text:response.data.message,
-                timer:1500
-            })
+            if (!emailValue) {
+                error1.textContent = "Email is required";
+                error1.style.display = "block";
+                return false;
+            } else if (!emailPattern.test(emailValue)) {
+                error1.textContent = "Invalid email format (only Gmail allowed)";
+                error1.style.display = "block";
+                return false;
+            } else {
+                error1.style.display = "none";
+                return true;
+            }
         }
-        }).catch((err)=>{
-            console.log(err)
-            Swal.fire({
-                icon:'error',
-                text:err.response.data.message,
-                timer:1500
-            })
-        })
-    } catch (err) {
-      // Show backend error (like "Incorrect password" or "User not found")
-      if (err.response && err.response.data && err.response.data.message) {
-        error2.textContent = err.response.data.message;
-        error2.style.display = "block";
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Login failed",
-          text: res.data.message
-        });
-      }
-    }
-  }
 
-  // ✅ Attach login to form submit
-  loginForm.addEventListener("submit", Login);
-</script>
+        // ✅ Password validation
+        function validatePasswordField() {
+            const passwordValue = passwordInput.value.trim();
+            if (!passwordValue) {
+                error2.textContent = "Password is required";
+                error2.style.display = "block";
+                return false;
+            } else {
+                error2.style.display = "none";
+                return true;
+            }
+        }
+
+        // ✅ Realtime validation
+        emailInput.addEventListener("input", validateEmailField);
+        passwordInput.addEventListener("input", validatePasswordField);
+
+        document.addEventListener("DOMContentLoaded", () => {
+    <% if (message) { %>
+                Swal.fire({
+                    icon: 'error',
+                    text: "<%= message %>",
+                    confirmButtonColor: '#04384c'
+                });
+                // Remove ?error=... from URL so it doesn’t persist
+                const url = new URL(window.location);
+                url.searchParams.delete('error');
+                window.history.replaceState({}, document.title, url.pathname);
+    <% } %>
+  });
+
+        // ✅ Final Login Function
+        async function Login(e) {
+            e.preventDefault(); // stop default form submission
+            const isEmailValid = validateEmailField();
+            const isPasswordValid = validatePasswordField();
+
+            if (!isEmailValid || !isPasswordValid) {
+                return;
+            }
+
+            try {
+                axios.post('/login', {
+                    email: emailInput.value.trim(),
+                    password: passwordInput.value.trim()
+                }).then((response) => {
+                    console.log('res', response.response)
+                    if (response.data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Login successful!",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        setTimeout(() => {
+                            window.location.href = "/";
+                        }, 1500);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            text: response.data.message,
+                            timer: 1500
+                        })
+                    }
+                }).catch((err) => {
+                    console.log(err)
+                    Swal.fire({
+                        icon: 'error',
+                        text: err.response.data.message,
+                        timer: 1500
+                    })
+                })
+            } catch (err) {
+                if (err.response && err.response.data && err.response.data.message) {
+                    error2.textContent = err.response.data.message;
+                    error2.style.display = "block";
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Login failed",
+                        text: res.data.message
+                    });
+                }
+            }
+        }
+
+        // ✅ Attach login to form submit
+        loginForm.addEventListener("submit", Login);
+
+
+    </script>
 
 </body>
 

@@ -253,7 +253,7 @@ const verifyOtp = async (req, res) => {
                         offerPrice: 50,
                         minimumPrice: 300,
                         restricted: true,
-                        refferedUserId:saveUserData._id,
+                        refferedUserId: saveUserData._id,
                         expiredOn: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
                         isList: false,
                     });
@@ -263,7 +263,7 @@ const verifyOtp = async (req, res) => {
                     await saveUserData.save();
                 }
             }
-                        logger.debug(`availableCoupons:${availableCoupons}`)
+            logger.debug(`availableCoupons:${availableCoupons}`)
 
             req.session.user = saveUserData._id;
             req.session.userData = null;
@@ -305,7 +305,8 @@ const resendOtp = async (req, res) => {
 const loadLogin = async (req, res) => {
     try {
         if (!req.session.user) {
-            return res.render('login', { message: null })
+            const message = req.query.error || null;
+            return res.render('login', { message })
         } else {
             res.redirect("/")
         }
@@ -317,17 +318,18 @@ const loadLogin = async (req, res) => {
 
 const postLogin = async (req, res) => {
     try {
+
         const { email, password } = req.body
         const findUser = await User.findOne({ isAdmin: 0, email: email })
         if (!findUser) {
-            return res.status(StatusCode.BAD_REQUEST).json({success:false, message: "User not found" })
+            return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "User not found" })
         }
         if (findUser.isBlocked) {
-            return res.status(StatusCode.BAD_REQUEST).json({success:false, message: "User blocked by admin" })
+            return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "User blocked by admin" })
         }
         const passwordMatch = await bcrypt.compare(password, findUser.password)
         if (!passwordMatch) {
-            return res.status(StatusCode.BAD_REQUEST).json({success:false, message: "Incorrect password" })
+            return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Incorrect password" })
         }
         req.session.user = findUser._id
         return res.status(StatusCode.OK).json({ success: true, message: "Login successful" });
