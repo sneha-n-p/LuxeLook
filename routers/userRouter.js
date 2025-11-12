@@ -54,8 +54,6 @@ router.get(
         if (err.message === 'User Blocked By Admin') {
           return res.redirect('/login?error=User+Blocked+By+Admin');
         }
-
-        // Generic failure
         return res.redirect('/signup?error=Something+went+wrong');
       }
 

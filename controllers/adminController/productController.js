@@ -12,35 +12,50 @@ const logger = require('../../helpers/logger')
 
 const productInfo = async (req, res) => {
   try {
-    let search = ""
-    if (req.query.search) {
-      search = req.query.search
+    let search = req.query.search ? req.query.search.trim() : "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = 4;
+    const skip = (page - 1) * limit;
+
+    // Build search query
+    let query = {};
+    if (search) {
+      query = {
+        productName: { $regex: search, $options: "i" }, // case-insensitive search
+      };
     }
 
-    const page = parseInt(req.query.page) || 1
-    const limit = 4
-    const skip = (page - 1) * limit
+    let Data, totalProducts, totalPage;
 
-    const Data = await Product.find({})
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit).populate('category')
+    // ✅ If search is active → show all results (no pagination)
+    if (search) {
+      Data = await Product.find(query).sort({ createdAt: -1 }).populate("category");
+      totalProducts = Data.length;
+      totalPage = 1;
+    } else {
+      // ✅ Otherwise use pagination
+      Data = await Product.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("category");
+      totalProducts = await Product.countDocuments(query);
+      totalPage = Math.ceil(totalProducts / limit);
+    }
 
-    const totalProducts = await Product.countDocuments()
-    const totalPage = Math.ceil(totalProducts / limit)
-    res.render('product', {
+    res.render("product", {
       products: Data,
       currentPage: page,
       totalPages: totalPage,
       totalproducts: totalProducts,
-      search
-
-    })
+      search, // ✅ Keep search term in input
+    });
   } catch (error) {
-    logger.error(error)
-    res.redirect("/admin/pageError")
+    logger.error(error);
+    res.redirect("/admin/pageError");
   }
-}
+};
+
 
 const loadAddProduct = async (req, res) => {
   try {

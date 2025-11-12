@@ -7,34 +7,50 @@ const logger = require('../../helpers/logger')
 
 const categoryInfo = async (req, res) => {
   try {
-    let search = ""
-    if (req.query.search) {
-      search = req.query.search
+    let search = req.query.search ? req.query.search.trim() : "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = 4;
+    const skip = (page - 1) * limit;
+
+    let query = {};
+
+    // If user searched something, filter using regex
+    if (search) {
+      query = {
+        name: { $regex: search, $options: "i" }, // case-insensitive search
+      };
     }
 
-    const page = parseInt(req.query.page) || 1
-    const limit = 4
-    const skip = (page - 1) * limit
+    // ✅ If search is active, show all results (no pagination)
+    let Data, totalCategories, totalPage;
 
-    const Data = await category.find({})
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
+    if (search) {
+      Data = await category.find(query).sort({ createdAt: -1 });
+      totalCategories = Data.length;
+      totalPage = 1; // only one page needed for search results
+    } else {
+      Data = await category
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+      totalCategories = await category.countDocuments(query);
+      totalPage = Math.ceil(totalCategories / limit);
+    }
 
-    const totalCategories = await category.countDocuments()
-    const totalPage = Math.ceil(totalCategories / limit)
-    res.render('Category', {
+    res.render("Category", {
       categories: Data,
       currentPage: page,
       totalPages: totalPage,
       totalCategory: totalCategories,
       search,
-    })
+    });
   } catch (error) {
-    logger.error(error)
-    res.status(StatusCode.BAD_REQUEST).redirect("/admin/pageError")
+    logger.error(error);
+    res.status(StatusCode.BAD_REQUEST).redirect("/admin/pageError");
   }
-}
+};
+
 
 const loadAddCategory = async (req, res) => {
   try {

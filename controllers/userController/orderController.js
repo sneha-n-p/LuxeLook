@@ -183,7 +183,27 @@ const placeOrder = async (req, res) => {
 
     if (paymentMethod === 'COD') {
       return res.redirect('/orderSuccess');
-    } else {
+      }else if(paymentMethod==='WalletPay'){
+        let wallet = await Wallet.findOne({userId:userId})
+        if(!wallet){
+          return res.status(StatusCode.UNAUTHORIZED).json({success:false,message:`Your Wallet Have Not Enough Money`})
+        }else{
+          if(wallet.balance<finalAmount){
+            return res.status(StatusCode.UNAUTHORIZED).json({success:false,message:`Your Wallet Have Not Enough Money`})
+          }else{
+            wallet.balance-=finalAmount
+            const transaction = {
+              amount:finalAmount,
+              type:'debit',
+              description:`Payment Amount of ${newOrder.orderId }`,
+              date:new Date(),
+            }
+            wallet.transactions.push(transaction)
+            await wallet.save()
+          }
+        }
+        return res.redirect('/orderSuccess');
+      } else {
       return res.status(StatusCode.OK).json({
         success: true,
         message: 'Order placed successfully.',
@@ -332,7 +352,7 @@ const cancelSingleProduct = async (req, res) => {
 
     await order.save();
 
-    if (order.paymentMethod === 'RAZORPAY') {
+    if (order.paymentMethod === 'RAZORPAY' || order.paymentMethod === 'WalletPay') {
       const transaction = {
         type: 'credit',
         amount: Math.round(refundAmount),
@@ -385,7 +405,7 @@ const cancelOrders = async (req, res) => {
     });
 
 
-    if (order.paymentMethod === 'RAZORPAY') {
+    if (order.paymentMethod === 'RAZORPAY'|| order.paymentMethod === 'WalletPay') {
       const refundAmount = order.finalAmount;
       const transaction = {
         amount: refundAmount,

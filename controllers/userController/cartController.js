@@ -1,5 +1,6 @@
 const User = require("../../models/userSchema")
 const Wishlist = require("../../models/wishlistSchema")
+const Wallet = require('../../models/walletSchema')
 const Product = require("../../models/productSchema")
 const Category = require("../../models/cartSchema")
 const Cart = require("../../models/cartSchema")
@@ -291,7 +292,6 @@ const loadCheckOut = async (req, res) => {
         let cartItems = [];
         let subtotal = 0;
         let razorpayKey = process.env.RAZORPAY_KEY_ID
-        // let walletPayment 
         if (cart && cart.items.length > 0) {
             cartItems = cart.items.map(item => {
                 const totalPrice = item.totalPrice;
@@ -329,6 +329,15 @@ const loadCheckOut = async (req, res) => {
             logger.debug(`availableCoupons:${coupons}`)
 
 
+            let walletAmount
+            let wallet = await Wallet.findOne({userId:userId})
+            if(wallet){
+                logger.debug(`walletamont:${wallet.balance}`)
+                 walletAmount = wallet.balance
+            }
+            
+
+
             res.render('checkout', {
                 user,
                 coupons,
@@ -338,6 +347,7 @@ const loadCheckOut = async (req, res) => {
                 delivery,
                 discount,
                 finalTotal,
+                walletAmount,
                 razorpayKey,
                 activePage: 'checkout'
             });
@@ -357,6 +367,12 @@ const loadCheckOut = async (req, res) => {
                 ],
                 usedBy: { $ne: userId }
             });
+            let walletAmount
+            let wallet = await Wallet.findOne({userId:userId})
+            if(wallet){
+                logger.debug(`walletamont:${wallet.balance}`)
+                 walletAmount = wallet.balance
+            }
 
             res.render('checkout', {
                 user,
@@ -367,6 +383,7 @@ const loadCheckOut = async (req, res) => {
                 delivery,
                 discount,
                 finalTotal,
+                walletAmount,
                 razorpayKey,
                 activePage: 'checkout'
             });
