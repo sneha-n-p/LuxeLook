@@ -228,7 +228,7 @@
       <h5 class="mb-4 fw-bold">My Wallet</h5>
       <% if (wallet) { %>
         <div class="wallet-card">
-          <div class="balance"><span id="walletBalance">₹<%= wallet.balance.toFixed(2) %></span></div>
+          <div class="balance"><span class="walletBalance">₹<%= wallet.balance.toFixed(2) %></span></div>
         </div>
 
         <form id="walletForm" class="add-amount">
@@ -253,7 +253,7 @@
                 <% transactions.forEach((txn, index) => { %>
                   <tr>
                     <td><%= index + 1 %></td>
-                    <td>₹<%= txn.amount %></td>
+                    <td>₹<%= txn.amount.toFixed(2) %></td>
                     <td><%= txn.type %></td>
                     <td><%= txn.description %></td>
                     <td><%= new Date(txn.date).toISOString().split('T')[0] %></td>
@@ -265,7 +265,7 @@
         </div>
       <% } else { %>
         <div class="wallet-card">
-          <div class="balance">₹0.00</div>
+          <div class="balance"><span class="walletBalance">₹0.00</span></div>
         </div>
 
         <form id="walletForm" class="add-amount">
@@ -353,8 +353,9 @@
             })
             .then((res2) => {
               const result = res2.data;
+              const NewBalance = result.newBalance
               if (result.success) {
-                document.getElementById('walletBalance').innerText = `₹${result.newBalance}`;
+                document.getElementsByClassName('walletBalance').innerText = `₹${NewBalance}`;
                 Swal.fire({
                   icon: 'success',
                   title: 'Success',

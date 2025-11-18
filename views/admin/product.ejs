@@ -139,7 +139,7 @@
                             <td style="color: #000000;"> 
                               <select>
                                 <%for(let i=0;i<product.variant.length;i++){%>
-                                  <option><%= product.variant[i].size%>:₹<%= product.variant[i].salePrice%></option>
+                                  <option><%= product.variant[i].size%>:₹<%= product.variant[i].salePrice.toFixed(2)%></option>
                                   <%}%>
                               </select>
                             </td>

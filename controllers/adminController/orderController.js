@@ -173,7 +173,7 @@ const verifyRequest = async (req, res) => {
                     balance: order.finalAmount,
                     transactions: [transaction],
                     date: new Date(),
-                });
+                })
             } else {
                 wallet.balance += order.finalAmount;
                 wallet.transactions.push(transaction);

@@ -70,10 +70,14 @@ const loadSalesPage = async (req, res) => {
         };
         break;
       case 'weekly':
-        const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+        const startOfWeek = new Date(now);
+
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+
         query.createdOn = {
-          $gte: new Date(weekStart.setHours(0, 0, 0, 0)),
-          $lte: new Date(now.setHours(23, 59, 59, 999)),
+          $gte: startOfWeek,
+          $lte: now,
         };
         break;
       case 'monthly':
@@ -142,7 +146,7 @@ const loadSalesPage = async (req, res) => {
 
 const downloadPDF = async (req, res) => {
   try {
-    logger.debug('orders.length',orders)
+    logger.debug('orders.length', orders)
     const { reportType, startDate, endDate } = req.query;
     let query = { status: "Delivered" };
 
@@ -200,7 +204,7 @@ const downloadPDF = async (req, res) => {
       })
     }
 
-    logger.debug('salesData:',salesData)
+    logger.debug('salesData:', salesData)
     const pdfBuffer = await PDFDocument(salesData);
 
     res.setHeader("Content-Type", "application/pdf");
@@ -208,7 +212,7 @@ const downloadPDF = async (req, res) => {
     res.send(pdfBuffer);
 
   } catch (err) {
-    logger.error( `PDF generation error: ${err}`);
+    logger.error(`PDF generation error: ${err}`);
     res.status(500).send("Error generating PDF");
   }
 };

@@ -242,6 +242,7 @@
                     </button>
                   </div>
                   <div id="couponMessage" class="coupon-message mb-3" style="display: none;"></div>
+                  <div id="removeCouponContainer"></div>
 
                   <h5 class="fw-bold mb-4 mt-4">Select Payment Method</h5>
                   <%if(finalTotal>=1000){%>
@@ -252,8 +253,9 @@
                     </div>
                     <%if(walletAmount){%>
                       <div class="form-check mb-4">
-                        <input class="form-check-input" type="radio" name="paymentMethod" id="walletPay" value="WalletPay">
-                        <label class="form-check-label" for="walletPay">Wallet(₹ <%=walletAmount%>)</label>
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="walletPay"
+                          value="WalletPay">
+                        <label class="form-check-label" for="walletPay">Wallet(₹ <%=walletAmount.toFixed(2)%>)</label>
                       </div>
                       <%}%>
                         <%}else{%>
@@ -271,7 +273,8 @@
                             <div class="form-check mb-4">
                               <input class="form-check-input" type="radio" name="paymentMethod" id="walletPay"
                                 value="WalletPay">
-                              <label class="form-check-label" for="walletPay">Wallet(₹ <%=walletAmount%>)</label>
+                              <label class="form-check-label" for="walletPay">Wallet(₹ <%=walletAmount.toFixed(2) %>
+                                  )</label>
                             </div>
                             <%}%>
                               <%}%>
@@ -374,15 +377,17 @@
         const addressSelect = form.querySelector('select[name="addressId"]');
         console.log('addressSelect:', addressSelect);
         const selectedMethod = [...paymentRadios].find(radio => radio.checked).value;
-        const cartItems = <% - JSON.stringify(cartItems) %>;
+        const CartItems = JSON.parse('<%- JSON.stringify(cartItems) %>');
 
         const formData = new FormData(form);
-        cartItems.forEach(item => {
+        console.log('cartaitem', CartItems)
+        CartItems.forEach(item => {
           formData.append('size', item.size);
-        });
+        })
         console.log('Form data:', Object.fromEntries(formData));
 
-        if (!addressSelect || addressSelect.options.length === 0) {
+
+        if (!addressSelect) {
           console.log('No address select element or no options available');
           Swal.fire({
             icon: 'warning',
@@ -411,16 +416,28 @@
         if (selectedMethod === 'RAZORPAY') {
           const finalAmount = document.getElementById('hiddenFinalTotal').value;
 
+          console.log('finalAmount:', finalAmount)
           try {
             const res = await fetch('/orders/create-razorpay-order', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ amount: finalAmount * 100 })
+              body: JSON.stringify({ amount: (finalAmount * 100) })
             });
 
-            const result = await res.json();
+            const result = await res.json()
+            console.log('result', result)
+
             if (!result.success || !result.order) {
-              throw new Error("Failed to create Razorpay order");
+              console.log('sneha', result.message)
+              Swal.fire({
+                icon: 'error',
+                title: 'Order Failed',
+                text: result.message,
+                showConfirmButton: true
+              }).then(() => {
+                window.location.href = result.redirectUrl
+              })
+              return
             }
 
             const order = result.order;
@@ -439,6 +456,8 @@
                   formData.append('razorpay_signature', response.razorpay_signature);
 
                   let plainObject = Object.fromEntries(formData)
+                  console.log('plainObject')
+
                   const placeOrderRes = await fetch('/placeOrder', {
                     method: 'POST',
                     headers: {
@@ -448,19 +467,23 @@
                   });
 
                   const placeOrderResult = await placeOrderRes.json();
-                  if (placeOrderResult.success) {
-                    window.location.href = '/orderSuccess';
-                  } else {
+                  console.log('placeOrderResult', placeOrderResult)
+                  if (!placeOrderResult.success) {
+
+                    // Show backend stock error
                     Swal.fire({
                       icon: 'error',
-                      title: 'Order Failed',
-                      text: placeOrderResult.message || 'Failed to place order.',
-                      timer: 2000,
-                      showConfirmButton: false
+                      title: 'Stock Error',
+                      text: placeOrderResult.message,
+                      showConfirmButton: true
                     }).then(() => {
-                      window.location.href = '/cart';
+                      window.location.href = '/cart/checkout';
                     });
+
+                    return;
                   }
+
+                  window.location.href = '/orderSuccess';
                 } catch (err) {
                   console.error('Razorpay order submission error:', err);
                   Swal.fire({
@@ -469,9 +492,10 @@
                     text: 'Something went wrong while placing the order.',
                     timer: 2000,
                     showConfirmButton: false
-                  }).then(() => {
-                    window.location.href = '/cart/checkout';
-                  });
+                  })
+                    .then(() => {
+                      window.location.href = '/cart/checkout';
+                    });
                 }
               },
               modal: {
@@ -482,9 +506,10 @@
                     text: 'You cancelled the payment. Please try again.',
                     timer: 2000,
                     showConfirmButton: false
-                  }).then(() => {
-                    window.location.href = '/cart/checkout';
-                  });
+                  })
+                    .then(() => {
+                      window.location.href = '/cart/checkout';
+                    });
                 }
               },
               theme: {
@@ -492,7 +517,7 @@
               }
             };
 
-            const rzp = new Razorpay(options);
+            const rzp = new Razorpay(options)
             rzp.on('payment.failed', function (response) {
               let plainObject = Object.fromEntries(formData)
               Swal.fire({
@@ -515,14 +540,14 @@
               text: 'Something went wrong while initiating the payment. Please try again.',
               timer: 2000,
               showConfirmButton: false
-            }).then(() => {
-              window.location.href = '/cart/checkout';
-            });
+            })
+              .then(() => {
+                // window.location.href = '/cart/checkout';
+              });
           }
         } else if (selectedMethod === 'COD') {
           // Handle COD
           try {
-            console.log('COD:', Object.fromEntries(formData))
             let plainObject = Object.fromEntries(formData)
             console.log(plainObject)
             const res = await fetch('/placeOrder', {
@@ -532,7 +557,7 @@
               },
               body: JSON.stringify(plainObject)
             });
-
+            // const res = await axios.post('/placeOrder',{plainObject})
 
             if (res.redirected) {
               window.location.href = res.url;
@@ -547,9 +572,10 @@
                   text: result.message || 'Failed to place order.',
                   timer: 2000,
                   showConfirmButton: false
-                }).then(() => {
-                  window.location.href = '/cart';
-                });
+                })
+                  .then(() => {
+                    window.location.href = '/cart/checkout';
+                  });
               }
             }
           } catch (err) {
@@ -567,25 +593,30 @@
         } else {
           //handle WalletPayment
           let plainObject = Object.fromEntries(formData)
-          let res = await axios.post('/placeOrder',{plainObject})
-           if (res.redirected) {
-              window.location.href = res.url;
+          console.log('wallet payment')
+          let { data } = await axios.post('/placeOrder', { ...plainObject })
+          console.log('res', data)
+          if (data.redirectUrl) {
+            Swal.fire({
+              icon: 'success',
+              text: data.message,
+            }).then(() => {
+              window.location.href = data.redirectUrl;
+            })
+          } else {
+            // const result = await res.json();
+            if (data.success) {
+              window.location.href = '/orderSuccess';
             } else {
-              const result = await res.json();
-              if (result.success) {
-                window.location.href = '/orderSuccess';
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Order Failed',
-                  text: result.message || 'Failed to place order.',
-                  timer: 2000,
-                  showConfirmButton: false
-                }).then(() => {
-                  window.location.href = '/cart';
-                });
-              }
+              Swal.fire({
+                icon: 'error',
+                title: 'Order Failed',
+                text: data.message || 'Failed to place order.',
+                timer: 2000,
+                showConfirmButton: false
+              });
             }
+          }
         }
       });
     }
@@ -621,6 +652,43 @@
         Swal.fire('Empty Coupon', 'Please enter a coupon code.', 'warning');
         return;
       }
+
+      //REMOVE COUPON BUTTON IMPLEMNTATION
+       document.getElementById('removeCouponContainer').innerHTML = `
+  <button id="removeCouponBtn" class="view-coupons-btn mt-2">Remove Coupon</button>`;
+
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'removeCouponBtn') {
+
+        const originalSubtotal = parseInt('<%= subtotal %>');
+        const originalDelivery = parseInt('<%= delivery %>');
+        const originalTotal = originalSubtotal + originalDelivery;
+
+        document.getElementById('discount').textContent = "₹0";
+        document.getElementById('finalTotal').textContent = `₹${originalTotal}`;
+        document.getElementById('hiddenFinalTotal').value = originalTotal;
+
+        document.getElementById('couponInput').value = "";
+
+        document.getElementById('couponMessage').style.display = 'none';
+
+        document.getElementById('removeCouponContainer').innerHTML = "";
+
+        const appliedCoupon = document.getElementById('appliedCoupon');
+        const appliedCouponId = document.getElementById('appliedCouponId');
+
+        if (appliedCoupon) appliedCoupon.remove();
+        if (appliedCouponId) appliedCouponId.remove();
+
+        Swal.fire({
+          icon: "info",
+          title: "Coupon removed",
+          timer: 1500,
+          showConfirmButton: false
+        });
+      }
+    });
+      
 
       try {
         const response = await fetch('/apply-coupon', {

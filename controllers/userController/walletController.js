@@ -138,7 +138,7 @@ const addAmountToWallet = async (req, res) => {
       walletBalanceAfter: wallet.balance
     });
 
-    res.status(StatusCode.OK).json({ message: 'Money added successfully', wallet })
+    res.status(StatusCode.OK).json({ success:true, message: 'Money added successfully', wallet })
   } catch (error) {
     logger.error(`error occur while loadWallet ${error}`)
     return res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')

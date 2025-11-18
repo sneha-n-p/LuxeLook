@@ -89,39 +89,48 @@
         .text-small a:hover {
             text-decoration: underline;
         }
+
         .wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
     </style>
 </head>
 
 <body>
- <div class="wrapper">
-    <div class="verify-container">
-        
-        <h4>Please enter the OTP in the mail:</h4>
+    <div class="wrapper">
+        <div class="verify-container">
 
-        <form id="otpForm" action="/login/verifying-forgetpass-otp" method="post" onsubmit="return validateOTPform()">
-            <input type="text" name="otp" id="otpInput" class="form-control" placeholder="Enter OTP" required>
-            <div id="timer" class="timer-text">Please wait <span id="countdown">60</span> seconds before requesting
-                another code.</div>
-            <div class="expired-msg" id="expiredMsg" style="display: none; color: red;">OTP expired</div>
-            <div>
-                <button type="submit" class="btn btn-submit">Submit</button>
-            </div>
-            <div class="text-small">
-                <button id="resend-btn" type="button" onclick="resendOTP()">Resend</button>
-            </div>
-        </form>
+            <h4>Please enter the OTP in the mail:</h4>
 
-    </div>
+            <form id="otpForm" action="/login/verifying-forgetpass-otp" method="post"
+                onsubmit="return validateOTPform()">
+                <input type="text" name="otp" id="otpInput" class="form-control" placeholder="Enter OTP" required>
+                <div id="timer" class="timer-text">Please wait <span id="countdown">60</span> seconds before requesting
+                    another code.</div>
+                <div class="expired-msg" id="expiredMsg" style="display: none; color: red;">OTP expired</div>
+                <div>
+                    <button type="submit" class="btn btn-submit">Submit</button>
+                </div>
+                <div class="text-small">
+                    <button id="resend-btn" type="button" onclick="resendOTP()">Resend</button>
+                </div>
+            </form>
+
+        </div>
     </div>
     <script>
         let countdown = 60;
         let isOtpExpired = false;
+
+        const OtpInput = document.getElementById('otpInput');
+        OtpInput.addEventListener('input', function () {
+            let digits = this.value.replace(/[^0-9]/g, "");
+            if (digits.length > 6) digits = digits.slice(0, 6);
+            this.value = digits;
+        });
 
         const countdownEl = document.getElementById('countdown');
         const otpInput = document.getElementById('otpInput');
@@ -156,7 +165,7 @@
                 return false;
             }
 
-            axios.post('/login/verifying-forgetpass-otp', { otp: otpValue })
+            axios.post('/login/verifying-forgetpass-otp', { otp: otpValue }, { validateStatus: (status) => status != 401 })
                 .then(function (response) {
                     if (response.data.success) {
                         Swal.fire({

@@ -111,6 +111,7 @@ const loadEditAddress = async (req, res) => {
         for (let add of addressData.address) {
             logger.debug('add:',add)
             if (add._id.equals(addressId)) {
+                logger.debug(`add:${add}`)
                 res.render("edit-Address", { user: userData, address: add, activePage: " edit-addresses", currentPath: '/addresses' })
             }
         }
@@ -131,7 +132,8 @@ const editAddress = async (req, res) => {
         const address = `${streetAddress},${city},${state},${pincode}`
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
         const { data } = await axios.get(url);
-        logger.debug('data:', data.results[0].address_components)
+        logger.debug( data.results[0].address_components)
+        if(!data) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid Address" })
         if (data.status !== "OK" || !data.results.length||data.results[0].partial_match) {
             return res.json({ success: false, message: "Invalid or incomplete address. Please check street, city, or pincode." });
         }
@@ -209,12 +211,15 @@ const cartAddAddress = async (req, res) => {
         const { addressType, name, state, streetAddress, apartment, city, pincode, phone, altPhone, isDefault } = req.body
         const apiKey = process.env.GOOGLE_API_KEY;
         const address = `${streetAddress},${city},${state},${pincode}`
-        loggerinfo.log(`address: ${address}`)
+        logger.info(`address: ${address}`)
 
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
         const { data } = await axios.get(url);
+        if(!addressType||!name||!phone&&phone!==altPhone){
+            return res.json({success:false,message:'please fill the field correctly'})
+        }
         if (data.status !== "OK" || !data.results.length||data.results[0].partial_match) {
-            logger.debug('data:',data)
+            logger.debug(`data:,data`)
             return res.json({ success: false, message:  "Invalid or incomplete address. Please check street, city, or pincode." });
         }
         const components = data.results[0].address_components;
@@ -246,7 +251,7 @@ const cartAddAddress = async (req, res) => {
             userAddress.address.push({ addressType, name, streetAddress, apartment, city, state, pincode, phone, altPhone, isDefault })
             await userAddress.save()
         }
-        res.status(StatusCode.CREATED).redirect({ success: true, redirectUrl: "/checkout" })
+        res.status(StatusCode.CREATED).json({ success: true, redirectUrl: "/cart/checkout" })
     } catch (error) {
         logger.error(error)
 

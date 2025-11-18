@@ -189,7 +189,7 @@
       <div class="col-md-3 mb-3">
         <div class="dashboard-card text-center">
           <h5>Total Products</h5>
-          <h3>₹<%= totalProduct %>
+          <h3><%= totalProduct %>
           </h3>
         </div>
       </div>
@@ -323,7 +323,7 @@
                       <td>
                         <%= order.userId.name %>
                       </td>
-                      <td>₹<%= order.finalAmount.toLocaleString() %>
+                      <td>₹<%= order.finalAmount.toFixed(2) %>
                       </td>
                       <td>
                         <% if (order.status==='delivered' ) { %>

@@ -155,7 +155,7 @@
                 <%}%>
               </td>
               <td style="color: black;">NO: <%= order.orderedItems.length %></td>
-              <td style="color: black;">₹ <%= order.finalAmount %></td>
+              <td style="color: black;">₹ <%= order.finalAmount.toFixed(2) %></td>
               <td style="color: black;"><%= order.createdOn.toDateString() %></td>
               <td style="color: black;">
                 <% if (order.status === 'Delivered') { %>

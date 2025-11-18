@@ -226,7 +226,7 @@
         </div>
         <div class="col-md-6">
           <label class="form-label" for="phone">Phone</label>
-          <input type="text" id="phone" class="form-control" name="phone" value="<%= address.phone %>" >
+          <input type="text" id="phone" class="form-control" name="phone" value="<%= address.pincode %>" >
           <div id="Error6" class="error-message"></div>
         </div>
         <div class="col-md-6">
@@ -269,7 +269,7 @@
   const phoneInput = document.getElementById('phone')
 const altPhoneInput = document.getElementById('altPhone')
 
-phoneInput.value = "+91 ";
+phoneInput.value = "+91 <%=address.phone%>";
       
       phoneInput.addEventListener("input", function () {
         if (!this.value.startsWith("+91 ")) {
@@ -281,7 +281,7 @@ phoneInput.value = "+91 ";
         }
       })
       
-      altPhoneInput.value = "+91 ";
+      altPhoneInput.value = "+91 <%=address.altPhone%>";
 altPhoneInput.addEventListener("input", function () {
   if (!this.value.startsWith("+91 ")) {
     this.value = "+91 " + this.value.replace(/[^0-9]/g, "");
@@ -291,6 +291,13 @@ altPhoneInput.addEventListener("input", function () {
     this.value = "+91 " + digits;
   }
 })
+
+const pincodeInput = document.getElementById('pincode');
+    pincodeInput.addEventListener('input', function () {
+      let digits = this.value.replace(/[^0-9]/g, "");
+      if (digits.length > 6) digits = digits.slice(0, 6);
+      this.value = digits;
+    });
 
   const showError = (elementId, message) => {
     const errorElement = document.getElementById(elementId);
@@ -403,13 +410,18 @@ altPhoneInput.addEventListener("input", function () {
             }).then(() => {
               window.location.href = "/addresses";
             });
+          }else{
+            Swal.fire({
+              icon:'error',
+              title:'Error',
+              text:response.data.message
+            })
           }
-        })
-        .catch(function (error) {
+        }).catch(function (error) {
           Swal.fire({
             icon: "error",
             title: "Oops...",
-            text: "Something went wrong while updating address!"
+            text:"Something went wrong while updating address!"
           });
           console.error("Update Address Error:", error);
         });

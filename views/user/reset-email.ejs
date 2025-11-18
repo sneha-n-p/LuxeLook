@@ -44,7 +44,7 @@
     }
 
     .submit-btn {
- background: linear-gradient(90deg, #B5654B  , #D17C63 );
+      background: linear-gradient(90deg, #B5654B, #D17C63);
       color: white;
       padding: 10px 30px;
       border: none;
@@ -55,32 +55,33 @@
     }
 
     .submit-btn:hover {
- background: linear-gradient(90deg, #B5654B  , #D17C63 );
+      background: linear-gradient(90deg, #B5654B, #D17C63);
     }
-    .back-arrow-btn {
-    position: absolute;
-    top: 60px;
-    left: 50px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-  }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
-    color: white;
-    transform: scale(1.1);
-  }
+    .back-arrow-btn {
+      position: absolute;
+      top: 60px;
+      left: 50px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .back-arrow-btn:hover {
+      background-color: #B5654B;
+      color: white;
+      transform: scale(1.1);
+    }
   </style>
 </head>
 
@@ -89,8 +90,8 @@
   <!-- Banner/Header -->
   <div class="email-banner">
     <button onclick="window.history.back()" class="back-arrow-btn">
-            &#8592;
-        </button>
+      &#8592;
+    </button>
     <div class="email-header">RESET EMAIL</div>
   </div>
 
@@ -99,7 +100,7 @@
     <div class="email-title">Enter your new email address</div>
     <form action="/profile/change-email" id="resetEmailForm" method="POST">
       <div class="mb-3">
-        <input type="email" name="newEmail" class="form-control" id='newEmail' placeholder="New Email Address" required>
+        <input type="email" name="newEmail" class="form-control" id='newEmail' placeholder="New Email Address">
       </div>
       <button type="submit" class="submit-btn">Update Email</button>
     </form>
@@ -109,40 +110,50 @@
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
-<script>
-  const emailInput = document.getElementById('newEmail');
-  const emailForm = document.getElementById('resetEmailForm');
 
-  const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  <script>
+    const emailInput = document.getElementById('newEmail');
+    const emailForm = document.getElementById('resetEmailForm');
 
-  emailInput.addEventListener('input', () => {
-    const email = emailInput.value.trim();
-    if (!emailPattern.test(email)) {
-      emailInput.classList.add('is-invalid');
-    } else {
-      emailInput.classList.remove('is-invalid');
-    }
-  });
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
-  emailForm.addEventListener('submit', (e) => {
-    e.preventDefault(); 
+    emailInput.addEventListener('input', () => {
+      const email = emailInput.value.trim();
+      if (!emailPattern.test(email)) {
+        emailInput.classList.add('is-invalid');
+      } else {
+        emailInput.classList.remove('is-invalid');
+      }
+    });
 
-    const newEmail = emailInput.value.trim();
+    emailForm.addEventListener('submit', (e) => {
+      e.preventDefault();
 
-    if (!emailPattern.test(newEmail)) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Email",
-        text: "Please enter a valid Gmail address (example@gmail.com)",
-        confirmButtonColor: "#B5654B"
-      });
-      return; 
-    }
+      const newEmail = emailInput.value.trim();
 
-    emailForm.submit();
-  });
-</script>
+      if (!newEmail) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'warning',
+          text: 'Please Entre An Email',
+          confirmButtonColor: "#B5654B"
+        })
+        return
+      }
+
+      if (!emailPattern.test(newEmail)) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid Email",
+          text: "Please enter a valid Gmail address (example@gmail.com)",
+          confirmButtonColor: "#B5654B"
+        });
+        return;
+      }
+
+      emailForm.submit();
+    });
+  </script>
 
 
 </body>

@@ -106,8 +106,11 @@ const updateCoupon = async (req, res) => {
     const { couponId, couponName, startDate, endDate, offerPrice, minimumPrice } = req.body;
     const objectId = new mongoose.Types.ObjectId(couponId);
     const selectedCoupon = await Coupon.findById(objectId);
-
-    if (!selectedCoupon) {
+    const existingCoupon = await Coupon.findOne({name:couponName});
+    if(existingCoupon&&existingCoupon._id.toString()!==selectedCoupon._id.toString()) return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'Coupon name already exist'})
+      
+      if (!selectedCoupon) {
+      logger.info(existingCoupon)
       return res.status(StatusCode.NOT_FOUND).send("Coupon not found");
     }
 
@@ -129,13 +132,13 @@ const updateCoupon = async (req, res) => {
     );
 
     if (updatedCoupon.modifiedCount > 0) {
-      res.send("Coupon updated successfully");
+      res.status(StatusCode.CREATED).json({success:true,message:"Coupon updated successfully"});
     } else {
-      res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Coupon update failed");
+      res.status(StatusCode.BAD_REQUEST).json({success:false,message:"Coupon update failed"});
     }
   } catch (error) {
     logger.error( `Update coupon error: ${error}`);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).send("Server error");
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({success:false,message:"Server error"});
   }
 };
 

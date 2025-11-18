@@ -53,13 +53,8 @@ const postLogin = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
-        req.session.destroy(err => {
-            if (err) {
-                logger.error(`Error destroy session ${err}`)
-                return res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")
-            }
-            res.redirect("/admin/login")
-        })
+        req.session.admin = null
+        res.redirect("/admin/login")
     } catch (error) {
         logger.error(`unexpected error during logout ${error}`)
         res.status(StatusCode.NOT_FOUND).redirect("/admin/pageError")

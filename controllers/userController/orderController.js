@@ -17,8 +17,10 @@ const logger = require('../../helpers/logger')
 const placeOrder = async (req, res) => {
   try {
     const userId = req.session.user;
-    const { addressId, paymentMethod, coupon, Total, couponId } = req.body;
-    logger.debug('req.body', req.body)
+    // const { plainObject } = req.body;
+    logger.debug(`req.body,${JSON.stringify(req.body)}`)
+    const { addressId, coupon, paymentMethod, Total, couponId } = req.body
+    logger.info(`addressId:${addressId}`)
 
     if (!userId) {
       return res.status(StatusCode.UNAUTHORIZED).json({
@@ -52,8 +54,8 @@ const placeOrder = async (req, res) => {
       });
     }
 
+
     const orderedItems = [];
-    const orderedStatus = 'Payment Failed'
     for (const item of cart.items) {
       const selectedSize = item.size;
       const product = item.productId;
@@ -79,8 +81,6 @@ const placeOrder = async (req, res) => {
           message: `Not enough stock for ${product.productName} in size ${selectedSize}`,
         });
 
-
-
       }
 
       orderedItems.push({
@@ -100,12 +100,12 @@ const placeOrder = async (req, res) => {
 
     const totalPrice = orderedItems.reduce((acc, item) => acc += item.price, 0);
 
-    logger.debug(`orderedItems: ${orderedItems}`)
-    logger.debug(`totalPrice: ${totalPrice}`)
+    logger.debug(`orderedItems: ${JSON.stringify(orderedItems)}`)
 
     let discount = 0;
     let appliedCoupon = null;
     let couponName = null;
+    logger.debug(`totalPrice: ${totalPrice}`)
 
     if (coupon && couponId) {
       appliedCoupon = await Coupon.findOne({
@@ -172,8 +172,29 @@ const placeOrder = async (req, res) => {
       paymentMethod,
     });
 
-    await newOrder.save();
+    if (paymentMethod === 'WalletPay') {
+      let wallet = await Wallet.findOne({ userId: userId })
+      if (!wallet) {
+        return res.json({ success: false, message: `Your Wallet Have Not Enough Money` })
+      } else {
+        if (wallet.balance < finalAmount) {
+          return res.json({ success: false, message: `Your Wallet Have Not Enough Money` })
+        } else {
+          wallet.balance -= finalAmount
+          const transaction = {
+            amount: finalAmount,
+            type: 'debit',
+            description: `Payment Amount of ${newOrder.orderId}`,
+            date: new Date(),
+          }
+          wallet.transactions.push(transaction)
+          await wallet.save()
+        }
+      }
+    }
 
+
+    await newOrder.save();
     for (const item of cart.items) {
       const product = item.productId;
       await product.save();
@@ -181,29 +202,9 @@ const placeOrder = async (req, res) => {
 
     await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
 
-    if (paymentMethod === 'COD') {
-      return res.redirect('/orderSuccess');
-      }else if(paymentMethod==='WalletPay'){
-        let wallet = await Wallet.findOne({userId:userId})
-        if(!wallet){
-          return res.status(StatusCode.UNAUTHORIZED).json({success:false,message:`Your Wallet Have Not Enough Money`})
-        }else{
-          if(wallet.balance<finalAmount){
-            return res.status(StatusCode.UNAUTHORIZED).json({success:false,message:`Your Wallet Have Not Enough Money`})
-          }else{
-            wallet.balance-=finalAmount
-            const transaction = {
-              amount:finalAmount,
-              type:'debit',
-              description:`Payment Amount of ${newOrder.orderId }`,
-              date:new Date(),
-            }
-            wallet.transactions.push(transaction)
-            await wallet.save()
-          }
-        }
-        return res.redirect('/orderSuccess');
-      } else {
+    if (paymentMethod === 'COD' || paymentMethod === 'WalletPay') {
+      return res.status(StatusCode.OK).json({ success: true, message: 'Order success', redirectUrl: '/orderSuccess' });
+    } else {
       return res.status(StatusCode.OK).json({
         success: true,
         message: 'Order placed successfully.',
@@ -296,19 +297,23 @@ const viewOrderDetails = async (req, res) => {
 
 const cancelSingleProduct = async (req, res) => {
   try {
+    console.log("cancelling single order : working here")
     const { productId, orderId, reason, size } = req.body;
     const order = await Order.findById(orderId).populate('orderedItems.product');
+    console.log("order details when canceling single ", order)
 
     if (!order) return res.status(StatusCode.NOT_FOUND).json({ message: 'Order not found' });
 
     const itemToCancel = order.orderedItems.find(item =>
       item.product._id.toString() === productId
     );
+    console.log("canceling single check point 1")
 
     if (!itemToCancel) return res.status(StatusCode.NOT_FOUND).json({ message: 'Product not found in order' });
     if (itemToCancel.status === 'Cancelled') {
       return res.status(StatusCode.BAD_REQUEST).json({ message: 'Product is already cancelled' });
     }
+
 
     const product = await Product.findById(productId);
     const variant = product.variant.find(v => v.size === size);
@@ -333,12 +338,14 @@ const cancelSingleProduct = async (req, res) => {
       itemInOrder.cancelReason = reason;
     }
 
+
+
     const activeItems = order.orderedItems.filter(item => item.status !== 'Cancelled');
-    const originalTotal = order.orderedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const originalTotal = order.orderedItems.reduce((sum, item) => sum + item.price, 0);
 
     const discountAmount = order.discount;
 
-    const itemTotal = itemToCancel.price * itemToCancel.quantity;
+    const itemTotal = itemToCancel.price
     const itemDiscountShare = (itemTotal / originalTotal) * discountAmount;
     const refundAmount = itemTotal - itemDiscountShare;
 
@@ -346,6 +353,7 @@ const cancelSingleProduct = async (req, res) => {
     order.finalAmount = order.totalPrice - (
       (order.totalPrice / originalTotal) * discountAmount
     );
+
 
     const allCancelled = order.orderedItems.every(item => item.status === 'Cancelled');
     if (allCancelled) order.status = 'Cancelled';
@@ -356,18 +364,48 @@ const cancelSingleProduct = async (req, res) => {
       const transaction = {
         type: 'credit',
         amount: Math.round(refundAmount),
-        description: `Refund for cancellation in Order ${orderId}`,
+        description: `Refund for cancellation in Order ${order.orderId}`,
         date: new Date(),
         reason: 'Order Cancel'
       };
 
-      const wallet = await Wallet.findOne({ userId: order.userId });
-      if (!wallet) return res.status(StatusCode.NOT_FOUND).json({ message: 'Wallet not found for user' });
+      // const wallet = await Wallet.findOne({ userId: order.userId });
+      // console.log("found wallet is ", wallet)
+      // if (!wallet) return res.status(StatusCode.NOT_FOUND).json({ message: 'Wallet not found for user' });
 
-      wallet.balance += transaction.amount;
-      wallet.transactions.push(transaction);
-      await wallet.save();
+      let wallet = await Wallet.findOne({ userId: order.userId });
+      const amountToAdd = parseFloat(order.finalAmount)
+      console.log("adding amount when single cansellation", amountToAdd)
+
+
+      if (!wallet) {
+        wallet = new Wallet({
+          userId: order.userId,
+          balance: refundAmount,
+          transactions: [
+            {
+              type: 'credit',
+              amount: Math.round(refundAmount),
+              description: `Refund for cancellation in Order ${order.orderId}`,
+              date: new Date(),
+              reason: 'Order Cancel'
+            },
+          ],
+        })
+      } else {
+        wallet.balance += refundAmount
+        wallet.transactions.push({
+          type: 'credit',
+          amount: Math.round(refundAmount),
+          description: `Refund for cancellation in Order ${order.orderId}`,
+          date: new Date(),
+          reason: 'Order Cancel'
+        })
+      }
+      await wallet.save()
     }
+
+
 
     res.json({ success: true, message: 'Product cancelled successfully' });
   } catch (error) {
@@ -405,13 +443,13 @@ const cancelOrders = async (req, res) => {
     });
 
 
-    if (order.paymentMethod === 'RAZORPAY'|| order.paymentMethod === 'WalletPay') {
+    if (order.paymentMethod === 'RAZORPAY' || order.paymentMethod === 'WalletPay') {
       const refundAmount = order.finalAmount;
       const transaction = {
         amount: refundAmount,
         type: 'credit',
         date: new Date(),
-        description: `Refund for Order ${orderId}`,
+        description: `Refund for Order ${order.orderId}`,
         reason: "Order Cancel"
       };
 
@@ -427,9 +465,9 @@ const cancelOrders = async (req, res) => {
             {
               type: 'credit',
               amount: amountToAdd,
-              description: 'Wallet top-up',
+              description: `Refund for Order ${order.orderId}`,
               date: new Date(),
-              reason: 'Razorpay'
+              reason: 'Order Cancel'
             },
           ],
         })
@@ -438,9 +476,9 @@ const cancelOrders = async (req, res) => {
         wallet.transactions.push({
           type: 'credit',
           amount: amountToAdd,
-          description: 'Order Cancel',
+          description: `Refund for Order ${order.orderId}`,
           date: new Date(),
-          reason: 'Razorpay'
+          reason: 'Order Cancel'
         })
       }
       await wallet.save()
@@ -498,12 +536,17 @@ const singleProductReturn = async (req, res) => {
 
     const order = await Order.findById(orderId)
 
+    if (order.orderedItems.length === 1) {
+      order.status = 'Return Request'
+      returnReason = reason
+    }
     order.orderedItems.forEach(item => {
       if (item.product.toString() === productId && item.size === size) {
         item.status = 'Return Request'
         item.returnReason = reason
       }
     })
+
     await order.save()
     res.status(StatusCode.OK).json({ success: true })
 
@@ -519,7 +562,35 @@ const razorpayInstance = new Razorpay({
 
 const razorpay = async (req, res) => {
   try {
+    const userId = req.session.user
     const { amount } = req.body;
+    logger.info(`amount:${amount}`)
+    const cart = await Cart.findOne({ userId }).populate('items.productId')
+    logger.debug(`cart:${cart}`)
+    if (Object.entries(cart).length === 0) {
+      res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Your cart is empty', redirectUrl: '/shop' })
+    }
+    for (let item of cart.items) {
+      const product = item.productId;
+
+      const variant = product.variant.find(v => v.size === item.size);
+
+      if (!variant) {
+        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `Variant not found for ${product.productName}`, redirectUrl: '/cart/checkout' });
+      }
+
+      if (variant.quantity <= 0) {
+        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `${product.productName} is OUT OF STOCK`, redirectUrl: '/cart/checkout' });
+      }
+
+      if (variant.quantity < item.quantity) {
+        return res.status(StatusCode.BAD_REQUEST).json({
+          success: false,
+          message: `Only ${variant.quantity} left for ${product.productName} (${item.size})`,
+          redirectUrl: '/cart/checkout'
+        });
+      }
+    }
     const options = {
       amount,
       currency: "INR",
@@ -538,7 +609,7 @@ const loadFailure = async (req, res) => {
   try {
     const userId = req.session.user
     const data = JSON.parse(req.query.data);
-    const { addressId, coupon, paymentMethod, Total, size,couponId } = data
+    const { addressId, coupon, paymentMethod, Total, size, couponId } = data
     const { error } = req.query
 
     const addId = new mongoose.Types.ObjectId(addressId)
@@ -733,12 +804,12 @@ const loadRetryPlaceOrder = async (req, res) => {
           item.status = 'Confirmed'
         }
         const product = await Product.findById(item.product)
-        product.variant.forEach(v=>{
-          if(v.size===item.size){
-            v.quantity-=item.quantity
+        product.variant.forEach(v => {
+          if (v.size === item.size) {
+            v.quantity -= item.quantity
           }
         })
-        product.quatity-=item.quantity
+        product.quatity -= item.quantity
         await product.save()
       }
     })

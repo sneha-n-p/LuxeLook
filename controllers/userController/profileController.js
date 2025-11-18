@@ -261,7 +261,7 @@ const changeEmailValidation = async (req, res) => {
     logger.debug(req.body);
     const userId = req.session.user;
     const userExist = await User.findById(userId);
-    logger.ingo(`userExist: ${userExist}`);
+    logger.info(`userExist: ${userExist}`);
 
     if (userExist.email !== newEmail) {
       const otp = generateOtp();

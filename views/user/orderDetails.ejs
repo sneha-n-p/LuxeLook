@@ -295,7 +295,7 @@
                       </div>
                       <% }) %>
                   </td>
-                  <td>₹<%= order.finalAmount %>
+                  <td>₹<%= order.finalAmount.toFixed(2) %>
                   </td>
                   <td>
                     <%= order.createdOn.toDateString() %>

@@ -309,8 +309,8 @@ const loadCheckOut = async (req, res) => {
         }
         if (address) {
             const addresses = address.address
-            logger.debug('addresses:', addresses)
-            logger.debug('cartItems:', cartItems)
+            logger.debug(`addresses:,${addresses}`)
+            logger.debug(`cartItems:,${JSON.stringify(cartItems)}`)
             const delivery = 0
             const discount = 0
             const finalTotal = subtotal + delivery - discount;

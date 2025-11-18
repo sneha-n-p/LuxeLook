@@ -38,6 +38,8 @@ const categoryInfo = async (req, res) => {
       totalPage = Math.ceil(totalCategories / limit);
     }
 
+    logger.debug(`Data:${Data}`)
+
     res.render("Category", {
       categories: Data,
       currentPage: page,

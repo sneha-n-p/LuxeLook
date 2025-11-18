@@ -38,7 +38,7 @@ const adminAuthCheck = (req, res, next) => {
   console.log('User  session:', req.session.user);
   if (!req.session.admin) {
     next();
-  }
+  } 
   else {
     console.log('No user session, redirecting to homePage');
     res.redirect('/admin/');

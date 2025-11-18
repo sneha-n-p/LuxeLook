@@ -421,6 +421,7 @@
                             size,
                             reason: result.value
                         });
+                        console.log("response of cancelling single order:",response)
 
                         if (response.data.success) {
                             Swal.fire({
@@ -430,6 +431,7 @@
                                 showConfirmButton: false,
                                 timer: 1200
                             }).then(() => location.reload());
+                            return
                         } else {
                             Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
                         }

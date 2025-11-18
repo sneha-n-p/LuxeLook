@@ -424,9 +424,9 @@
         }
 
 
-        document.addEventListener("DOMContentLoaded", () => {
-            recalculateSubtotal();
-        });
+        // document.addEventListener("DOMContentLoaded", () => {
+        //     recalculateSubtotal();
+        // });
 
         function confirmRemove(productId) {
             Swal.fire({
@@ -449,6 +449,7 @@
                                     showConfirmButton: false,
                                     timer: 1200
                                 }).then(() => {
+                                    window.location.href = '/cart'
                                     let Count = response.data.cartCount
                                     if (Count > 0) {
                                         document.getElementById('cartLength').innerHTML = Count
