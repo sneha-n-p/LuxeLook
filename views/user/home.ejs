@@ -1,293 +1,263 @@
 <%-include("../../views/partials/userPartial/header")%>
 
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f8f6f1;
-      color: #333;
-    }
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f6f1;
+    color: #333;
+  }
 
+  /* =======================
+     BANNER
+  ======================= */
+  .banner-image1 {
+    width: 100%;
+    height: 720px;
+    object-fit: cover;
+    margin-top: -47px;
+    border-radius: 0;
+    filter: brightness(0.75);
+  }
+
+  .banner-overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .banner-overlay-text h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-shadow: 4px 4px 15px rgba(0, 0, 0, 0.7);
+  }
+
+  .banner-overlay-text p {
+    font-size: 1.4rem;
+    font-weight: 500;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+  }
+
+  .discover {
+    background: linear-gradient(90deg, #000, #434343);
+    color: #f4c10f;
+    border-radius: 30px;
+    padding: 12px 36px;
+    font-weight: 600;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .discover:hover {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+  }
+
+  /* =======================
+     BESTSELLERS
+  ======================= */
+  .bestsellers .card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bestsellers .card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .bestsellers .card-body .btn {
+    margin-top: auto;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #B5654B, #D17C63);
+    color: white;
+    border: none;
+  }
+
+  .wishlist-symbol {
+    font-size: 24px;
+    color: #d40000;
+    background: none;
+    border: none;
+  }
+
+  /* =======================
+     FEATURES SECTION
+  ======================= */
+  .feature-card {
+    background-color: hsl(32, 50%, 87%);
+    border-radius: 25px;
+    padding: 20px;
+    height: 100%;
+    text-align: center;
+  }
+
+  /* =======================
+     MOBILE FIXES
+  ======================= */
+  @media (max-width: 576px) {
+
+    /* Banner */
     .banner-image1 {
-      width: 100%;
-      height: 720px;
-      object-fit: cover;
-      border-radius: 20px;
-      filter: brightness(0.75);
-    }
-
-    .banner-overlay-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 2;
-      color: #fff;
-      text-align: center;
-      width: 100%;
-      padding: 20px;
+      height: 260px !important;
+      border-radius: 6px;
     }
 
     .banner-overlay-text h1 {
-      font-size: 3.5rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-shadow: 4px 4px 15px rgba(0, 0, 0, 0.7);
+      font-size: 1.8rem !important;
     }
 
     .banner-overlay-text p {
-      font-size: 1.4rem;
-      font-weight: 500;
-      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+      font-size: 1rem !important;
     }
 
     .discover {
-      background: linear-gradient(90deg, #000, #434343);
-      color: #f4c10f;
-      border-radius: 30px;
-      padding: 12px 36px;
-      font-weight: 600;
-      font-size: 1rem;
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
+      padding: 8px 24px !important;
     }
 
-    .discover:hover {
-      background: #fff;
-      color: #000;
-      border: 2px solid #000;
+    /* Two products per row */
+    .bestsellers .col-md-3 {
+      width: 50% !important;
+      flex: 0 0 50% !important;
+      max-width: 50% !important;
     }
 
-    .features .col-md-4 {
-      background: linear-gradient(135deg, #fffbe9, #f7f0d3);
-      border-radius: 20px;
-      margin: 10px;
-      padding: 30px 20px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    /* Product image */
+    .bestsellers .card img {
+      height: 170px !important;
+      object-fit: cover;
     }
 
-    .features .col-md-4:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    h3 {
-      color: #2c2c2c;
+    /* Product name smaller */
+    .bestsellers .card-title {
+      font-size: 13px !important;
       font-weight: 600;
     }
 
-    /* === Uniform card layout for Bestsellers section === */
-.bestsellers .card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.bestsellers .card-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-align: center;
-  padding: 1rem;
-  flex-grow: 1;
-}
-
-/* Keep the button area fixed at the bottom */
-.bestsellers .card-body .btn {
-  margin-top: auto;
-  border: none;
-  border-radius: 50px;
-  background: linear-gradient(90deg, #B5654B, #D17C63);
-  color: #fff;
-  padding: 6px 18px;
-  font-size: 0.9rem;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.bestsellers .card-body .btn:hover {
-  background: #333;
-  color: #fff;
-  transform: scale(1.05);
-}
-
-/* Ensure wishlist and out-of-stock stay neatly below button */
-.bestsellers .wishlist-symbol {
-  margin-top: 10px;
-}
-
-.bestsellers .text-danger {
-  margin-top: 10px;
-}
-
-    .wishlist-symbol {
-      background: none;
-      border: none;
-      color: #d40000;
-      font-size: 24px;
-      cursor: pointer;
-      margin: 0 5px;
-      transition: transform 0.25s ease;
-    }
-
-    .wishlist-symbol:hover {
-      transform: scale(1.4);
-      /* Zoom symbols slightly more */
-      color: #a80000;
-    }
-
-    .text-danger {
-      font-size: 14px;
-      font-weight: bold;
-      color: #cc0000 !important;
-    }
-
-    h2.section-title {
-      font-weight: 700;
-      margin-bottom: 30px;
-      position: relative;
-      color: #1a1a1a;
-    }
-
-    h2.section-title::after {
-      content: "";
-      position: absolute;
-      width: 70px;
-      height: 3px;
-      background: #d4af37;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: -12px;
-    }
-
-    .features p,
-    .card-body p {
-      color: #555;
-    }
-
-    .bestsellers h2 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #1e1e1e;
-      margin-bottom: 40px;
+    /* Stack feature cards one below one */
+    .home-wrapper .col-md-3,
+    .home-wrapper .col-sm-3 {
+      width: 100% !important;
+      flex: 0 0 100% !important;
+      max-width: 100% !important;
+      font-size: small;
     }
 
     .feature-card {
-      background-color: hsl(32, 50%, 87%);
-      border-radius: 25px;
-      padding: 20px;
-      height: 100%;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-      font-size: 0.95rem;
+      padding: 16px !important;
     }
+    
+  }
+</style>
 
-    .feature-card h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
+<!-- =======================
+     BANNER
+======================= -->
+<section class="hero text-center py-5 bg-light position-relative">
+  <img class="banner-image1" src="\images\banner_image1.webp.jpg" alt="banner">
+  <div class="banner-overlay-text">
+    <h1>Elevate Your Style, Embrace the Elegance</h1>
+    <p>Luxury fashion at your fingertips.</p>
+    <a href="/shop"><button class="discover">Discover</button></a>
+  </div>
+</section>
 
-    .feature-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    }
-  </style>
+<!-- =======================
+     BESTSELLERS
+======================= -->
+<section class="bestsellers py-5">
+  <div class="container">
+    <h2 class="text-center mb-4">Our Bestsellers</h2>
 
-  <section class="hero text-center py-5 bg-light position-relative">
-    <!-- <div class="container position-relative"> -->
-    <img class="banner-image1" src="\images\banner_image1.webp.jpg" alt="banner-image1">
+    <div class="row">
+      <% for (let i = 0; i < 4; i++) { %>
+        <% if (products[i]) { %>
 
-    <div class="banner-overlay-text">
-      <h1 class="display-4">Elevate Your Style, Embrace the Elegance</h1>
-      <p class="lead">Luxury fashion at your fingertips.</p>
-      <!-- <input class="form-control w-50 mx-auto" type="text" placeholder="Search..."> -->
-      <a href="/shop"><button class="discover">Discover</button></a>
+          <div class="col-md-3 mb-4 d-flex">
+            <div class="card w-100">
+
+              <img src="<%= products[i].productImage[0] %>" alt="Product" class="card-img-top">
+
+              <div class="card-body d-flex flex-column">
+
+    <div class="product-info-block">
+        <h5 class="card-title"><%= products[i].productName %></h5>
+        <!-- <p><%= products[i].description %></p> -->
+
+        <% if (products[i].bestOffer > 0) { %>
+          <p>
+            <s>₹<%= products[i].regularPrice %></s>
+            <span class="text-danger ms-2">-<%= products[i].bestOffer %>%</span>
+          </p>
+          <p class="fw-bold">₹<%= products[i].variant[0].salePrice %></p>
+        <% } else { %>
+          <p class="fw-bold">₹<%= products[i].variant[0].salePrice %></p>
+        <% } %>
     </div>
 
-    <!-- </div> -->
-  </section>
+    <!-- BUTTON ALWAYS AT BOTTOM -->
+    <a href="/shop/product-details/<%= products[i]._id %>">
+      <button class="btn btn-outline-dark btn-sm w-100">View Details</button>
+    </a>
 
+    <% if (products[i].quatity > 0) { %>
+      <button class="wishlist-symbol mt-2" onclick="addToWishlist('<%= products[i]._id %>')">❤️</button>
+    <% } else { %>
+      <p class="text-danger mt-2"><strong>Out of Stock</strong></p>
+    <% } %>
 
-  <section class="features py-5 text-center">
+</div>
+
+            </div>
+          </div>
+
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- =======================
+       FEATURES UNDER PRODUCTS
+  ======================= -->
+  <section class="home-wrapper d-flex flex-column mt-4">
     <div class="container">
       <div class="row justify-content-center g-3">
+
         <div class="col-md-3 col-sm-3">
           <div class="feature-card">
-            <h3>🚚 Free Shipping</h3>
+            <h4>🚚 Free Shipping</h4>
             <p>Enjoy hassle-free shopping with free worldwide delivery.</p>
           </div>
         </div>
+
         <div class="col-md-3 col-sm-3">
           <div class="feature-card">
-            <h3>📞 Support 24/7</h3>
+            <h4>📞 Support 24/7</h4>
             <p>Dedicated customer service for support and assistance.</p>
           </div>
         </div>
+
         <div class="col-md-3 col-sm-3">
           <div class="feature-card">
-            <h3>💰 Secure Payments</h3>
+            <h4>💰 Secure Payments</h4>
             <p>Shop without worries, your data is safe with us.</p>
           </div>
         </div>
+
       </div>
     </div>
   </section>
-
-
-
-  <section class="bestsellers py-5">
-    <div class="container">
-      <h2 class="text-center mb-4">Our Bestsellers</h2>
-      <div class="row">
-        <% for (let i=0; i < 4; i++) { %>
-          <% if (products[i]) { %>
-            <div class="col-md-3 mb-4 d-flex">
-              <div class="card w-100">
-                <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
-                <div class="card-body text-center d-flex flex-column">
-                  <div>
-                    <h5 class="card-title">
-                      <%= products[i].productName %>
-                    </h5>
-                    <p>
-                      <%= products[i].description %>
-                    </p>
-
-                    <% if (products[i].bestOffer> 0) { %>
-                      <p class="card-text mb-1">
-                        <s class="text-muted">₹<%= products[i].regularPrice %></s>
-                        <span class="text-danger ms-2">-<%= products[i].bestOffer %>%</span>
-                      </p>
-                      <p class="card-text fw-bold">₹<%= products[i].variant[0].salePrice %>
-                      </p>
-                      <% } else { %>
-                        <p class="card-text fw-bold">₹<%= products[i].variant[0].salePrice %>
-                        </p>
-                        <% } %>
-                  </div>
-
-                  <div class="mt-auto">
-                    <a href="/shop/product-details/<%= products[i]._id %>">
-                      <button class="btn btn-outline-dark btn-sm w-100">View Details</button>
-                    </a>
-
-                    <% if (products[i].quatity > 0) { %>
-                  <div class="mt-2 d-flex justify-content-center align-items-center" style="height: 40px;">
-                    <button class="wishlist-symbol" onclick="addToWishlist('<%= products[i]._id %>')">&#10084;</button>
-                  </div>
-                <% } else { %>
-                  <div class="text-danger class=mt-2 d-flex justify-content-center align-items-center" style="height: 40px;"><strong>Out of Stock</strong></div>
-                <% } %>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-            <% } %>
-              <% } %>
-      </div>
-    </div>
-  </section>
-
+</section>
 
   <script>
 

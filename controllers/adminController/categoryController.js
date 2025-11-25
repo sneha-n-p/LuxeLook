@@ -14,20 +14,18 @@ const categoryInfo = async (req, res) => {
 
     let query = {};
 
-    // If user searched something, filter using regex
     if (search) {
       query = {
-        name: { $regex: search, $options: "i" }, // case-insensitive search
+        name: { $regex: search, $options: "i" },
       };
     }
 
-    // ✅ If search is active, show all results (no pagination)
     let Data, totalCategories, totalPage;
 
     if (search) {
       Data = await category.find(query).sort({ createdAt: -1 });
       totalCategories = Data.length;
-      totalPage = 1; // only one page needed for search results
+      totalPage = 1; 
     } else {
       Data = await category
         .find(query)

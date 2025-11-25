@@ -1,200 +1,112 @@
 <%- include("../../views/partials/adminPartial/header") %>
 
-  <style>
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    /* Desktop Sidebar Offset */
     .main-wrap {
-      display: flex;
-      min-height: 100vh;
-      background-color: #1e1e2f;
-      padding-left: 220px;
-      position: relative;
+        display: flex;
+        min-height: 100vh;
+        background-color: #1e1e2f;
+        padding-left: 220px;
     }
 
+    /* Fix sidebar for laptop */
     .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 220px;
-      height: 100vh;
-      background-color: #111827;
-      color: #ffffff;
-      z-index: 1000;
-      padding-top: 1rem;
+        width: 220px;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        background: #111827;
     }
 
-    .content-main {
-      flex: 1;
-      padding: 2rem;
-      z-index: 1;
-      position: relative;
-      background-color: #1c1c24;
-      min-height: 100vh;
-      color: #ffffff;
+    /* Mobile: remove sidebar offset */
+    @media (max-width:1024px) {
+        .main-wrap {
+            padding-left: 0 !important;
+        }
     }
+</style>
 
-    /* Header styles */
-    .content-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
+<div class="main-wrap">
+<section class="content-main w-full min-h-screen p-6 bg-[#1c1c24] text-white flex justify-center">
 
-    .content-title {
-      font-size: 24px;
-      font-weight: 600;
-    }
+    <div class="w-full max-w-xl">
 
-    /* Card and form styles */
-    .card {
-      background-color: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      padding: 20px;
-      z-index: 10;
-      position: relative;
-      min-height: 400px;
-    }
-
-    .card-body {
-      padding: 25px;
-    }
-
-    .form-label {
-      font-weight: 500;
-      color: #333333;
-    }
-
-    .form-control {
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      font-size: 15px;
-      color: #333333;
-      width: 100%;
-    }
-
-    .form-control:focus {
-      border-color: #6c63ff;
-      box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
-      outline: none;
-    }
-
-    .error-message {
-      font-size: 13px;
-      color: #ff4d4f;
-      margin-top: 4px;
-    }
-
-    .btn-primary {
-      background-color: #6c63ff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: background-color 0.3s;
-    }
-
-    .btn-primary:hover {
-      background-color: #574fd6;
-    }
-
-    .d-grid {
-      display: grid;
-    }
-
-    .row {
-      display: flex;
-      align-items: stretch;
-    }
-
-    .col-lg-4 {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .col-lg-4 .card {
-      flex-grow: 1;
-    }
-
-    @media (max-width: 768px) {
-      .content-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .content-title {
-        margin-bottom: 15px;
-      }
-
-      .row {
-        flex-direction: column;
-      }
-
-      .col-lg-4 {
-        width: 100%;
-      }
-    }
-  </style>
-
-  <div class="main-wrap">
-    <section class="content-main">
-      <div class="content-header">
-        <h2 class="content-title">Edit Coupon</h2>
-        <button onclick="window.history.back()" class="btn btn-secondary" style="color: white;">⬅ Go Back
-        </button>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-4">
-          <div class="card">
-            <div class="card-body">
-              <form method="post" id="coupon-form">
-                <input type="hidden" id="coupon-id" name="couponId" value="<%= findCoupon._id %>">
-                <div class="mb-4">
-                  <label class="form-label">Coupon Name</label>
-                  <input type="text" name="couponName" class="form-control" id="coupon-name"
-                    value="<%= findCoupon.name %>" />
-                  <div id="error-coupon-name" class="error-message"></div>
-                </div>
-
-                <div class="mb-4">
-                  <label class="form-label">Start Date</label>
-                  <input type="date" name="startDate" id="startingDate" class="form-control"
-                    value="<%= findCoupon.createdOn %>" />
-                  <div id="error-start-date" class="error-message"></div>
-                </div>
-
-                <div class="mb-4">
-                  <label class="form-label">End Date</label>
-                  <input type="date" name="endDate" id="expiringDate" class="form-control"
-                    value="<%= findCoupon.expiredOn %>" />
-                  <div id="error-end-date" class="error-message"></div>
-                </div>
-
-                <div class="mb-4">
-                  <label class="form-label">Offer Price</label>
-                  <input type="text" name="offerPrice" id="offer-price" class="form-control"
-                    value="<%= findCoupon.offerPrice %>" />
-                  <div id="error-offer-price" class="error-message"></div>
-                </div>
-
-                <div class="mb-4">
-                  <label class="form-label">Minimum Price</label>
-                  <input type="text" name="minimumPrice" id="minimum-price" class="form-control"
-                    value="<%= findCoupon.minimumPrice %>" />
-                  <div id="error-minimum-price" class="error-message"></div>
-                </div>
-
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-primary">Edit</button>
-                </div>
-              </form>
-            </div>
-          </div>
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold">Edit Coupon</h2>
+            <button onclick="window.history.back()" class="bg-gray-700 px-4 py-2 rounded hover:bg-gray-600 text-white">
+                ⬅ Go Back
+            </button>
         </div>
-      </div>
-    </section>
-  </div>
+
+        <!-- FORM CARD -->
+        <div class="bg-white text-black rounded-2xl shadow-xl p-6">
+
+            <form method="post" id="coupon-form">
+
+                <input type="hidden" id="coupon-id" name="couponId" value="<%= findCoupon._id %>">
+
+                <!-- Coupon Name -->
+                <div class="mb-4">
+                    <label class="font-medium">Coupon Name</label>
+                    <input type="text" name="couponName" id="coupon-name"
+                        value="<%= findCoupon.name %>"
+                        class="w-full border p-2 rounded mt-1">
+                    <p id="error-coupon-name" class="text-red-500 text-sm"></p>
+                </div>
+
+                <!-- Start Date -->
+                <div class="mb-4">
+                    <label class="font-medium">Start Date</label>
+                    <input type="date" name="startDate" id="startingDate"
+                        value="<%= findCoupon.createdOn %>"
+                        class="w-full border p-2 rounded mt-1">
+                    <p id="error-start-date" class="text-red-500 text-sm"></p>
+                </div>
+
+                <!-- End Date -->
+                <div class="mb-4">
+                    <label class="font-medium">End Date</label>
+                    <input type="date" name="endDate" id="expiringDate"
+                        value="<%= findCoupon.expiredOn %>"
+                        class="w-full border p-2 rounded mt-1">
+                    <p id="error-end-date" class="text-red-500 text-sm"></p>
+                </div>
+
+                <!-- Offer Price -->
+                <div class="mb-4">
+                    <label class="font-medium">Offer Price</label>
+                    <input type="text" name="offerPrice" id="offer-price"
+                        value="<%= findCoupon.offerPrice %>"
+                        class="w-full border p-2 rounded mt-1">
+                    <p id="error-offer-price" class="text-red-500 text-sm"></p>
+                </div>
+
+                <!-- Minimum Price -->
+                <div class="mb-4">
+                    <label class="font-medium">Minimum Price</label>
+                    <input type="text" name="minimumPrice" id="minimum-price"
+                        value="<%= findCoupon.minimumPrice %>"
+                        class="w-full border p-2 rounded mt-1">
+                    <p id="error-minimum-price" class="text-red-500 text-sm"></p>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                    class="w-full bg-indigo-600 py-2 rounded text-white hover:bg-indigo-700 mt-4">
+                    Update Coupon
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+</section>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

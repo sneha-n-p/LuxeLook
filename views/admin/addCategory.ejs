@@ -1,112 +1,95 @@
 <%-include("../../views/partials/adminPartial/header")%>
- <!-- <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
   <title>Add Category</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head> -->
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     body {
-      background-color: #0f172a;
-      color: #f1f5f9;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    .main-content {
-      padding: 50px 30px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background-color: #1e293b;
-      border: none;
-      padding: 30px;
-      border-radius: 12px;
-    }
-
-    .form-label {
-      color: #f1f5f9;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-
-    .form-control,
-    .form-select {
-      background-color: #f8fafc;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 12px;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-      background-color: #f8fafc;
-      box-shadow: none;
-      border-color: #38bdf8;
-    }
-
-    .btn-add {
-      background-color: #22d3ee;
-      color: #0f172a;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 6px;
-      margin-top: 20px;
-    }
-
-    .btn-add:hover {
-      background-color: #06b6d4;
-    }
-
-    .categories-errors {
-      color: red;
+      font-family: 'Poppins', sans-serif;
     }
   </style>
+</head>
 
-  <body>
+<body class="bg-[#0f172a] text-[#f1f5f9] min-h-screen">
 
-    <div class="main-content">
-       <button 
-  onclick="window.history.back()" 
-  class="btn btn-secondary" 
-  style= "color: white;">⬅ Go Back
-</button>
-      <h3 class="mb-4">Add Categories</h3>
+  <!-- MAIN CONTAINER -->
+  <div class="w-full max-w-xl mx-auto px-4 py-10">
 
-      <div class="card">
-        <form id="addCategoryForm">
-          <div class="mb-3">
-            <label for="categoryName" class="form-label">Category Name:</label>
-            <p class="categories-errors" id="Category-name-error"></p>
-            <input type="text" class="form-control" id="categoryName" name="name" placeholder="category Name" maxlength="25">
-          </div>
+    <!-- Back Button -->
+    <button 
+      onclick="window.history.back()" 
+      class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded mb-6">
+      ⬅ Go Back
+    </button>
 
-          <div class="mb-3">
-            <label for="categoryDescription" class="form-label">Description:</label>
-            <p class="categories-errors" id="Category-Description-error"></p>
-            <textarea class="form-control" id="categoryDescription" name="description" rows="3"
-              placeholder="Description" maxlength="150"></textarea>
-          </div>
+    <h3 class="text-2xl font-semibold mb-4">Add Categories</h3>
 
-          <div class="mb-3">
-            <label for="categoryOffer" class="form-label">Offer (%):</label>
-            <p class="categories-errors" id="Category-Offer-error"></p>
-            <input type="number" class="form-control" id="categoryOffer" placeholder="offer in percent">
-          </div>
+    <!-- Card -->
+    <div class="bg-[#1e293b] p-6 rounded-xl shadow-lg">
 
-          <div class="mb-3">
-            <label for="status" class="form-label">Status:</label>
-            <select class="form-select" id="status" name="status">
-              <option value="" selected disabled>Select status</option>
-              <option value="Listed">Listed</option>
-              <option value="Unlisted">Unlisted</option>
-            </select>
-          </div>
+      <form id="addCategoryForm" class="space-y-5">
 
-          <button type="submit" class="btn btn-add">ADD CATEGORY</button>
-        </form>
-      </div>
+        <!-- Category Name -->
+        <div>
+          <label for="categoryName" class="block mb-1 font-medium">Category Name:</label>
+          <p class="text-red-400 text-sm" id="Category-name-error"></p>
+          <input type="text" 
+                 id="categoryName" 
+                 name="name"
+                 maxlength="25"
+                 placeholder="Category Name"
+                 class="w-full p-3 rounded bg-[#f8fafc] text-black outline-none focus:ring-2 focus:ring-cyan-400">
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="categoryDescription" class="block mb-1 font-medium">Description:</label>
+          <p class="text-red-400 text-sm" id="Category-Description-error"></p>
+          <textarea id="categoryDescription" 
+                    name="description"
+                    maxlength="150"
+                    rows="3"
+                    placeholder="Description"
+                    class="w-full p-3 rounded bg-[#f8fafc] text-black outline-none focus:ring-2 focus:ring-cyan-400"></textarea>
+        </div>
+
+        <!-- Offer -->
+        <div>
+          <label for="categoryOffer" class="block mb-1 font-medium">Offer (%):</label>
+          <p class="text-red-400 text-sm" id="Category-Offer-error"></p>
+          <input type="number"
+                 id="categoryOffer"
+                 placeholder="Offer in percent"
+                 class="w-full p-3 rounded bg-[#f8fafc] text-black outline-none focus:ring-2 focus:ring-cyan-400">
+        </div>
+
+        <!-- Status -->
+        <div>
+          <label for="status" class="block mb-1 font-medium">Status:</label>
+          <select id="status" 
+                  name="status"
+                  class="w-full p-3 rounded bg-[#f8fafc] text-black outline-none focus:ring-2 focus:ring-cyan-400">
+            <option value="" selected disabled>Select status</option>
+            <option value="Listed">Listed</option>
+            <option value="Unlisted">Unlisted</option>
+          </select>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit"
+                class="w-full bg-cyan-400 hover:bg-cyan-300 text-black font-semibold py-3 rounded-lg mt-4 transition">
+          ADD CATEGORY
+        </button>
+
+      </form>
+
     </div>
+  </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -17,7 +17,7 @@ const loadCoupon = async (req, res) => {
     }
 
     const page = parseInt(req.query.page) || 1
-    const limit = 4
+    const limit = 10
     const skip = (page - 1) * limit
 
     const findCoupons = await Coupon.find({})

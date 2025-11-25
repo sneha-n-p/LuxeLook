@@ -81,8 +81,9 @@ const procedToCheckOut = async (req, res) => {
             const product = await Product.findById(item.productId).populate('category')
             logger.debug(`product.category:${product.category.status}`)
 
-            if (item.isBlocked || product.category.status == 'Unlisted') return res.json({ success: false, message: `${product.productName} is Blocked By Admin` })
-
+            if ( product.category.status == 'Unlisted') return res.json({ success: false, message: `${product.category.name} Category Blocked By Admin` })
+                if ( product.isBlocked ) return res.json({ success: false, message: `${product.productName} Product Blocked By Admin` })
+                
             for (let variants of product.variant) {
                 if (variants.size === item.size) {
                     if (variants.quantity < item.quantity) {

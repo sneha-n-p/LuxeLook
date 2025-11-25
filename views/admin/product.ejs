@@ -1,214 +1,222 @@
-<%-include("../../views/partials/adminPartial/header")%>
+<%- include("../../views/partials/adminPartial/header") %>
+<script src="https://cdn.tailwindcss.com"></script>
 
-    <style>
-        body {
-            background-color: #0f172a;
-            color: #f1f5f9;
-            font-family: 'Segoe UI', sans-serif;
-        }
+<style>
+/* --- FIX: Prevent content from sliding under sidebar --- */
+.main-content {
+  margin-left: 240px; /* Same as sidebar width */
+  transition: all 0.3s ease;
+}
 
-        .main-content {
-            padding: 30px;
-        }
+/* Mobile / Tablet */
+@media (max-width: 991px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+</style>
 
-        .table {
-            color: #000000;
-        }
+<body class="bg-[#0f172a] text-white font-sans">
 
-        .table th,
-        .table td {
-            vertical-align: middle;
-        }
+<div class="main-content px-4 py-8">
 
-        .table thead th {
-          color: #fff;
-          background-color: #000;
-            border-bottom: 2px solid #334155;
-        }
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl md:text-3xl font-semibold">Products</h1>
 
-        .table tbody tr {
-            background-color: #000000;
-            border-bottom: 1px solid #334155;
-        }
+    <div class="flex items-center gap-3">
+      <button onclick="window.history.back()"
+        class="hidden sm:inline-block bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded">
+        ⬅ Go Back
+      </button>
 
-        .btn-add-product {
-            background-color: #22d3ee;
-            color: #0f172a;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 6px;
-        }
+      <a href="/admin/Products/add-product"
+        class="bg-cyan-400 hover:bg-cyan-300 text-black font-semibold px-4 py-2 rounded">
+        ADD PRODUCT +
+      </a>
+    </div>
+  </div>
 
-        .btn-add-product:hover {
-            background-color: #06b6d4;
-        }
+  <!-- Search Box -->
+  <div class="mb-4">
+    <input id="productSearch"
+      class="w-full md:w-1/2 bg-[#1e293b] text-white p-3 rounded outline-none focus:ring-2 focus:ring-cyan-400"
+      placeholder="Search for Products">
+  </div>
 
-        .status-listed {
-            background-color: #22c55e;
-            color: #fff;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-        }
+  <!-- DESKTOP TABLE -->
+  <div class="hidden md:block bg-transparent">
+    <div class="overflow-x-auto rounded-lg border border-gray-700">
+      <table class="min-w-full table-auto border-collapse">
+        <thead>
+          <tr class="bg-black">
+            <th class="px-4 py-3 text-sm text-white">IMAGE</th>
+            <th class="px-4 py-3 text-sm text-white">NAME</th>
+            <th class="px-4 py-3 text-sm text-white">DESCRIPTION</th>
+            <th class="px-4 py-3 text-sm text-white">CATEGORY</th>
+            <th class="px-4 py-3 text-sm text-white">REGULAR(₹)</th>
+            <th class="px-4 py-3 text-sm text-white">SALE(₹)</th>
+            <th class="px-4 py-3 text-sm text-white">OFFER</th>
+            <th class="px-4 py-3 text-sm text-white">STOCK</th>
+            <th class="px-4 py-3 text-sm text-white">ACTION</th>
+          </tr>
+        </thead>
 
-        .status-unlisted {
-            background-color: #ef4444;
-            color: #fff;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-        }
+        <tbody>
 
-        .search-bar {
-            background-color: #1e293b;
-            border: none;
-            color: #f1f5f9;
-        }
+          <% products.forEach(function(product,index) { %>
+          <tr class="border-b border-gray-800">
+            <td class="px-4 py-3">
+              <img src="<%= product.productImage[0] %>" width="60" height="60"
+                class="object-cover rounded">
+            </td>
 
-        .search-bar::placeholder {
-            color: #cbd5e1;
-        }
+            <td class="px-4 py-3 text-sm"><%= product.productName %></td>
 
-        .pagination .page-link {
-            background-color: #1e293b;
-            color: #f1f5f9;
-            border: none;
-        }
+            <td class="px-4 py-3 text-sm max-w-[250px] truncate"><%= product.description %></td>
 
-        .pagination .page-link.active {
-            background-color: #22d3ee;
-            color: #0f172a;
-        }
-    </style>
-    </head>
+            <td class="px-4 py-3 text-sm"><%= product.category.name %></td>
 
-    <body>
-        <div class="main-content">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3>Products</h3>
-                 <button 
-  onclick="window.history.back()" 
-  class="btn btn-secondary" 
-  style= "color: white;">⬅ Go Back
-</button>
-</div>
-<div class="d-flex justify-content-end mb-3">
-  <a href="/admin/Products/add-product" class="btn btn-add" style="background-color: #06b6d4;">ADD PRODUCT +</a>
-</div>
+            <td class="px-4 py-3 text-sm">₹ <%= product.regularPrice %></td>
 
-            <div class="mb-4">
-                <input type="text" id="productSearch" class="form-control search-bar" placeholder="Search for Products">
+            <td class="px-4 py-3 text-sm">
+              <select class="bg-[#0b1220] text-white px-2 py-1 rounded">
+                <% product.variant.forEach(v => { %>
+                <option><%= v.size %>: ₹<%= v.salePrice.toFixed(2) %></option>
+                <% }) %>
+              </select>
+            </td>
+
+            <td class="px-4 py-3 text-sm">
+              <span><%= product.productOffer ? product.productOffer + '%' : '0%' %></span>
+
+              <div class="mt-2">
+                <% if(product.productOffer > 0) { %>
+                <button onclick="editOffer('<%= product._id %>')"
+                  class=" text-decorating-none text-xs px-2 py-1 rounded bg-yellow-400 text-black mr-1">Edit</button>
+
+                <button onclick="removeOffer('<%= product._id %>')"
+                  class="text-xs px-2 py-1 rounded bg-red-600 text-white">Remove</button>
+
+                <% } else { %>
+                <button onclick="addOffer('<%= product._id %>')"
+                  class="text-xs px-2 py-1 rounded bg-green-600 text-white">Add Offer</button>
+                <% } %>
+              </div>
+            </td>
+
+            <td class="px-4 py-3 text-sm"><%= product.quatity %></td>
+
+            <td class="px-4 py-3">
+              <div class="flex gap-2">
+                <a href="/admin/Products/edit-product/<%= product._id %>"
+                  class="px-3 py-1 text-sm rounded bg-white/10 hover:bg-white/20">✎</a>
+
+                <% if(!product.isBlocked) { %>
+                <button onclick="confirmBlockProduct(event,'<%= product._id %>')"
+                  class="px-3 py-1 rounded bg-red-600 text-white">Block</button>
+                <% } else { %>
+                <button onclick="confirmUnblockProduct(event,'<%= product._id %>')"
+                  class="px-3 py-1 rounded bg-green-600 text-white">Unblock</button>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+
+  <!-- MOBILE VIEW -->
+  <div class="md:hidden space-y-4 mt-6">
+    <% products.forEach(function(product,index) { %>
+    <div class="bg-[#1e293b] p-4 rounded-lg shadow">
+      <div class="flex gap-3">
+        <img src="<%= product.productImage[0] %>" class="w-20 h-20 rounded object-cover">
+
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold"><%= product.productName %></h3>
+          <p class="text-sm text-gray-300 line-clamp-3"><%= product.description %></p>
+
+          <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <span class="text-xs text-gray-400">Category</span>
+              <div><%= product.category.name %></div>
             </div>
 
-            <table class="table table-hover table-borderless">
-                <thead>
-                    <tr>
-                        <th>NO</th>
-                        <th>IMAGE</th>
-                        <th>NAME</th>
-                        <th>DESCRIPTION</th>
-                        <th>CATEGORY</th>
-                        <th>REGULAR(₹)</th>
-                        <th>SALE(₹)</th>
-                        <th>OFFER</th>
-                        <th>STOCK</th>
-                        <th>ACTION</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% products.forEach(function(product,index) { %>
-                        <tr>
-                            <td style="color: #000;"><%= index+1 %>
-                            </td>
-                            <td>
-                                <img src="<%= product.productImage[0] %>" alt="Product Image" width="45" height="60"
-                                    style="object-fit: cover; border-radius: 4px;">
-                            </td>
-                            <td style="color: #000;">
-                                <%= product.productName %>
-                            </td>
-                            <td style="color: #000;">
-                                <%= product.description %>
-                            </td>
-                            <td style="color: #000;">
-                                <%= product.category.name %>
-                            </td>
-                            <td style="color: #000000;">₹ 
-                              <%=product.regularPrice %>
-                            </td>
-                            <td style="color: #000000;"> 
-                              <select>
-                                <%for(let i=0;i<product.variant.length;i++){%>
-                                  <option><%= product.variant[i].size%>:₹<%= product.variant[i].salePrice.toFixed(2)%></option>
-                                  <%}%>
-                              </select>
-                            </td>
-                            
-                            <td class="text-start" style="color: #000;">
-                                <div>
-                                  <span><%= product.productOffer ? product.productOffer + '%' : '0%' %></span>
-                                  <div class="mt-2">
-                                    <% if (product.productOffer && product.productOffer > 0) { %>
-                                      <button class="btn btn-sm btn-warning me-1" onclick="editOffer('<%= product._id %>')">Edit Offer</button>
-                                      <button class="btn btn-sm btn-danger" onclick="removeOffer('<%= product._id %>')">Remove Offer</button>
-                                    <% } else { %>
-                                      <button class="btn btn-sm btn-success" onclick="addOffer('<%= product._id %>')">Add Offer</button>
-                                    <% } %>
-                                  </div>
-                                </div>
-                              </td>
-                            <td style="color: #000;">
-                                <%= product.quatity %>
-                            </td>
-
-                            <td>
-
-                                <button class="btn btn-sm btn-outline-light"><a class="bi bi-pencil"
-                                        href="/admin/Products/edit-product/<%=product._id%>"></a></button>
-                                <%if(product.isBlocked===false){%>
-                                    <button class="btn btn-danger">
-                                        <a href="#"
-                                            onclick="confirmBlockProduct(event, '<%= product._id.toString() %>')"
-                                            class="text-white" style="text-decoration: none;">Block</a>
-                                    </button>
-                                    <%} else{%>
-                                        <button class="btn btn-success">
-                                            <a href="#"
-                                                onclick="confirmUnblockProduct(event, '<%= product._id.toString() %>')"
-                                                class="text-white" style="text-decoration: none;">Unblock</a>
-                                        </button>
-                                        <%}%>
-                            </td>
-                        </tr>
-                        <% }) %>
-                </tbody>
-            </table>
-
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div style="color: #fff;">Showing <%= currentPage %>  of <%= totalPages %>
-                </div>
-                <nav>
-                    <ul class="pagination mb-0">
-                        <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-                            <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-                        </li>
-
-                        <% for (let i=1; i <=totalPages; i++) { %>
-                            <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                                <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
-                                    <%= i %>
-                                </a>
-                            </li>
-                            <% } %>
-
-                                <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-                                    <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-                                </li>
-                    </ul>
-                </nav>
-
+            <div>
+              <span class="text-xs text-gray-400">Regular Price</span>
+              <div>₹ <%= product.regularPrice %></div>
             </div>
+
+            <div>
+              <span class="text-xs text-gray-400">Sale</span>
+              <div>
+                <% if(product.variant.length) { %>
+                <%= product.variant[0].size %> :
+                ₹<%= product.variant[0].salePrice.toFixed(2) %>
+                <% } else { %>-<% } %>
+              </div>
+            </div>
+
+            <div>
+              <span class="text-xs text-gray-400">Stock</span>
+              <div><%= product.quatity %></div>
+            </div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+            <% if(product.productOffer > 0) { %>
+            <button onclick="editOffer('<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-yellow-400 text-black">Edit Offer</button>
+            <button onclick="removeOffer('<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-red-600 text-white">Remove</button>
+            <% } else { %>
+            <button onclick="addOffer('<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-green-600 text-white">Add Offer</button>
+            <% } %>
+
+            <a href="/admin/Products/edit-product/<%= product._id %>" class="text-xs px-2 py-1 rounded bg-white/10">Edit</a>
+
+            <% if(!product.isBlocked) { %>
+            <button onclick="confirmBlockProduct(event,'<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-red-600 text-white">Block</button>
+            <% } else { %>
+            <button onclick="confirmUnblockProduct(event,'<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-green-600 text-white">Unblock</button>
+            <% } %>
+          </div>
         </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div style="color: #fff;">Showing <%= currentPage %>  of <%= totalPages %>
+    </div>
+    <nav>
+        <ul class="pagination mb-0">
+            <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+            </li>
+
+            <% for (let i=1; i <=totalPages; i++) { %>
+                <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                        <%= i %>
+                    </a>
+                </li>
+                <% } %>
+
+                    <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+                    </li>
+        </ul>
+    </nav>
+
+</div>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
 

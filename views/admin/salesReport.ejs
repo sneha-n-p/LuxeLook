@@ -1,254 +1,185 @@
 <%- include("../../views/partials/adminPartial/header") %>
 
-  <style>
-    body {
-      background-color: #0f172a;
-      color: #f1f5f9;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    /* DESKTOP layout (table visible, cards hidden) */
+    @media (min-width: 1024px) {
+        .desktop-table {
+        display: block;
+        padding: 0; 
+    }
+    .mobile-card {
+        display: none;
+    }
+    }
+
+    /* MOBILE layout (table hidden, cards visible) */
+    @media (max-width: 1023px) {
+        .desktop-table {
+            display: none;
+        }
+        .mobile-card {
+            display: block;
+        }
+
+        .main-content {
+            margin-left: 0 !important;
+            padding: 20px !important;
+        }
     }
 
     .main-content {
-      margin-left: 220px;
-      padding: 69px;
-      max-width: 1496px;
+        margin-left: 220px;
+        padding: 40px;
+        background-color: #0f172a;
+        color: white;
     }
+</style>
 
-    .content-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
+<body class="bg-[#0f172a] text-white">
 
-    .content-title {
-      font-size: 24px;
-      font-weight: 600;
-      color: #f1f5f9;
-    }
+<div class="main-content">
 
-    .sales-form {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .sales-form label,
-    .sales-form select,
-    .sales-form input {
-      color: #fff;
-      font-size: 14px;
-    }
-
-    .sales-form select,
-    .sales-form input[type="date"] {
-      padding: 8px 12px;
-      border-radius: 4px;
-      border: none;
-      background-color: #1e293b;
-      color: #f1f5f9;
-    }
-
-    .sales-form select::placeholder,
-    .sales-form input[type="date"]::placeholder {
-      color: #cbd5e1;
-    }
-
-    .sales-form button {
-      background-color: #28a745;
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .sales-form button:hover {
-      background-color: #218838;
-    }
-
-    .date-range {
-      display: none;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .report-summary {
-      margin-bottom: 20px;
-      background-color: #fff;
-      padding: 15px;
-      border-radius: 6px;
-      color: #000;
-    }
-
-    .sales-table {
-      width: 100%;
-      height: 40%;
-      border-collapse: collapse;
-      background-color: #fff;
-      color: #000;
-    }
-
-    .sales-table th,
-    .sales-table td {
-      padding: 10px;
-      border: 1px solid #000;
-      text-align: left;
-    }
-
-    .download-links {
-      margin-top: 20px;
-    }
-
-    .download-links a {
-      margin-right: 15px;
-      color: #00d1ff;
-      text-decoration: none;
-    }
-
-    .download-links a:hover {
-      color: #06b6d4;
-    }
-
-    @media (max-width: 768px) {
-      .main-content {
-        margin-left: 0;
-        padding: 20px;
-      }
-
-      .sales-form {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    .button {
-      border-radius: 10%;
-      background-color: #00d1ff;
-    }
-  </style>
-
-  <body>
-    <div class="main-content">
-      <div class="content-header">
-        <h2 class="content-title">Sales Report</h2>
-        <button 
-  onclick="window.history.back()" 
-  class="btn btn-secondary" 
-  style= "color: white;">⬅ Go Back
-</button>
-      </div>
-
-      <form action="/admin/sales" method="GET" id="sales-filter-form" class="sales-form">
-        <label for="report-type">Report Type:</label>
-        <select name="reportType" id="report-type">
-          <option value="daily" <%=(reportType || 'daily' )==='daily' ? 'selected' : '' %>>Daily</option>
-          <option value="weekly" <%=reportType==='weekly' ? 'selected' : '' %>>Weekly</option>
-          <option value="monthly" <%=reportType==='monthly' ? 'selected' : '' %>>Monthly</option>
-          <option value="yearly" <%=reportType==='yearly' ? 'selected' : '' %>>Yearly</option>
-          <option value="custom" <%=reportType==='custom' ? 'selected' : '' %>>Custom</option>
-        </select>
-
-        <div id="custom-date-range" class="date-range">
-          <label for="start-date">Start Date:</label>
-          <input type="date" name="startDate" id="start-date">
-
-          <label for="end-date">End Date:</label>
-          <input type="date" name="endDate" id="end-date">
-        </div>
-
-        <button type="submit">Generate Report</button>
-        <a href="/admin/sales" class="btn btn-danger">Clear</a>
-      </form>
-
-      <% if (salesData) { %>
-        <div class="report-summary">
-          <p><strong>Overall Sales Count:</strong>
-            <%= salesData.totalSales %>
-          </p>
-          <p><strong>Overall Order Amount:</strong> Rs.<%= salesData.totalAmount %>
-          </p>
-          <p><strong>Overall Discount:</strong> Rs.<%= salesData.totalDiscount.toFixed(2) %>
-          </p>
-        </div>
-
-        <table class="sales-table">
-          <thead>
-            <tr style="background-color: #1c2b45; color: #fff;">
-              <th>User Name</th>
-              <th>Date</th>
-              <th>Order ID</th>
-              <th>Amount</th>
-              <th>Discount</th>
-              <th>Coupon Used</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% salesData.orders.forEach(order=> { %>
-              <tr>
-                <td>
-                  <%=order.userName%>
-                </td>
-                <td>
-                  <%= order.createdOn.toDateString() %>
-                </td>
-                <td>
-                  <%= order.orderId %>
-                </td>
-                <td>Rs.<%= order.finalAmount.toFixed(2) %>
-                </td>
-                <td>Rs.<%= order.discount.toFixed(2) %>
-                </td>
-                <td>
-                  <%= order.couponApplied || 'N/A' %>
-                </td>
-              </tr>
-              <% }); %>
-          </tbody>
-        </table>
-
-        <div class="d-flex justify-content-between align-items-center mt-3">
-          <div style="color: #fff;">
-            Showing <%= currentPage %> of <%= totalPage %>
-          </div>
-
-          <nav>
-            <ul class="pagination mb-0">
-              <!-- Previous button -->
-              <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-                <a class="page-link" href="?page=<%= currentPage - 1 %>&<%= queryParams %>">‹</a>
-              </li>
-
-              <!-- Page numbers -->
-              <% for (let i=1; i <=totalPage; i++) { %>
-                <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                  <a class="page-link" href="?page=<%= i %>&<%= queryParams %>">
-                    <%= i %>
-                  </a>
-                </li>
-                <% } %>
-
-                  <!-- Next button -->
-                  <li class="page-item <%= currentPage == totalPage ? 'disabled' : '' %>">
-                    <a class="page-link" href="?page=<%= currentPage + 1 %>&<%= queryParams %>">›</a>
-                  </li>
-            </ul>
-          </nav>
-        </div>
-
-
-        <div class="download-links">
-          <button class="button"><a href="javascript:void(0)" onclick="downloadPDF()" style="color: #000;">Download
-              PDF</a></button>
-          <button class="button"> <a href="javascript:void(0)" onclick="downloadExcel()" style="color: #000;">Download
-              Excel</a></button>
-        </div>
-        <% } %>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-semibold">Sales Report</h2>
+        <button onclick="window.history.back()" class="bg-gray-600 px-4 py-2 rounded hover:bg-gray-500">
+            ⬅ Go Back
+        </button>
     </div>
 
+    <!-- FILTERS / FORM CENTERED -->
+    <form action="/admin/sales" method="GET" 
+          id="sales-filter-form"
+          class="bg-[#1e293b] p-4 rounded-lg max-w-6xl mx-auto flex flex-wrap items-center gap-4 text-white">
+
+        <div class="flex flex-col">
+            <label class="text-sm">Report Type</label>
+            <select name="reportType" id="report-type"
+                class="bg-[#334155] px-3 py-2 rounded text-white">
+                <option value="daily" <%=(reportType || 'daily' )==='daily' ? 'selected' : '' %>>Daily</option>
+                <option value="weekly" <%=reportType==='weekly' ? 'selected' : '' %>>Weekly</option>
+                <option value="monthly" <%=reportType==='monthly' ? 'selected' : '' %>>Monthly</option>
+                <option value="yearly" <%=reportType==='yearly' ? 'selected' : '' %>>Yearly</option>
+                <option value="custom" <%=reportType==='custom' ? 'selected' : '' %>>Custom</option>
+            </select>
+        </div>
+
+        <!-- Custom Date Range -->
+        <div id="custom-date-range" class="hidden flex-wrap gap-3 w-full lg:w-auto">
+            <div class="flex flex-col">
+                <label class="text-sm">Start Date</label>
+                <input type="date" name="startDate" id="start-date"
+                    class="bg-[#334155] px-3 py-2 rounded text-white" />
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-sm">End Date</label>
+                <input type="date" name="endDate" id="end-date"
+                    class="bg-[#334155] px-3 py-2 rounded text-white" />
+            </div>
+        </div>
+
+        <button type="submit" class="bg-green-600 px-4 py-2 rounded hover:bg-green-500">
+            Generate Report
+        </button>
+
+        <a href="/admin/sales" class="bg-red-600 px-4 py-2 rounded hover:bg-red-500 text-white">
+            Clear
+        </a>
+    </form>
+
+    <!-- REPORT SUMMARY -->
+    <% if (salesData) { %>
+    <div class="bg-white text-black p-4 rounded-lg mt-6 max-w-6xl mx-auto">
+        <p><strong>Overall Sales Count:</strong> <%= salesData.totalSales %></p>
+        <p><strong>Overall Order Amount:</strong> Rs.<%= salesData.totalAmount %></p>
+        <p><strong>Overall Discount:</strong> Rs.<%= salesData.totalDiscount.toFixed(2) %></p>
+    </div>
+
+    <!-- DESKTOP TABLE -->
+<div class="desktop-table mt-6 overflow-x-auto max-w-6xl mx-auto rounded-xl shadow-lg">
+    <table class="w-full bg-white text-black border-collapse">
+
+        <thead class="bg-[#1c2b45] text-white">
+            <tr>
+                <th class="py-3 px-4 text-left">User Name</th>
+                <th class="py-3 px-4 text-left">Date</th>
+                <th class="py-3 px-4 text-left">Order ID</th>
+                <th class="py-3 px-4 text-left">Amount</th>
+                <th class="py-3 px-4 text-left">Discount</th>
+                <th class="py-3 px-4 text-left">Coupon Used</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <% salesData.orders.forEach(order => { %>
+            <tr class="border-b hover:bg-gray-100 transition">
+                <td class="py-3 px-4"><%= order.userName %></td>
+                <td class="py-3 px-4"><%= order.createdOn.toDateString() %></td>
+                <td class="py-3 px-4"><%= order.orderId %></td>
+                <td class="py-3 px-4">Rs.<%= order.finalAmount.toFixed(2) %></td>
+                <td class="py-3 px-4">Rs.<%= order.discount.toFixed(2) %></td>
+                <td class="py-3 px-4"><%= order.couponApplied || 'N/A' %></td>
+            </tr>
+            <% }) %>
+        </tbody>
+
+    </table>
+</div>
+
+
+    <!-- MOBILE CARD VIEW (OPTION B — Highlighted Card UI) -->
+    <div class="mobile-card mt-6 space-y-4">
+        <% salesData.orders.forEach(order => { %>
+
+        <div class="bg-[#1e293b] border border-[#334155] rounded-xl p-4 shadow-xl text-white">
+
+            <p class="text-lg font-bold text-cyan-300 mb-3">
+                <%= order.userName %>
+            </p>
+
+            <div class="space-y-1 text-gray-300">
+                <p><strong>Date:</strong> <%= order.createdOn.toDateString() %></p>
+                <p><strong>Order ID:</strong> <%= order.orderId %></p>
+                <p><strong>Amount:</strong> Rs.<%= order.finalAmount %></p>
+                <p><strong>Discount:</strong> Rs.<%= order.discount %></p>
+                <p><strong>Coupon Used:</strong> <%= order.couponApplied || 'N/A' %></p>
+            </div>
+
+        </div>
+
+        <% }) %>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="flex justify-between items-center mt-6">
+        <p>Showing <%= currentPage %> of <%= totalPage %></p>
+
+        <div class="flex items-center gap-2">
+            <a href="?page=<%= currentPage-1 %>&<%= queryParams %>"
+               class="px-3 py-1 bg-gray-700 rounded text-white
+               <%= currentPage==1 ? 'opacity-40 pointer-events-none':'' %>">‹</a>
+
+            <span class="px-4 py-1 bg-blue-600 rounded text-white"><%= currentPage %></span>
+
+            <a href="?page=<%= currentPage+1 %>&<%= queryParams %>"
+               class="px-3 py-1 bg-gray-700 rounded text-white
+               <%= currentPage==totalPage ? 'opacity-40 pointer-events-none':'' %>">›</a>
+        </div>
+    </div>
+
+    <!-- DOWNLOAD BUTTONS -->
+    <div class="flex gap-4 mt-6">
+        <button onclick="downloadPDF()" class="bg-cyan-400 text-black px-4 py-2 rounded hover:bg-cyan-300">Download PDF</button>
+        <button onclick="downloadExcel()" class="bg-cyan-400 text-black px-4 py-2 rounded hover:bg-cyan-300">Download Excel</button>
+    </div>
+
+    <% } %>
+
+</div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

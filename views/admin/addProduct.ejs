@@ -1,130 +1,43 @@
+<!-- ADMIN HEADER -->
 <%-include("../../views/partials/adminPartial/header")%>
 
-  <style>
-    /* Center the entire form section */
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #0f172a;
-  color: #f1f5f9;
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-}
+  <!-- TAILWIND CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-/* Adjust container alignment */
-.product-form {
-  max-width: 900px;
-  width: 100%;
-  background-color: #1e293b;
-  padding: 49px 147px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  margin-left: 189px;
-}
+  <body class="bg-[#0f172a] text-white min-h-screen flex justify-center px-4 py-10">
 
+    <div class="w-full max-w-4xl bg-[#1e293b] p-8 md:p-12 rounded-2xl shadow-2xl">
 
-    .form-control {
-      background-color: #f8fafc;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 12px;
-    }
+      <!-- Back Button -->
+      <button onclick="window.history.back()"
+        class="mb-6 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded flex items-center gap-2">
+        ⬅ Go Back
+      </button>
 
-    .form-control:focus {
-      background-color: #f8fafc;
-      box-shadow: none;
-      border-color: #38bdf8;
-    }
+      <h1 class="text-2xl md:text-3xl font-semibold mb-6">Add Product</h1>
 
-    .form-label {
-      color: #f1f5f9;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
+      <form id="add-productForm" action="/admin/Products/add-product" method="POST" enctype="multipart/form-data"
+        class="space-y-6">
 
-    .btn-submit {
-      background-color: #2dd4bf;
-      color: #0f172a;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 6px;
-    }
+        <!-- GRID FIRST ROW -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    .btn-submit:hover {
-      background-color: #14b8a6;
-    }
-
-    .category-image-box {
-      width: 160px;
-      height: 160px;
-      background-color: #cbd5e1;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #475569;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .category-image-box:hover {
-      background-color: #94a3b8;
-    }
-
-    /* .product-form {
-      max-width: 900px;
-      margin: 0 auto;
-    } */
-
-    .image-preview {
-      max-width: 150px;
-      max-height: 150px;
-      margin-top: 10px;
-      border-radius: 8px;
-      object-fit: cover;
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
-    }
-
-    .error-message {
-      color: #ef4444;
-      font-size: 0.75rem;
-      margin-bottom: 8px;
-      display: none;
-    }
-  </style>
-
-  <div class="product-form">
-     <button 
-  onclick="window.history.back()" 
-  class="btn btn-secondary" 
-  style= "color: white;margin-left: -129px;margin-bottom: 54px;">⬅ Go Back
-</button>
-    <form name="productForm" id="add-productForm" action="/admin/Products/add-product" method="POST"
-      enctype="multipart/form-data">
-      <div class="row mb-4">
-        <div class="col-12 col-md-6">
-          <div class="mb-3">
-            <label class="form-label">Product Name:</label>
-            <div id="name-error" class="error-message"></div>
-            <input type="text" class="form-control" id="name" name="ProductName"  pattern="/^[A-Za-z ,.-]+$/" maxlength="100"
-              title="Only alphabets and spaces allowed." />
+          <!-- Product Name -->
+          <div>
+            <label class="block font-medium mb-1">Product Name</label>
+            <p id="name-error" class="text-red-400 text-sm"></p>
+            <input type="text" id="name" name="ProductName"
+              class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
+              maxlength="100" />
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Product Description:</label>
-            <div id="description-error" class="error-message"></div>
-            <textarea class="form-control" id="description" name="description" rows="3"  pattern="/^[A-Za-z ,.-]+$/"
-              title="Only alphabets and spaces allowed." maxlength="100"></textarea>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Product Category:</label>
-            <div id="category-error" class="error-message"></div>
-            <select class="form-select" id="category" name="category" >
-              <option value="" selected disabled>Select categories</option>
+          <!-- Product Category -->
+          <div>
+            <label class="block font-medium mb-1">Category</label>
+            <p id="category-error" class="text-red-400 text-sm"></p>
+            <select id="category" name="category"
+              class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400">
+              <option value="" disabled selected>Select Category</option>
               <% categories.forEach(category=> { %>
                 <option value="<%= category.name %>">
                   <%= category.name %>
@@ -133,72 +46,114 @@ body {
             </select>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Offer (%):</label>
-            <div id="offer-error" class="error-message"></div>
-            <input type="number" class="form-control" id="offer" name="offer" min="0" max="99" placeholder="Optional" />
+          <!-- Description -->
+          <div class="md:col-span-2">
+            <label class="block font-medium mb-1">Description</label>
+            <p id="description-error" class="text-red-400 text-sm"></p>
+            <textarea id="description" name="description" rows="3"
+              class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
+              maxlength="150"></textarea>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Price</label>
-            <div id="price-error" class="error-message"></div>
-            <input type="number" class="form-control" id="price" name="price" min="0"
-              placeholder="Greater than SalesPrice"  /> 
+          <!-- Offer -->
+          <div>
+            <label class="block font-medium mb-1">Offer (%)</label>
+            <p id="offer-error" class="text-red-400 text-sm"></p>
+            <input type="number" id="offer" name="offer"
+              class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
+              placeholder="Optional" />
           </div>
 
-          <!-- <div class="mb-3">
-            <label class="form-label">Sales Price</label>
-            <div id="salesPrice-error" class="error-message"></div>
-            <input type="number" class="form-control" id="salesPrice" name="salesPrice" min="0"
-              placeholder="Less than Price" required />
-          </div> -->
+          <!-- Price -->
+          <div>
+            <label class="block font-medium mb-1">Price</label>
+            <p id="price-error" class="text-red-400 text-sm"></p>
+            <input type="number" id="price" name="price"
+              class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
+              placeholder="Greater than Sale Price" />
+          </div>
 
-          <div class="mb-3" id="variant-section">
-            <label class="form-label">Product Variants:</label>
-            <div id="variant-container">
-              <div class="variant-row d-flex gap-2 mb-2">
-                <div>
-                  <div id="variantSize-error-0" class="error-message"></div>
-                  <input type="text" id="variant-size" name="variantSize[]" class="form-control" placeholder="Size"
-                     />
-                </div>
-                <div>
-                  <div id="variantSalePrice-error-0" class="error-message"></div>
-                  <input type="number" id="variant-salePrice" name="variantSalePrice[]" class="form-control"
-                    placeholder="Sale Price"  />
-                </div>
-                <div>
-                  <div id="variantQuantity-error-0" class="error-message"></div>
-                  <input type="number" id="variant-quantity" name="variantQuantity[]" class="form-control"
-                    placeholder="Quantity"  />
-                </div>
-                <button type="button" class="btn btn-danger" onclick="removeVariant(this)">✖</button>
+        </div>
+
+        <!-- VARIANT SECTION -->
+        <div>
+          <label class="block font-medium mb-2">Product Variants</label>
+
+          <div id="variant-container" class="space-y-3">
+
+            <!-- ONE DEFAULT VARIANT ROW -->
+            <div class="grid grid-cols-3 gap-3 items-center">
+              <div>
+                <input type="text" name="variantSize[]" placeholder="Size"
+                  class="w-full p-3 rounded bg-white text-black outline-none">
               </div>
+
+              <div>
+                <input type="number" name="variantSalePrice[]" placeholder="Sale Price"
+                  class="w-full p-3 rounded bg-white text-black outline-none">
+              </div>
+
+              <div class="flex items-center gap-2">
+                <input type="number" name="variantQuantity[]" placeholder="Qty"
+                  class="w-full p-3 rounded bg-white text-black outline-none">
+
+                </div>
+                <button type="button" onclick="removeVariant(this)"
+                  class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded">
+                  ✖
+                </button>
             </div>
-            <button type="button" class="btn btn-secondary mt-2" onclick="addVariant()">+ Add Variant</button>
+
+          </div>
+
+          <button type="button" onclick="addVariant()"
+            class="mt-3 bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded">
+            + Add Variant
+          </button>
+        </div>
+
+        <!-- IMAGES -->
+        <div>
+          <label class="block font-medium mb-3">Product Images (4)</label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+            <% for (let i=1; i<=4; i++) { %>
+              <div class="border border-gray-600 rounded p-4">
+                <label class="block mb-2 font-medium">Image <%= i %></label>
+
+                <input type="file" name="image<%= i %>" id="image<%= i %>"
+                  class="w-full text-white file:bg-cyan-500 file:px-4 file:py-2 file:rounded" accept=".jpg,.jpeg,.png"
+                  onchange="previewImage(event, <%= i %>)" />
+
+                <!-- Preview before crop -->
+                <img id="preview<%= i %>" class="hidden mt-3 w-32 h-32 object-cover rounded shadow" />
+
+                <!-- Cropped Image Output Container (required) -->
+                <div class="croppedPreview<%= i %> mt-3"></div>
+
+                <button type="button" onclick="cropImage(<%= i %>)"
+                  class="mt-3 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded">
+                  Save Image <%= i %>
+                </button>
+              </div>
+
+              <% } %>
+
           </div>
         </div>
-      </div>
 
-      <!-- Image Upload Section -->
-      <div class="image-upload-container mb-4 ">
-        <% for (let i=1; i <=4; i++) { %>
-          <div class="image-upload-group" id="images">
-            <label for="image<%= i %>">Image <%= i %></label>
-            <div id="image<%= i %>-error" class="error-message"></div>
-            <input type="file" name="image<%= i %>" id="image<%= i %>" class="form-control" accept=".jpg, .jpeg, .png"
-              onchange="previewImage(event, <%= i %>)">
-            <img id="preview<%= i %>" src="#" alt="Image preview" class="image-preview" style="display: none;">
-            <button type="button" class="btn btn-primary mt-2" onclick="cropImage(<%= i %>)">Save Image <%= i %>
-                </button>
-            <div class="croppedPreview<%= i %>"></div>
-          </div>
-          <% } %>
-      </div>
+        <!-- SUBMIT BUTTON -->
+        <button type="submit"
+          class="w-full bg-cyan-400 hover:bg-cyan-300 text-black font-semibold py-3 rounded-lg text-lg">
+          ADD PRODUCT
+        </button>
+      </form>
 
-      <button type="submit" class="btn btn-submit">ADD PRODUCT</button>
-    </form>
-  </div>
+    </div>
+
+  </body>
+
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://unpkg.com/cropperjs@1.6.1/dist/cropper.min.js"></script>
@@ -332,62 +287,62 @@ body {
     document.addEventListener("DOMContentLoaded", function () {
       const form = document.getElementById("add-productForm")
       form.addEventListener("submit", async function (event) {
-  event.preventDefault();
+        event.preventDefault();
 
-  if (validateForm()) {
-    const formData = new FormData(form);
+        if (validateForm()) {
+          const formData = new FormData(form);
 
-    for (let i = 1; i <= 4; i++) {
-      const croppedInput = document.getElementById(`cropped-image-${i}`);
-      if (croppedInput && croppedInput.value) {
-        formData.delete(`image${i}`);
-        const blob = dataURLtoBlob(croppedInput.value);
-        formData.append(`image${i}`, blob, `cropped-${Date.now()}-${i}.jpg`);
-      }
-    }
+          for (let i = 1; i <= 4; i++) {
+            const croppedInput = document.getElementById(`cropped-image-${i}`);
+            if (croppedInput && croppedInput.value) {
+              formData.delete(`image${i}`);
+              const blob = dataURLtoBlob(croppedInput.value);
+              formData.append(`image${i}`, blob, `cropped-${Date.now()}-${i}.jpg`);
+            }
+          }
 
-    try {
-      const resp = await axios.post("/admin/Products/add-product", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+          try {
+            const resp = await axios.post("/admin/Products/add-product", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            const data = resp.data;
+            if (data.success) {
+              Swal.fire({
+                title: "Success!",
+                text: data.message,
+                icon: "success",
+                confirmButtonText: "OK",
+              }).then(() => {
+                window.location.href = data.url;
+              });
+            } else {
+              Swal.fire({
+                title: "Error!",
+                text: data.message || "Something went wrong",
+                icon: "error",
+                confirmButtonText: "OK",
+              });
+            }
+          } catch (err) {
+            console.error("Axios Error:", err);
+            Swal.fire({
+              title: "Error!",
+              text: "Failed to add product. Please try again.",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          }
+        } else {
+          // 🔹 Add this else block
+          Swal.fire({
+            icon: "warning",
+            title: "Invalid Form",
+            text: "Please correct the highlighted errors before submitting.",
+            confirmButtonText: "OK",
+          });
+        }
       });
-
-      const data = resp.data;
-      if (data.success) {
-        Swal.fire({
-          title: "Success!",
-          text: data.message,
-          icon: "success",
-          confirmButtonText: "OK",
-        }).then(() => {
-          window.location.href = data.url;
-        });
-      } else {
-        Swal.fire({
-          title: "Error!",
-          text: data.message || "Something went wrong",
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-      }
-    } catch (err) {
-      console.error("Axios Error:", err);
-      Swal.fire({
-        title: "Error!",
-        text: "Failed to add product. Please try again.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    }
-  } else {
-    // 🔹 Add this else block
-    Swal.fire({
-      icon: "warning",
-      title: "Invalid Form",
-      text: "Please correct the highlighted errors before submitting.",
-      confirmButtonText: "OK",
-    });
-  }
-});
 
     });
 
@@ -441,7 +396,7 @@ body {
               }
               croppers[index] = new Cropper(preview, {
                 aspectRatio: 1,
-                viewMode:1 ,
+                viewMode: 1,
                 autoCropArea: 0.8,
                 movable: true,
                 zoomable: true,
@@ -509,7 +464,7 @@ body {
           hiddenInput.type = "hidden";
           hiddenInput.id = `cropped-image-${index}`;
           hiddenInput.name = `croppedImage${index}`;
-          document.forms["productForm"].appendChild(hiddenInput);
+          document.getElementById("add-productForm").appendChild(hiddenInput);
         }
         hiddenInput.value = croppedImageUrl;
 
@@ -530,26 +485,52 @@ body {
 
     function addVariant() {
       variantCount++;
-      const container = document.getElementById('variant-container');
-      const variantRow = document.createElement('div');
-      variantRow.className = 'variant-row d-flex gap-2 mb-2';
+
+      const container = document.getElementById("variant-container");
+
+      const variantRow = document.createElement("div");
+      variantRow.className = "grid grid-cols-3 gap-3 items-center";
+
       variantRow.innerHTML = `
-      <div>
-        <div id="variantSize-error-${variantCount}" class="error-message"></div>
-        <input type="text" name="variantSize[]" class="form-control" placeholder="Size" required />
+    <div>
+      <input 
+        type="text" 
+        name="variantSize[]" 
+        placeholder="Size"
+        class="w-full p-3 rounded bg-white text-black outline-none"
+      >
+    </div>
+
+    <div>
+      <input 
+        type="number" 
+        name="variantSalePrice[]" 
+        placeholder="Sale Price"
+        class="w-full p-3 rounded bg-white text-black outline-none"
+      >
+    </div>
+
+    <div>
+      <input 
+        type="number" 
+        name="variantQuantity[]" 
+        placeholder="Qty"
+        class="w-full p-3 rounded bg-white text-black outline-none"
+      >
       </div>
-      <div>
-        <div id="variantSalePrice-error-${variantCount}" class="error-message"></div>
-        <input type="number" name="variantSalePrice[]" class="form-control" placeholder="Sale Price" required />
-      </div>
-      <div>
-        <div id="variantQuantity-error-${variantCount}" class="error-message"></div>
-        <input type="number" name="variantQuantity[]" class="form-control" placeholder="Quantity" required />
-      </div>
-      <button type="button" class="btn btn-danger" onclick="removeVariant(this)">✖</button>
-    `;
+      <button 
+        type="button" 
+        onclick="removeVariant(this)"
+        class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
+      >
+        ✖
+      </button>
+
+  `;
+
       container.appendChild(variantRow);
     }
+
 
     function removeVariant(btn) {
       btn.parentElement.remove();

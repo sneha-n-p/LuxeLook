@@ -213,60 +213,297 @@
       padding: 10px;
       box-sizing: border-box;
     }
-    .back-arrow-btn {
-    position: absolute;
-    top: 247px;
-    left: 25px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-  }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
-    color: white;
-    transform: scale(1.1);
-  }
+    .back-arrow-btn {
+      position: absolute;
+      top: 20px;
+      /* smaller consistent spacing */
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .back-arrow-btn:hover {
+      background-color: #B5654B;
+      transform: scale(1.1);
+    }
+
+    /* ⭐ Mobile Fix: Move arrow up slightly */
+    @media (max-width: 768px) {
+      .back-arrow-btn {
+        top: 10px;
+        left: 10px;
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+      }
+    }
+
+    /* ⭐ Extra small screens */
+    @media (max-width: 480px) {
+      .back-arrow-btn {
+        top: 8px;
+        left: 8px;
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+      }
+    }
+
+
+    /* Sidebar (Desktop) */
+    .sidebar {
+      background-color: #F2E8DC;
+      padding: 25px 18px;
+      border-radius: 8px;
+    }
+
+    .sidebar h5 {
+      font-weight: bold;
+      margin-bottom: 18px;
+      color: #6B4C3B;
+    }
+
+    .sidebar a {
+      display: block;
+      margin-bottom: 12px;
+      color: #333;
+      font-weight: 500;
+      padding: 10px;
+      border-radius: 6px;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      background: rgba(181, 101, 75, 0.15);
+      color: #B5654B;
+    }
+
+    /* Mobile top bar */
+    .mobile-settings-bar {
+      display: none;
+      background: #F2E8DC;
+      padding: 12px 18px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .mobile-settings-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #6B4C3B;
+    }
+
+    .mobile-hamburger-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      color: #6B4C3B;
+      cursor: pointer;
+    }
+
+    /* Hide desktop sidebar on mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none !important;
+      }
+
+      .mobile-settings-bar {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    /* Drop-down (mobile) */
+    .mobile-dropdown {
+      display: none;
+      flex-direction: column;
+      background: #F2E8DC;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 15px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .mobile-dropdown a {
+      padding: 10px 12px;
+      font-size: 15px;
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      align-items: center;
+      border-radius: 6px;
+      transition: 0.2s;
+    }
+
+    .mobile-dropdown a:hover {
+      background: rgba(181, 101, 75, 0.15);
+      color: #B5654B;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ---------- MOBILE ORDER CARD VIEW ---------- */
+    @media (max-width: 768px) {
+
+      /* Hide the desktop table */
+      .orders-table {
+        display: none !important;
+      }
+
+      /* Card container */
+      .mobile-order-card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        gap: 12px;
+      }
+
+      .mobile-order-card img {
+        width: 70px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+      }
+
+      .mobile-order-info {
+        flex: 1;
+      }
+
+      .mobile-order-title {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+
+      .mobile-order-status {
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+
+      .mobile-order-date {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 8px;
+      }
+
+      .mobile-order-btn {
+        font-size: 13px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #B5654B, #D17C63);
+        color: white;
+        border: none;
+      }
+
+      .mobile-retry-btn {
+        font-size: 13px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #601c06, #53271a);
+        color: white;
+        border: none;
+      }
+    }
+
+    /* Unified Button Style (Desktop + Mobile) */
+    .order-btn {
+      background: linear-gradient(90deg, #B5654B, #D17C63);
+      color: #fff;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 25px;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .order-btn:hover {
+      opacity: 0.85;
+    }
+
+    /* Mobile button size */
+    @media (max-width: 768px) {
+      .order-btn {
+        font-size: 13px;
+        padding: 6px 14px;
+        border-radius: 20px;
+      }
+
+      .order-banner {
+        height: 220px !important;
+        width: 100% !important;
+        object-fit: cover !important;
+      }
+
+    }
   </style>
 
   <!-- Banner -->
   <section class="hero text-center bg-light p-0 mb-4">
     <div class="banner">
-      <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100">
+      <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class=" order-banner img-fluid w-100">
       <button onclick="window.location.href='/profile'" class="back-arrow-btn">
-            &#8592;
-        </button>
-      <h1>ORDERS</h1>
+        &#8592;
+      </button>
+      <h1 class="banner-text">ORDERS</h1>
     </div>
   </section>
 
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar -->
-      <div class="col-md-2 sidebar">
+
+      <!-- MOBILE SETTINGS TOP BAR -->
+      <div class="mobile-settings-bar d-md-none">
+        <span class="mobile-settings-title">SETTINGS</span>
+
+        <button class="mobile-hamburger-btn" onclick="toggleDropdown()">
+          <i class="material-icons">&#xe8b8;</i>
+        </button>
+      </div>
+      <!-- DROPDOWN MENU (MOBILE) -->
+      <div id="mobileDropdown" class="mobile-dropdown d-md-none">
+        <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+        <a href="/profile"><i class="fas fa-user"></i> Personal Info</a>
+        <a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+        <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+      </div>
+
+      <!-- NORMAL SIDEBAR (DESKTOP) -->
+      <div class="col-md-2 sidebar d-none d-md-block">
         <h5>SETTINGS</h5>
-        <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
-          <i class="fas fa-shopping-cart"></i> Orders
-        </a>
-        <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">
-          <i class="fas fa-user"></i> Personal Info
-        </a>
-        <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">
-          <i class="fas fa-map-marker-alt"></i> Addresses
-        </a>
-        <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">
-          <i class="fas fa-wallet"></i> Wallet
-        </a>
+        <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+        <a href="/profile"><i class="fas fa-user"></i> Personal Info</a>
+        <a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+        <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
       </div>
 
       <!-- Orders Content -->
@@ -329,7 +566,8 @@
                         </button>
                       </div>
                       <% } else if( order.status.trim()==='Payment Failed' ) {%>
-                        <a href="/orders/retry-Checkout?orderId=<%= order._id %>" class="action-btn btn-return">RETRY</a>
+                        <a href="/orders/retry-Checkout?orderId=<%= order._id %>"
+                          class="action-btn btn-return text-decoration-none">RETRY</a>
                         <%}else if (['Pending', 'Shipped' , 'Out For Delivery' ,'Confirmed'
                           ].includes(order.status.trim())) { %>
                           <button class="action-btn btn-cancel" onclick="fullCancellation('<%= order._id %>')">
@@ -353,57 +591,136 @@
                 <% }) %>
             </tbody>
           </table>
-          <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
-            <div>Showing <%= currentPage %>  of <%= totalPages %>
-            </div>
-            <nav>
-              <ul class="pagination mb-0">
-                <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-                  <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-                </li>
-                <% for (let i=1; i <=totalPages; i++) { %>
-                  <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                    <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
-                      <%= i %>
-                    </a>
-                  </li>
-                  <% } %>
-                    <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-                      <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-                    </li>
-              </ul>
-            </nav>
-          </div>
-          <% } else { %>
-            <div class="Empty-Orders">
-              <span>Your Orders Are Empty</span><br><br>
-              <a href="/shop"><button>Discover Now</button></a>
-            </div>
-            <% } %>
+
       </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
+  <!-- --------- MOBILE CARD VIEW --------- -->
+  <div class="d-md-none">
 
-    function fullCancellation(orderId) {
-      const reasons = [
-        "Found a better price elsewhere",
-        "Order placed by mistake",
-        "Item won't arrive on time",
-        "Changed my mind",
-        "Other"
-      ];
+    <% orders.forEach(order=> { %>
+      <div class="mobile-order-card">
 
-      const optionsHtml = reasons.map(reason =>
-        `<option value="${reason}">${reason}</option>`
-      ).join("");
+        <!-- Product Image -->
+        <a href="/orders/details/<%= order._id %>">
+          <img src="<%= order.orderedItems[0].product.productImage[0] %>" />
+        </a>
 
-      Swal.fire({
-        title: "Cancel Order",
-        html: `
+        <div class="mobile-order-info">
+
+          <!-- Product Title -->
+          <div class="mobile-order-title">
+            <%= order.orderedItems[0].productName %>
+          </div>
+
+          <!-- Status -->
+          <div class="mobile-order-status">
+            <% if(order.status==="Delivered" ){ %>
+              <span style="color: green;">Delivered</span>
+              <% } else if(order.status==="Pending" ) { %>
+                <span style="color: rgb(46, 78, 95);">Pending</span>
+                <%}else if(order.status==="Confirmed" ){%>
+                  <span style="color:orange">Confirmed</span>
+
+                  <% } else { %>
+                    <span style="color: red;">
+                      <%= order.status %>
+                    </span>
+                    <% } %>
+          </div>
+
+          <div class="mobile-order-length font-bold">
+            Order Quantity: <%= order.orderedItems.length %>
+          </div>
+          <!-- Date -->
+          <div class="mobile-order-date">
+            <%= order.createdOn.toDateString() %>
+          </div>
+
+          <!-- Action Button -->
+          <% if (order.status.trim()==="Delivered" ) { %>
+            <button class="mobile-order-btn" onclick="returnOrder('<%= order._id %>')">
+              Return
+            </button>
+
+            <% } else if (order.status.trim()==="Pending" || order.status.trim()==="Shipped" ||
+              order.status.trim()==="Out For Delivery" || order.status.trim()==="Confirmed" ) { %>
+
+              <button class="mobile-order-btn" onclick="fullCancellation('<%= order._id %>')">
+                Cancel
+              </button>
+
+              <% } else if (order.status.trim()==="payment Failed" || order.status.trim()==="Payment Failed" ) { %>
+
+                <button class="mobile-retry-btn text-decoration-none"
+                  onclick="window.location='/orders/retry-Checkout?orderId=<%= order._id %>'">
+                  RETRY
+                </button>
+
+                <% } else { %>
+
+                  <button class="mobile-order-btn" onclick="window.location='/orders/details/<%= order._id %>'">
+                    View
+                  </button>
+
+                  <% } %>
+
+        </div>
+      </div>
+      <% }) %>
+
+  </div>
+
+  <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
+    <div>Showing <%= currentPage %> of <%= totalPages %>
+    </div>
+    <nav>
+      <ul class="pagination mb-0">
+        <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+          <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+        </li>
+        <% for (let i=1; i <=totalPages; i++) { %>
+          <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+            <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+              <%= i %>
+            </a>
+          </li>
+          <% } %>
+            <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+              <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+            </li>
+      </ul>
+    </nav>
+  </div>
+  <% } else { %>
+    <div class="Empty-Orders">
+      <span>Your Orders Are Empty</span><br><br>
+      <a href="/shop"><button>Discover Now</button></a>
+    </div>
+    <% } %>
+
+
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+
+        function fullCancellation(orderId) {
+          const reasons = [
+            "Found a better price elsewhere",
+            "Order placed by mistake",
+            "Item won't arrive on time",
+            "Changed my mind",
+            "Other"
+          ];
+
+          const optionsHtml = reasons.map(reason =>
+            `<option value="${reason}">${reason}</option>`
+          ).join("");
+
+          Swal.fire({
+            title: "Cancel Order",
+            html: `
       <p>Are you sure you want to cancel the full order?</p>
       <select id="cancel-reason" class="swal2-input">
         <option value="" disabled selected>Select a reason</option>
@@ -416,93 +733,93 @@
   style="display:none;"
 ></textarea>
     `,
-        showCancelButton: true,
-        confirmButtonColor: "#B5654B",
-        cancelButtonColor: "#6B4C3B",
-        confirmButtonText: "Yes, Cancel it!",
-        didOpen: () => {
-          const reasonSelect = document.getElementById("cancel-reason");
-          const otherReason = document.getElementById("other-reason");
+            showCancelButton: true,
+            confirmButtonColor: "#B5654B",
+            cancelButtonColor: "#6B4C3B",
+            confirmButtonText: "Yes, Cancel it!",
+            didOpen: () => {
+              const reasonSelect = document.getElementById("cancel-reason");
+              const otherReason = document.getElementById("other-reason");
 
-          // Show textarea only if "Other" is selected
-          reasonSelect.addEventListener("change", function () {
-            if (this.value === "Other") {
-              otherReason.style.display = "block";
-            } else {
-              otherReason.style.display = "none";
-              otherReason.value = "";
+              // Show textarea only if "Other" is selected
+              reasonSelect.addEventListener("change", function () {
+                if (this.value === "Other") {
+                  otherReason.style.display = "block";
+                } else {
+                  otherReason.style.display = "none";
+                  otherReason.value = "";
+                }
+              });
+            },
+            preConfirm: () => {
+              // Get the "Other" input field safely
+              const otherReasonElement = document.getElementById('other-reason');
+              const otherReasonText = otherReasonElement ? otherReasonElement.value.trim() : '';
+
+              // Get the selected reason
+              const reasonSelect = document.getElementById('cancel-reason');
+              const selectedReason = reasonSelect ? reasonSelect.value : '';
+
+              // Validate selection
+              if (!selectedReason) {
+                Swal.showValidationMessage('Please select a reason');
+                return false;
+              }
+
+              // If "Other" is chosen but input is empty
+              if (selectedReason === 'Other' && !otherReasonText) {
+                Swal.showValidationMessage('Please enter your custom reason');
+                return false;
+              }
+
+              // Return the correct value
+              return selectedReason === 'Other' ? otherReasonText : selectedReason;
+            }
+
+
+          }).then((result) => {
+
+            console.log('result', result)
+            if (result.isConfirmed) {
+              axios.post('/orders/cancel', {
+                orderId,
+                reason: result.value
+              }).then(response => {
+                if (response.data.success) {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Cancelled!",
+                    text: "Order cancelled successfully.",
+                    showConfirmButton: false,
+                    timer: 1200
+                  }).then(() => location.reload());
+                } else {
+                  Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
+                }
+              }).catch(() => {
+                Swal.fire("Oops...", "Something went wrong while cancelling the order!", "error");
+              });
             }
           });
-        },
-        preConfirm: () => {
-          // Get the "Other" input field safely
-          const otherReasonElement = document.getElementById('other-reason');
-          const otherReasonText = otherReasonElement ? otherReasonElement.value.trim() : '';
-
-          // Get the selected reason
-          const reasonSelect = document.getElementById('cancel-reason');
-          const selectedReason = reasonSelect ? reasonSelect.value : '';
-
-          // Validate selection
-          if (!selectedReason) {
-            Swal.showValidationMessage('Please select a reason');
-            return false;
-          }
-
-          // If "Other" is chosen but input is empty
-          if (selectedReason === 'Other' && !otherReasonText) {
-            Swal.showValidationMessage('Please enter your custom reason');
-            return false;
-          }
-
-          // Return the correct value
-          return selectedReason === 'Other' ? otherReasonText : selectedReason;
         }
 
 
-      }).then((result) => {
+        function returnOrder(orderId) {
+          const reasons = [
+            "Found a better price elsewhere",
+            "Order placed by mistake",
+            "Item won't arrive on time",
+            "Changed my mind",
+            "Other"
+          ];
 
-        console.log('result',result)
-        if (result.isConfirmed) {
-          axios.post('/orders/cancel', {
-            orderId,
-            reason: result.value
-          }).then(response => {
-            if (response.data.success) {
-              Swal.fire({
-                icon: "success",
-                title: "Cancelled!",
-                text: "Order cancelled successfully.",
-                showConfirmButton: false,
-                timer: 1200
-              }).then(() => location.reload());
-            } else {
-              Swal.fire("Error!", response.data.message || "Cancellation failed.", "error");
-            }
-          }).catch(() => {
-            Swal.fire("Oops...", "Something went wrong while cancelling the order!", "error");
-          });
-        }
-      });
-    }
+          let optionsHtml = reasons.map(reason =>
+            `<option value="${reason}">${reason}</option>`
+          ).join("");
 
-
-    function returnOrder(orderId) {
-      const reasons = [
-        "Found a better price elsewhere",
-        "Order placed by mistake",
-        "Item won't arrive on time",
-        "Changed my mind",
-        "Other"
-      ];
-
-      let optionsHtml = reasons.map(reason =>
-        `<option value="${reason}">${reason}</option>`
-      ).join("");
-
-      Swal.fire({
-        title: 'Return Order',
-        html: `
+          Swal.fire({
+            title: 'Return Order',
+            html: `
         <select id="returnReasonSelect" class="swal2-select" style="width:45%;padding:8px;">
           <option value="" disabled selected>Select a reason</option>
           ${optionsHtml}
@@ -513,73 +830,100 @@
   placeholder="Please specify your reason" 
   style="display:none;"
 ></textarea>      `,
-        didOpen: () => {
-          const otherReason = document.getElementById('other-reason')
-          const selectedReason = document.getElementById('returnReasonSelect')
+            didOpen: () => {
+              const otherReason = document.getElementById('other-reason')
+              const selectedReason = document.getElementById('returnReasonSelect')
 
-          selectedReason.addEventListener('change', function () {
-            if (this.value === 'Other') {
-              otherReason.style.display = 'block'
-            } else {
-              otherReason.style.display = 'none'
-              otherReason.value = ''
-            }
-          })
-        },
-        preConfirm: () => {
-          const otherReasonText = document.getElementById('other-reason').value.trim();
-          const selectedReason = document.getElementById('returnReasonSelect').value;
+              selectedReason.addEventListener('change', function () {
+                if (this.value === 'Other') {
+                  otherReason.style.display = 'block'
+                } else {
+                  otherReason.style.display = 'none'
+                  otherReason.value = ''
+                }
+              })
+            },
+            preConfirm: () => {
+              const otherReasonText = document.getElementById('other-reason').value.trim();
+              const selectedReason = document.getElementById('returnReasonSelect').value;
 
-          if (!selectedReason) {
-            Swal.showValidationMessage('Please select a reason');
-            return false;
-          }
+              if (!selectedReason) {
+                Swal.showValidationMessage('Please select a reason');
+                return false;
+              }
 
-          if (selectedReason === 'Other' && !otherReasonText) {
-            Swal.showValidationMessage('Please enter your custom reason');
-            return false;
-          }
+              if (selectedReason === 'Other' && !otherReasonText) {
+                Swal.showValidationMessage('Please enter your custom reason');
+                return false;
+              }
 
-          return selectedReason === 'Other' ? otherReasonText : selectedReason;
-        },
+              return selectedReason === 'Other' ? otherReasonText : selectedReason;
+            },
 
-        showCancelButton: true,
-        confirmButtonText: 'Submit',
-        confirmButtonColor: "#B5654B",
-        cancelButtonColor: "#6B4C3B",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.patch('/orders/return', {
-            orderId,
-            reason: result.value
-          }).then(response => {
-            if (response.data.success) {
-              Swal.fire({
-                icon: "success",
-                title: "Return Requested!",
-                text: "Return request submitted successfully.",
-                showConfirmButton: false,
-                timer: 2000
-              }).then(() => {
-                location.reload();
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            confirmButtonColor: "#B5654B",
+            cancelButtonColor: "#6B4C3B",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.patch('/orders/return', {
+                orderId,
+                reason: result.value
+              }).then(response => {
+                if (response.data.success) {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Return Requested!",
+                    text: "Return request submitted successfully.",
+                    showConfirmButton: false,
+                    timer: 2000
+                  }).then(() => {
+                    location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops!",
+                    text: response.data.message || "Return request failed.",
+                  });
+                }
+              }).catch(() => {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops!",
+                  text: "Something went wrong while submitting return request.",
+                });
               });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Oops!",
-                text: response.data.message || "Return request failed.",
-              });
             }
-          }).catch(() => {
-            Swal.fire({
-              icon: "error",
-              title: "Oops!",
-              text: "Something went wrong while submitting return request.",
-            });
           });
         }
-      });
-    }
-  </script>
 
-  <%- include("../../views/partials/userPartial/footer") %>
+        function toggleDropdown() {
+          const drop = document.getElementById("mobileDropdown");
+          drop.style.display = drop.style.display === "flex" ? "none" : "flex";
+        }
+      </script>
+
+      <%- include("../../views/partials/userPartial/footer") %>
+        <!-- MOBILE OFFCANVAS SIDEBAR -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title">SETTINGS</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+          </div>
+
+          <div class="offcanvas-body">
+            <a href="/orders" class="d-block mb-3">
+              <i class="fas fa-shopping-cart"></i> Orders
+            </a>
+            <a href="/profile" class="d-block mb-3">
+              <i class="fas fa-user"></i> Personal Info
+            </a>
+            <a href="/addresses" class="d-block mb-3">
+              <i class="fas fa-map-marker-alt"></i> Addresses
+            </a>
+            <a href="/wallet" class="d-block mb-3">
+              <i class="fas fa-wallet"></i> Wallet
+            </a>
+          </div>
+        </div>

@@ -12,7 +12,8 @@ const path = require('path');
 const ejs = require('ejs');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-const logger = require('../../helpers/logger')
+const logger = require('../../helpers/logger');
+const Category = require("../../models/categorySchema");
 
 const placeOrder = async (req, res) => {
   try {
@@ -54,11 +55,16 @@ const placeOrder = async (req, res) => {
       });
     }
 
-
     const orderedItems = [];
-    for (const item of cart.items) {
+    for (let item of cart.items) {
       const selectedSize = item.size;
       const product = item.productId;
+      const category = await Category.findById(product.category)
+      logger.info(`category ,${category}`)
+
+      if (product.isBlocked) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `${product.productName} Product Blocked By Admin` })
+      if (category.status == 'Unlisted') return res.json({ success: false, message: `${category.name} Category Blocked By Admin` })
+
 
       if (!product.variant || !Array.isArray(product.variant)) {
         return res.status(StatusCode.BAD_REQUEST).json({
@@ -259,7 +265,7 @@ const loadOrders = async (req, res) => {
       .sort({ createdOn: -1 })
       .limit(limit)
       .skip((page - 1) * limit);
-
+    logger.info(`sanju ${JSON.stringify(orders)}`)
     res.render("orderDetails", {
       user,
       orders,
@@ -368,10 +374,6 @@ const cancelSingleProduct = async (req, res) => {
         date: new Date(),
         reason: 'Order Cancel'
       };
-
-      // const wallet = await Wallet.findOne({ userId: order.userId });
-      // console.log("found wallet is ", wallet)
-      // if (!wallet) return res.status(StatusCode.NOT_FOUND).json({ message: 'Wallet not found for user' });
 
       let wallet = await Wallet.findOne({ userId: order.userId });
       const amountToAdd = parseFloat(order.finalAmount)
@@ -536,10 +538,10 @@ const singleProductReturn = async (req, res) => {
 
     const order = await Order.findById(orderId)
 
-    if (order.orderedItems.length === 1) {
+    // if (order.orderedItems.length === 1) {
       order.status = 'Return Request'
       returnReason = reason
-    }
+    // }
     order.orderedItems.forEach(item => {
       if (item.product.toString() === productId && item.size === size) {
         item.status = 'Return Request'
@@ -567,11 +569,16 @@ const razorpay = async (req, res) => {
     logger.info(`amount:${amount}`)
     const cart = await Cart.findOne({ userId }).populate('items.productId')
     logger.debug(`cart:${cart}`)
+
     if (Object.entries(cart).length === 0) {
       res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Your cart is empty', redirectUrl: '/shop' })
     }
     for (let item of cart.items) {
       const product = item.productId;
+      const category = await Category.findById(product.category)
+      logger.info(`category,${category}`)
+      if (product.isBlocked) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `${product.productName} Product Blocked By Admin`, redirectUrl: '/cart/checkout' })
+      if (category.status == 'Unlisted') return res.json({ success: false, message: `${category.name} Category Blocked By Admin`, redirectUrl: '/cart/checkout' })
 
       const variant = product.variant.find(v => v.size === item.size);
 
@@ -749,6 +756,7 @@ const loadRetryCheckout = async (req, res) => {
     const { orderId } = req.query
     const user = await User.findById(userId)
     const order = await Order.findById(orderId).populate('orderedItems.product')
+    logger.info(order)
     let razorpayKey = process.env.RAZORPAY_KEY_ID
     if (!order) {
       res.status(StatusCode.BAD_REQUEST).redirect('/orders')
@@ -765,6 +773,12 @@ const loadRetryCheckout = async (req, res) => {
       usedBy: { $ne: userId }
     });
 
+    let walletAmount
+    let wallet = await Wallet.findOne({ userId: userId })
+    if (wallet) {
+      logger.debug(`walletamont:${wallet.balance}`)
+      walletAmount = wallet.balance
+    }
     logger.debug(order)
     return res.status(StatusCode.OK).render('retryCheckout', {
       user: user,
@@ -776,6 +790,8 @@ const loadRetryCheckout = async (req, res) => {
       delivery: 0,
       discount: order.discount,
       coupons,
+      walletAmount,
+      couponApplied: order.couponApplied || null,
       razorpayKey,
       activePage: 'checkout'
     })

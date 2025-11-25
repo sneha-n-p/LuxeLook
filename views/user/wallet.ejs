@@ -1,244 +1,345 @@
-
-
-
 <%- include("../../views/partials/userPartial/header") %>
 
-<style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #FFF8F3;
-  }
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #FFF8F3;
+    }
 
-  .banner {
-    position: relative;
-  }
+    .banner {
+      position: relative;
+    }
 
-  .banner img {
-    height: 417px;
-    object-fit: cover;
-    width: 100%;
-  }
+    .banner img {
+      height: 417px;
+      object-fit: cover;
+      width: 100%;
+    }
 
-  .banner h1 {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 42px;
-    font-weight: 700;
-    text-shadow: 2px 2px 8px black;
-  }
+    .banner h1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 42px;
+      font-weight: 700;
+      text-shadow: 2px 2px 8px black;
+    }
 
-  .sidebar {
-    background-color: #F2E8DC;
-    padding: 30px 20px;
-    height: auto;
-    color: #6B4C3B;
-    border-radius: 8px;
-  }
+    .back-arrow-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
 
-  .sidebar h5 {
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
+    .back-arrow-btn:hover {
+      background-color: #B5654B;
+      transform: scale(1.1);
+    }
 
-  .sidebar a {
-    display: flex;
-    align-items: center; 
-    color: #333;
-    margin-bottom: 10px;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 10px 15px; 
-    border-radius: 5px; 
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+    /* Wallet Section */
+    .wallet-section {
+      background-color: #FCF4ED;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-  .sidebar a:hover {
-    color: #B5654B;
-    background-color: rgba(181, 101, 75, 0.1);
-  }
+    .wallet-card {
+      background: linear-gradient(90deg, #B5654B, #D17C63);
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+    }
 
-  .sidebar a i {
-    margin-right: 10px;
-    font-size: 16px; 
-    width: 20px;
-    text-align: center;
-    color: #333;
-    transition: color 0.3s ease; 
-  }
+    .balance {
+      font-size: 28px;
+      font-weight: 600;
+    }
 
-  .sidebar a:hover i {
-    color: #B5654B; 
-  }
+    .add-amount {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      align-items: center;
+    }
 
-  .wallet-section {
-    background-color: #FCF4ED;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
+    .add-amount input {
+      flex: 1;
+      min-width: 250px;
+      height: 45px;
+    }
 
-  .wallet-card {
-    background: linear-gradient(90deg, #B5654B, #D17C63);
-    color: white;
-    padding: 25px;
-    border-radius: 12px;
-    margin-bottom: 25px;
-    position: relative;
-  }
+    .add-amount button {
+      height: 45px;
+      white-space: nowrap;
+      background: linear-gradient(90deg, #B5654B, #D17C63);
+      color: white;
+      border-radius: 25px;
+      padding: 0 25px;
+      border: none;
+    }
 
-  .wallet-card .balance {
-    font-size: 28px;
-    font-weight: 600;
-  }
+    /* DESKTOP TABLE */
+    .wallet-table {
+      display: block;
+    }
 
-  .add-amount {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
+    /* MOBILE CARD LIST */
+    .wallet-mobile-list {
+      display: none;
+    }
 
-  .add-amount input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    height: 45px;
-    font-size: 14px;
-    background-color: #fff;
-  }
+    .wallet-card-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 15px 18px;
+      margin-bottom: 15px;
+      box-shadow: 0 3px 9px rgba(0, 0, 0, 0.08);
+    }
 
-  .add-amount button {
-    background: linear-gradient(90deg, #6B4C3B, #8A6649);
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 25px;
-    font-size: 15px;
-    transition: 0.3s;
-  }
+    .txn-label {
+      font-weight: 600;
+      color: #6B4C3B;
+    }
 
-  .add-amount button:hover {
-    opacity: 0.9;
-  }
+    .txn-value {
+      font-weight: 500;
+      color: #000;
+    }
 
-  .table {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-  }
+    /* MOBILE RESPONSIVE */
+    @media (max-width: 768px) {
 
-  .table thead {
-    background: linear-gradient(90deg, #B5654B, #D17C63);
-    color: #fff;
-  }
+      .wallet-table {
+        display: none !important;
+      }
 
-  .table th,
-  .table td {
-    padding: 15px;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 14px;
-  }
+      .wallet-mobile-list {
+        display: block !important;
+      }
 
-  .pagination .page-link {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    color: #333;
-    transition: 0.3s;
-  }
+      .add-amount {
+        flex-direction: column;
+      }
 
-  .pagination .page-item.active .page-link {
-    background: linear-gradient(90deg, #B5654B, #D17C63);
-    border-color: #B5654B;
-    color: #fff;
-  }
+      .add-amount input {
+        width: 100%;
+      }
 
-  .pagination .page-link:hover {
-    background-color: #F2E8DC;
-    color: #B5654B;
-  }
+      .add-amount button {
+        width: 100%;
+      }
 
-  footer {
-    background-color: #f8f9fa;
-    padding: 20px;
-  }
-  .back-arrow-btn {
-    position: absolute;
-    top: 247px;
-    left: 25px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-  }
+      .banner img {
+        height: 250px;
+      }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
-    color: white;
-    transform: scale(1.1);
-  }
-</style>
+      .banner h1 {
+        font-size: 28px;
+      }
+    }
 
-<!-- Banner -->
-<section class="hero text-center bg-light p-0 mb-4">
-  <div class="banner">
-    <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100">
-    <button onclick="window.history.back()" class="back-arrow-btn">
-            &#8592;
-        </button>
-    <h1>WALLET</h1>
-  </div>
-</section>
+    @media (max-width: 480px) {
+      .banner img {
+        height: 200px;
+      }
 
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-2 sidebar">
-        <h5>SETTINGS</h5>
-        <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
-          <i class="fas fa-shopping-cart"></i> Orders
-        </a>
-        <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">
-          <i class="fas fa-user"></i> Personal Info
-        </a>
-        <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">
-          <i class="fas fa-map-marker-alt"></i> Addresses
-        </a>
-        <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">
-          <i class="fas fa-wallet"></i> Wallet
-        </a>
+      .banner h1 {
+        font-size: 22px;
+      }
+    }
+
+    /* Mobile top bar */
+    .mobile-settings-bar {
+      display: none;
+      background: #F2E8DC;
+      padding: 12px 18px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .mobile-settings-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #6B4C3B;
+    }
+
+    .mobile-hamburger-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      color: #6B4C3B;
+      cursor: pointer;
+    }
+
+    /* Hide desktop sidebar on mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none !important;
+      }
+
+      .mobile-settings-bar {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    /* Drop-down (mobile) */
+    .mobile-dropdown {
+      display: none;
+      flex-direction: column;
+      background: #F2E8DC;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 15px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .mobile-dropdown a {
+      padding: 10px 12px;
+      font-size: 15px;
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      align-items: center;
+      border-radius: 6px;
+      transition: 0.2s;
+    }
+
+    .mobile-dropdown a:hover {
+      background: rgba(181, 101, 75, 0.15);
+      color: #B5654B;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Sidebar (Desktop) */
+    .sidebar {
+      background-color: #F2E8DC;
+      padding: 25px 18px;
+      border-radius: 8px;
+    }
+
+    .sidebar h5 {
+      font-weight: bold;
+      margin-bottom: 18px;
+      color: #6B4C3B;
+    }
+
+    .sidebar a {
+      display: block;
+      margin-bottom: 12px;
+      color: #333;
+      font-weight: 500;
+      padding: 10px;
+      border-radius: 6px;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      background: rgba(181, 101, 75, 0.15);
+      color: #B5654B;
+    }
+
+    .pagination .page-link {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      color: #333;
+      transition: 0.3s;
+    }
+
+    .pagination .page-item.active .page-link {
+      background: linear-gradient(90deg, #B5654B, #D17C63);
+      border-color: #B5654B;
+      color: #fff;
+    }
+
+    .pagination .page-link:hover {
+      background-color: #F2E8DC;
+      color: #B5654B;
+    }
+    .sticky-pagination {
+      position: sticky;
+      bottom: 0;
+      background-color: #F2E8DC;
+      padding: 15px 10px;
+      z-index: 999;
+      border-top: 1px solid #ddd;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+
+  <section class="hero text-center bg-light p-0 mb-4">
+    <div class="banner">
+      <img src="/wallpaper/pageBanner-1.jpg" class="img-fluid w-100">
+      <button onclick="window.history.back()" class="back-arrow-btn">&#8592;</button>
+      <h1>WALLET</h1>
+    </div>
+  </section>
+
+  <div class="container-fluid">
+    <div class="row">
+
+      <div class="mobile-settings-bar d-md-none"> <span class="mobile-settings-title">SETTINGS</span> <button
+          class="mobile-hamburger-btn" onclick="toggleDropdown()"> <i class="material-icons">&#xe8b8;</i> </button>
+      </div>
+      <div id="mobileDropdown" class="mobile-dropdown d-md-none"> <a href="/orders"><i class="fas fa-shopping-cart"></i>
+          Orders</a> <a href="/profile"><i class="fas fa-user"></i> Personal Info</a> <a href="/addresses"><i
+            class="fas fa-map-marker-alt"></i> Addresses</a> <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+      </div>
+      <div class="col-md-2 sidebar d-none d-md-block">
+        <h5>SETTINGS</h5> <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a> <a href="/profile"><i
+            class="fas fa-user"></i> Personal Info</a> <a href="/addresses"><i class="fas fa-map-marker-alt"></i>
+          Addresses</a> <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
       </div>
 
-    <!-- Wallet Section -->
-    <div class="col-md-10 wallet-section">
-      <h5 class="mb-4 fw-bold">My Wallet</h5>
-      <% if (wallet) { %>
+
+      <div class="col-md-10 wallet-section">
+        <h5 class="fw-bold mb-4">My Wallet</h5>
+
+        <!-- Wallet Balance -->
         <div class="wallet-card">
-          <div class="balance"><span class="walletBalance">₹<%= wallet.balance.toFixed(2) %></span></div>
+          <div class="balance">₹<%= wallet ? wallet.balance.toFixed(2) : "0.00" %>
+          </div>
         </div>
 
-        <form id="walletForm" class="add-amount">
-          <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" >
+        <!-- Add Money -->
+        <form class="add-amount">
+          <input type="number" id="walletAmount" class="form-control" placeholder="Enter amount" />
           <button type="button" onclick="addMoney()">Add</button>
         </form>
 
-        <!-- Transactions Table -->
-        <div class="table-responsive">
-          <table class="table align-middle text-center">
+        <!-- DESKTOP TABLE -->
+        <div class="wallet-table">
+          <table class="table table-bordered text-center">
             <thead>
               <tr>
                 <th>#</th>
@@ -250,167 +351,274 @@
             </thead>
             <tbody>
               <% if (transactions) { %>
-                <% transactions.forEach((txn, index) => { %>
+                <% transactions.forEach((txn, index)=> { %>
                   <tr>
-                    <td><%= index + 1 %></td>
-                    <td>₹<%= txn.amount.toFixed(2) %></td>
-                    <td><%= txn.type %></td>
-                    <td><%= txn.description %></td>
-                    <td><%= new Date(txn.date).toISOString().split('T')[0] %></td>
+                    <td>
+                      <%= index+1 %>
+                    </td>
+                    <td>₹<%= txn.amount.toFixed(2) %>
+                    </td>
+                    <td>
+                      <%= txn.type %>
+                    </td>
+                    <td>
+                      <%= txn.description %>
+                    </td>
+                    <td>
+                      <%= new Date(txn.date).toISOString().split("T")[0] %>
+                    </td>
                   </tr>
-                <% }) %>
-              <% } %>
+                  <% }) %>
+                    <% } else { %>
+                      <div class="wallet-card">
+                        <div class="balance"><span class="walletBalance">₹0.00</span></div>
+                      </div>
+
+                      <form id="walletForm" class="add-amount">
+                        <div class="flex-grow-1 w-100">
+                          <input type="number" name="amount" id="walletAmount" class="form-control"
+                            placeholder="Enter amount">
+                        </div>
+
+                        <button type="button" onclick="addMoney()" class="btn w-auto">
+                          Add
+                        </button>
+                      </form>
+
+                      <% } %>
+
             </tbody>
           </table>
         </div>
-      <% } else { %>
-        <div class="wallet-card">
-          <div class="balance"><span class="walletBalance">₹0.00</span></div>
+
+        <!-- MOBILE CARD LIST -->
+        <div class="wallet-mobile-list">
+
+          <% if (transactions) { %>
+            <% transactions.forEach((txn, index)=> { %>
+
+              <div class="wallet-card-box">
+                <p><span class="txn-label">#</span>: <span class="txn-value">
+                    <%= index + 1 %>
+                  </span></p>
+
+                <p><span class="txn-label">Amount</span>:
+                  <span class="txn-value">₹<%= txn.amount.toFixed(2) %></span>
+                </p>
+
+                <p><span class="txn-label">Type</span>:
+                  <span class="txn-value">
+                    <%= txn.type %>
+                  </span>
+                </p>
+
+                <p><span class="txn-label">Action</span>:
+                  <span class="txn-value">
+                    <%= txn.description %>
+                  </span>
+                </p>
+
+                <p><span class="txn-label">Date</span>:
+                  <span class="txn-value">
+                    <%= new Date(txn.date).toISOString().split('T')[0] %>
+                  </span>
+                </p>
+              </div>
+
+              <% }) %>
+                <% } else { %>
+                  <div class="wallet-card">
+                    <div class="balance"><span class="walletBalance">₹0.00</span></div>
+                  </div>
+
+                  <form id="walletForm" class="add-amount">
+                    <div class="flex-grow-1 w-100">
+                      <input type="number" name="amount" id="walletAmount" class="form-control"
+                        placeholder="Enter amount">
+                    </div>
+
+                    <button type="button" onclick="addMoney()" class="btn w-auto">
+                      Add
+                    </button>
+                  </form>
+
+                  <% } %>
+
+
         </div>
 
-        <form id="walletForm" class="add-amount">
-          <input type="number" name="amount" id="walletAmount" placeholder="Enter amount" required>
-          <button type="button" onclick="addMoney()">Add</button>
-        </form>
-      <% } %>
+      </div>
+    </div>
 
-      <!-- Pagination -->
-      <% if (totalPages > 1) { %>
-        <div class="d-flex justify-content-end mt-4">
-          <ul class="pagination mb-0">
-            <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-              <a class="page-link" href="?page=<%= currentPage - 1 %>">‹</a>
+
+
+    <!-- Pagination -->
+    <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
+      <div>Showing <%= currentPage %> of <%= totalPages %>
+      </div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+          </li>
+          <% for (let i=1; i <=totalPages; i++) { %>
+            <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                <%= i %>
+              </a>
             </li>
-            <% for (let i = 1; i <= totalPages; i++) { %>
-              <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-              </li>
             <% } %>
-            <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-              <a class="page-link" href="?page=<%= currentPage + 1 %>">›</a>
-            </li>
-          </ul>
-        </div>
-      <% } %>
+              <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+              </li>
+        </ul>
+      </nav>
     </div>
   </div>
-</div>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-  function addMoney() {
-    const amount = parseFloat(document.getElementById("walletAmount").value);
 
-    if (!amount || amount <= 0) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Please enter a valid amount',
-        confirmButtonColor: '#B5654B'
-      });
-      return;
-    }
 
-    if (amount > 500) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Limit Exceeded',
-        text: 'You can only add up to ₹500 at a time.',
-        confirmButtonColor: '#B5654B'
-      });
-      return;
-    }
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    function addMoney() {
+      const amount = parseFloat(document.getElementById("walletAmount").value);
 
-    axios.post('/wallet/create-order', { amount })
-      .then((res) => {
-        const data = res.data;
-
-        if (!data.success) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: data.message || 'Failed to create order',
-            confirmButtonColor: '#B5654B'
-          });
-          return;
-        }
-
-        const options = {
-          key: '<%= process.env.RAZORPAY_KEY_ID %>',
-          amount: data.amount,
-          currency: data.currency,
-          order_id: data.orderId,
-          name: 'LUXE LOOK',
-          description: 'Add Money to Wallet',
-          handler: function (response) {
-            axios.post('/wallet/payment-success', {
-              amount,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature
-            })
-            .then((res2) => {
-              const result = res2.data;
-              const NewBalance = result.newBalance
-              if (result.success) {
-                document.getElementsByClassName('walletBalance').innerText = `₹${NewBalance}`;
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Success',
-                  text: 'Money added successfully!',
-                  confirmButtonColor: '#B5654B',
-                  timer: 1500,
-                  showConfirmButton: false
-                }).then(() => window.location.reload());
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: result.message || 'Payment failed',
-                  confirmButtonColor: '#B5654B'
-                });
-              }
-            })
-            .catch((err) => {
-              console.error('Payment verification error:', err);
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Server error during payment',
-                confirmButtonColor: '#B5654B'
-              });
-            });
-          },
-          prefill: {
-            name: '<%= user.username %>',
-            email: '<%= user.email %>',
-            contact: '<%= user.phone %>'
-          },
-          theme: { color: '#B5654B' }
-        };
-
-        const rzp = new Razorpay(options);
-        rzp.open();
-      })
-      .catch((err) => {
-        console.error('Create order error:', err);
+      if (!amount || amount <= 0) {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Failed to initiate payment',
+          text: 'Please enter a valid amount',
           confirmButtonColor: '#B5654B'
         });
-      });
-  }
+        return;
+      }
 
-  const walletForm = document.getElementById('walletForm');
-  walletForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    addMoney();
-  });
-</script>
+      if (amount > 500) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Limit Exceeded',
+          text: 'You can only add up to ₹500 at a time.',
+          confirmButtonColor: '#B5654B'
+        });
+        return;
+      }
+
+      axios.post('/wallet/create-order', { amount })
+        .then((res) => {
+          const data = res.data;
+
+          if (!data.success) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.message || 'Failed to create order',
+              confirmButtonColor: '#B5654B'
+            });
+            return;
+          }
+
+          const options = {
+            key: '<%= process.env.RAZORPAY_KEY_ID %>',
+            amount: data.amount,
+            currency: data.currency,
+            order_id: data.orderId,
+            name: 'LUXE LOOK',
+            description: 'Add Money to Wallet',
+            handler: function (response) {
+              axios.post('/wallet/payment-success', {
+                amount,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+              })
+                .then((res2) => {
+                  const result = res2.data;
+                  const NewBalance = result.newBalance
+                  if (result.success) {
+                    document.getElementsByClassName('walletBalance').innerText = `₹${NewBalance}`;
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Success',
+                      text: 'Money added successfully!',
+                      confirmButtonColor: '#B5654B',
+                      timer: 1500,
+                      showConfirmButton: false
+                    }).then(() => window.location.reload());
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: result.message || 'Payment failed',
+                      confirmButtonColor: '#B5654B'
+                    });
+                  }
+                })
+                .catch((err) => {
+                  console.error('Payment verification error:', err);
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Server error during payment',
+                    confirmButtonColor: '#B5654B'
+                  });
+                });
+            },
+            prefill: {
+              name: '<%= user.username %>',
+              email: '<%= user.email %>',
+              contact: '<%= user.phone %>'
+            },
+            theme: { color: '#B5654B' }
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.open();
+        })
+        .catch((err) => {
+          console.error('Create order error:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to initiate payment',
+            confirmButtonColor: '#B5654B'
+          });
+        });
+    }
+
+    const walletForm = document.getElementById('walletForm');
+    walletForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      addMoney();
+    });
+    function toggleDropdown() {
+      const drop = document.getElementById("mobileDropdown");
+      drop.style.display = drop.style.display === "flex" ? "none" : "flex";
+    }
+  </script>
 
 
-<%- include("../../views/partials/userPartial/footer") %>
+  <%- include("../../views/partials/userPartial/footer") %>
+    <!-- MOBILE OFFCANVAS SIDEBAR -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">SETTINGS</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+
+      <div class="offcanvas-body">
+        <a href="/orders" class="d-block mb-3">
+          <i class="fas fa-shopping-cart"></i> Orders
+        </a>
+        <a href="/profile" class="d-block mb-3">
+          <i class="fas fa-user"></i> Personal Info
+        </a>
+        <a href="/addresses" class="d-block mb-3">
+          <i class="fas fa-map-marker-alt"></i> Addresses
+        </a>
+        <a href="/wallet" class="d-block mb-3">
+          <i class="fas fa-wallet"></i> Wallet
+        </a>
+      </div>
+    </div>

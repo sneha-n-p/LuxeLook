@@ -12,32 +12,25 @@ const logger = require('../../helpers/logger')
 
 const loadwishlist = async (req, res) => {
     try {
-        let search = ""
-        if (req.query.search) {
-            search = req.query.search
-        }
-        let page = 1
-        if (req.query.page) {
-            page = req.query.page
-        }
-        const limit = 5
+        let search = req.query.search || "";
+        let sort = req.query.sort || "";
+        let page = parseInt(req.query.page) || 1;
+        
+        const limit = 6
         const productData = await Product.find({
             isBlocked: false,
             $or: [
                 { productName: { $regex: ".*" + search + ".*", $options: "i" } }
             ],
         })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec()
-
-        const count = await Product.find({
-            isBlocked: false,
-            $or: [
-                { productName: { $regex: ".*" + search + ".*", $options: "i" } }
-            ],
-        }).countDocuments()
-        const totalPages = Math.round(count / limit);
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .exec()
+        
+        const user = await User.findById(req.session.user)
+        let count = user.wishlist.length
+        const totalPages = Math.ceil(count / limit);
+        logger.info(totalPages)
         if (req.session.user) {
             const id = req.session.user
             const user = await User.findById(id)
@@ -67,10 +60,10 @@ const addToWishlist = async (req, res) => {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Product Already In Wishlist" })
         }
         const products = await Product.find({ _id: { $in: user.wishlist } }).populate('category')
-        const whishListCount = products.length+1
+        const whishListCount = products.length + 1
         user.wishlist.push(productId)
         await user.save()
-        return res.status(StatusCode.OK).json({ success: true, message: "Product Added To Wishlist",TotalWhishlistCount:whishListCount })
+        return res.status(StatusCode.OK).json({ success: true, message: "Product Added To Wishlist", TotalWhishlistCount: whishListCount })
 
     } catch (error) {
         logger.error(error)

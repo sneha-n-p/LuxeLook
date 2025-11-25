@@ -14,9 +14,11 @@
             height: 100%;
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
-
         }
 
+        /* ================================
+           DESKTOP: SPLIT SCREEN
+        ================================= */
         .split {
             display: flex;
             height: 100vh;
@@ -29,29 +31,23 @@
             align-items: center;
             background-color: #fbf7f2;
             padding: 40px;
+            position: relative;
         }
 
         .right-side {
             flex: 1;
-            background: url('/images/login-image.png') no-repeat center center;
-            background-size: cover;
-            position: relative;
-            z-index: 10;
+            background: url('/images/login-image.png') no-repeat center center/cover;
         }
 
+        /* Login form styling */
         .login-form {
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
         }
 
         .login-form h2 {
             font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .login-form p {
-            color: #6c757d;
-            margin-bottom: 25px;
+            margin-bottom: 12px;
         }
 
         .form-control {
@@ -75,33 +71,6 @@
             float: right;
             font-size: 0.9rem;
             color: #26c6da;
-            text-decoration: none;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: #ccc;
-        }
-
-        .divider:not(:empty)::before {
-            margin-right: .5em;
-        }
-
-        .divider:not(:empty)::after {
-            margin-left: .5em;
         }
 
         .google-btn {
@@ -109,41 +78,18 @@
             justify-content: center;
             align-items: center;
             border: 1px solid #ddd;
-            border-radius: 8px;
             padding: 10px;
-            cursor: pointer;
+            border-radius: 8px;
         }
 
-        .google-btn img {
-            width: 20px;
-            margin-right: 10px;
+        /* ⭐ Mobile Logo (hidden in desktop) */
+        .mobile-logo {
+            display: none;
+            width: 180px;
+            margin: 0 auto 20px auto;
         }
 
-        .signup-text {
-            margin-top: 15px;
-            font-size: 0.9rem;
-        }
-
-        .signup-text a {
-            color: #26c6da;
-            text-decoration: none;
-        }
-
-        .signup-text a:hover {
-            text-decoration: underline;
-        }
-
-        .logo {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-        }
-
-        .logo img {
-            width: 120px;
-        }
-
-        .left-section {
+        .right-side {
             flex: 1;
             background-color: #fce9e4;
             display: flex;
@@ -154,27 +100,48 @@
             overflow: hidden;
         }
 
-        .left-section>img {
+        .right-side>img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
-        .img-logo {
-            position: absolute;
-            top: -11px;
-            right: 502px;
-            width: 161px;
-            /* Adjust based on your logo size */
-            height: auto;
-            z-index: 5;
-        }
-
-        .Error-message {
-            color: red;
+        .Error-message { 
+            color: red; 
             font-size: 0.9rem;
-            margin-top: 4px;
-            display: none;
+             margin-top: 4px; 
+             display: none;
+             }
+        /* ================================
+           MOBILE RESPONSIVE
+        ================================= */
+        @media (max-width: 768px) {
+
+            /* Hide right-side completely */
+            .right-side {
+                display: none !important;
+            }
+
+            /* Stack layout */
+            .split {
+                flex-direction: column;
+                height: auto;
+            }
+
+            /* Left-side takes full width */
+            .left-side {
+                width: 100%;
+                padding: 50px 35px;
+            }
+
+            /* Show small logo */
+            .mobile-logo {
+                display: block;
+            }
+
+            .login-form {
+                max-width: 100%;
+            }
+            .Error-message { color: red; font-size: 0.9rem; margin-top: 4px; display: none; }
         }
     </style>
 </head>
@@ -182,22 +149,30 @@
 <body>
 
     <div class="split">
+
+        <!-- LEFT SIDE FORM -->
         <div class="left-side">
             <div class="login-form">
-                <h2>Welcome back!</h2>
-                <p>Enter your Credentials to access your account</p>
 
-                <form id="loginForm" action="/login" method="POST">
+                <!-- ⭐ Mobile-only logo -->
+                <img src="/images/logo_forWhite.png" class="mobile-logo" alt="LuxeLook Logo">
+
+                <h2>Welcome back!</h2>
+                <p>Enter your credentials to access your account</p>
+
+                <form id="loginForm" method="POST" action="/login">
+
                     <div class="mb-3">
                         <label>Email address</label>
                         <div id="LoginError1" class="Error-message"></div>
-                        <input id="email" type="email" name="email" class="form-control" placeholder="Enter your email">
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email">
                     </div>
 
                     <div class="mb-3">
-                        <label>Password</label> <a href="/login/forgot-password" class="forgot-link">forgot password</a>
+                        <label>Password</label>
+                        <a href="/login/forgot-password" class="forgot-link">Forgot password?</a>
                         <div id="LoginError2" class="Error-message"></div>
-                        <input id="password" type="password" name="password" class="form-control"
+                        <input type="password" id="password" name="password" class="form-control"
                             placeholder="Password">
                     </div>
                     <% if (message) { %>
@@ -206,25 +181,25 @@
                             <button onclick="Login(event)" class="btn btn-login w-100">Login</button>
                 </form>
 
-                <div class="divider">or</div>
+                <div class="divider text-center my-4">or</div>
 
                 <a href="/auth/google" class="google-btn">
-                    <img src="https://img.icons8.com/color/16/000000/google-logo.png" />
+                    <img src="https://img.icons8.com/color/20/000000/google-logo.png" />
                     Sign in with Google
                 </a>
 
-                <div class="signup-text text-center">
+                <div class="signup-text text-center mt-3">
                     Don’t have an account? <a href="/signup">Sign Up</a>
                 </div>
             </div>
         </div>
-        <div class="left-section">
-            <div class="top-nav-top">
-                <img class="img-logo" src="images\logo_forWhite.png" alt="luxelook-logo">
-            </div class="top-nav-bottom">
-            <img src="\wallpaper\signup_image.jpeg" alt="LuxeLook Logo">
+
+        <!-- RIGHT SIDE IMAGE (hidden on mobile) -->
+        <div class="right-side">
+            <img class="img-logo" src="images/logo_forWhite.png">
+
         </div>
-    </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -240,7 +215,7 @@
         // ✅ Email validation
         function validateEmailField() {
             const emailValue = emailInput.value.trim();
-            const emailPattern = /^[^\s@]+@gmail\.com$/;
+            const emailPattern = /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|protonmail\.com)$/;
 
             if (!emailValue) {
                 error1.textContent = "Email is required";

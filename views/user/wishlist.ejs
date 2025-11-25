@@ -1,4 +1,3 @@
-
 <style>
   body {
     background-color: #FFF8F3;
@@ -160,29 +159,147 @@
   .btn-outline-dark:hover {
     background-color: #333;
   }
+
   .back-arrow-btn {
-    position: absolute;
-    top: 247px;
-    left: 25px;
-    background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 20px;          /* smaller consistent spacing */
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.back-arrow-btn:hover {
+  background-color: #B5654B;
+  transform: scale(1.1);
+}
+
+/* ⭐ Mobile Fix: Move arrow up slightly */
+@media (max-width: 768px) {
+  .back-arrow-btn {
+    top: 10px;
+    left: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+  }
+}
+
+/* ⭐ Extra small screens */
+@media (max-width: 480px) {
+  .back-arrow-btn {
+    top: 8px;
+    left: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+}
+
+
+  /*  MOBILE WISHLIST CARD GRID — SHOW IN MOBILE ONLY */
+  @media (max-width: 768px) {
+
+    .wishlist-table {
+      display: none !important;
+    }
+
+    .wishlist-mobile-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .wishlist-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .wishlist-card img {
+      width: 100%;
+      height: 160px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .wishlist-card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 6px;
+      color: #222;
+    }
+
+    .wishlist-card-price {
+      color: #000;
+      font-weight: 700;
+      margin-top: 4px;
+      font-size: 1rem;
+    }
+
+    .wishlist-card-btn {
+      background: linear-gradient(90deg, #B5654B, #D17C63);
     color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
+    padding: 8px 22px;
+    border-radius: 25px;
+    margin: 5px;
+    font-size: 15px;
+    text-decoration: none;
+    display: inline-block;
+    }
+
+    .wishlist-delete-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      border: none;
+      color: rgb(124, 4, 4);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 20px;
+    }
+
+    /* Mobile pagination */
+    .sticky-pagination {
+      padding: 0;
+    }
+
   }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
-    color: white;
-    transform: scale(1.1);
+  /* DESKTOP– mobile grid hidden */
+  .wishlist-mobile-grid {
+    display: none;
+  }
+  /* MOBILE BANNER FIX */
+.wishlist-banner {
+  height: 417px;
+  object-fit: cover;
+}
+
+ @media (max-width: 768px) {
+    .sidebar { display: none !important; }
+    .mobile-settings-bar { display: flex; justify-content: space-between; }
+
+    .wishlist-banner {
+    height: 220px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+  .banner-text{
+    margin-top: -30%;
+  }
   }
 </style>
 
@@ -193,99 +310,122 @@
 
   <%-include("../../views/partials/userPartial/header")%>
 
-
     <section class="hero text-center bg-light p-0 mb-4">
-      <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner"class="img-fluid w-100"
+      <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="wishlist-banner img-fluid w-100"
         style="height: 417; object-fit: cover;">
-        <button onclick="window.history.back()" class="back-arrow-btn">
-            &#8592;
-        </button>
-      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg"
+       
+      <button onclick="window.history.back()" class="back-arrow-btn">
+        &#8592;
+      </button>
+      <h1 class="banner-text position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg"
         style="text-shadow: 2px 2px 8px black;">WHISHLIST</h1>
-      </h1>
     </section>
 
     <div class="container my-5">
-      <%if(wishlist.length>0) { %>
-        <table class="table wishlist-table text-center">
-          <thead>
-            <tr>
-              <th style="color:#fff;">Image</th>
-              <th style="color:#fff;">Product</th>
-              <th style="color:#fff;">Price</th>
-              <th style="color:#fff;">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <%for(let product of wishlist){%>
-              <tr>
-                <td>
-                  <img src="<%= product.productImage[0] %>" class="wishlist-product-img">
-                </td>
-                <td>
-                  <strong>
-                    <%= product.productName %>
-                  </strong><br>
-                  <p class="product-cat">
-                    <%=product.category.name %>
-                  </p>
-                  <small>
-                    <%= product.description %>
-                  </small><br>
-                  <% if (product.quatity===0) { %>
-                    <p class="text-danger fw-bold">Out of Stock</p>
-                    <% } %>
-                </td>
-                <td>₹<%= product.regularPrice %>
-                </td>
 
-                <td>
-                  <a href="/shop/product-details/<%= product._id %>">
-                    <button class="add-cart-btn">
-                      View Details
-                    </button>
-                  </a>
-                  <button class="delet-cart-btn" onclick="confirmRemove('<%=product._id%>')">&#128465;</button>
-                </td>
+  <% if (wishlist.length > 0) { %>
 
-              </tr>
-              <%}%>
-          </tbody>
-        </table>
-        <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
-        <div>Showing <%= currentPage %>  of <%= totalPages %>
-        </div>
-        <nav>
-          <ul class="pagination mb-0">
-            <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-              <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-            </li>
+    <!-- DESKTOP TABLE (unchanged) -->
+    <table class="table wishlist-table text-center">
+      <thead>
+        <tr>
+          <th style="color:#fff;">Image</th>
+          <th style="color:#fff;">Product</th>
+          <th style="color:#fff;">Price</th>
+          <th style="color:#fff;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% wishlist.forEach(product => { %>
+          <tr>
+            <td><img src="<%= product.productImage[0] %>" class="wishlist-product-img"></td>
 
-            <% for (let i=1; i <=totalPages; i++) { %>
-              <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-                <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
-                  <%= i %>
-                </a>
-              </li>
+            <td>
+              <strong><%= product.productName %></strong><br>
+              <small><%= product.description %></small><br>
+              <% if (product.quatity === 0) { %>
+                <p class="text-danger fw-bold">Out of Stock</p>
               <% } %>
+            </td>
 
-                <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-                  <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-                </li>
-          </ul>
-        </nav>
-      </div>
-        <% }else{ %>
-          <div class="Empty-wishlist" style="background-color: #F2E8DC;">
-            <span>Your Wishlist Is Empty</span>
-            <br><br>
-            <a href="/shop"><button>Discover Now</button></a>
-          </div>
-          <%}%>
+            <td>₹<%= product.regularPrice %></td>
 
+            <td>
+              <a href="/shop/product-details/<%= product._id %>">
+                <button class="add-cart-btn">View Details</button>
+              </a>
+              <button class="delet-cart-btn" onclick="confirmRemove('<%= product._id %>')">&#128465;</button>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- 📱 MOBILE GRID VIEW -->
+    <div class="wishlist-mobile-grid">
+
+      <% wishlist.forEach(product => { %>
+
+        <div class="wishlist-card position-relative">
+
+          <!-- DELETE BUTTON -->
+          <button class="wishlist-delete-btn background-color-red"
+            onclick="confirmRemove('<%= product._id %>')" >x</button>
+
+          <!-- IMAGE -->
+          <img src="<%= product.productImage[0] %>" />
+
+          <!-- TITLE -->
+          <p class="wishlist-card-title"><%= product.productName %></p>
+
+          <!-- PRICE -->
+          <p class="wishlist-card-price">₹<%= product.regularPrice %></p>
+
+          <!-- BUTTON -->
+          <a class="wishlist-card-btn" href="/shop/product-details/<%= product._id %>">
+            View Details
+          </a>
+
+        </div>
+
+      <% }) %>
 
     </div>
 
+    <!-- Pagination -->
+    <div class="sticky-pagination d-flex justify-content-between align-items-center mt-3">
+      <div>Showing <%= currentPage %> of <%= totalPages %></div>
+      <nav>
+        <ul class="pagination mb-0">
+          <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+            <a class="page-link" href="?page=<%= currentPage - 1 %>">‹</a>
+          </li>
+
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+            </li>
+          <% } %>
+
+          <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+            <a class="page-link" href="?page=<%= currentPage + 1 %>">›</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+  <% } else { %>
+
+    <!-- EMPTY STATE -->
+    <div class="Empty-wishlist" style="background-color: #F2E8DC;">
+      <span>Your Wishlist Is Empty</span>
+      <br><br>
+      <a href="/shop"><button>Discover Now</button></a>
+    </div>
+
+  <% } %>
+
+</div>
 
 
 
@@ -304,33 +444,6 @@
 
         }).then((result) => {
           if (result.isConfirmed) {
-            // axios.post(`/removeFromWishlist`,{productId})
-            //   .then(function (response){
-            //     if (response.data.success) {
-            //       Swal.fire({
-            //         icon: "success",
-            //         title: "Removed!",
-            //         text: "Product removed from wishlist.",
-            //         showConfirmButton: false,
-            //         timer: 1500
-            //       }).then(() => {
-            //         if (data.wishlistCount === 0) {
-            //           window.location.href = "/wishlist"
-            //         } else {
-            //           location.reload()
-            //         }
-            //       });
-            //     }
-            //   })
-            //   .catch(error => {
-            //     Swal.fire({
-            //       icon: "error",
-            //       title: "Oops...",
-            //       text: "Something went wrong while removing the product!"
-            //     });
-            //     console.error("Remove Wishlist Error:", error);
-            //   });
-
             axios.post('/wishlist/removeFromWishlist', { productId })
               .then(response => {
                 if (response.data.success) {

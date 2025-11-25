@@ -176,6 +176,20 @@
       transform: translate(0.05em, 0.05em);
       box-shadow: 0.05em 0.05em;
     }
+  /* Horizontal scroll ONLY for mobile */
+  @media (max-width: 768px) {
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      white-space: nowrap; /* prevents shrinking */
+    }
+
+    .table-scroll table {
+      min-width: 650px !important; /* keep the table full width */
+    }
+  }
+
   </style>
 
   <div class="main-content py-4">
@@ -224,7 +238,7 @@
         <div class="dashboard-card">
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="dashboard-title">Sales Report</h5>
-            <div>
+            <div class="col-lg-12">
               <button id="yearlyBtn" class="btn btn-sm filter-btn">Yearly</button>
               <button id="monthlyBtn" class="btn btn-sm filter-btn active">Monthly</button>
               <button id="weeklyBtn" class="btn btn-sm filter-btn">Weekly</button>
@@ -259,46 +273,40 @@
               </select>
             </div>
           </div>
-          <div class="table-container">
-            <table class="table table-striped">
-              <thead>
-                <tr id="tableHeader">
-                  <th>Product</th>
-                  <th>Product Name</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Sold</th>
-                </tr>
-              </thead>
-              <tbody id="topSellingItemsTable">
-                <% if (topProducts && topProducts.length> 0) { %>
-                  <% topProducts.forEach(product=> { %>
+          <div class="table-container table-scroll">
+    <table class="table table-striped">
+        <thead>
+            <tr id="tableHeader">
+                <th>Product</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Sold</th>
+            </tr>
+        </thead>
+        <tbody id="topSellingItemsTable">
+            <% if (topProducts && topProducts.length > 0) { %>
+                <% topProducts.forEach(product => { %>
                     <tr>
-                      <td class="d-flex align-items-center">
-                        <img src="<%= product.productImage %>" alt="<%= product.name %>" class="mr-2"
-                          style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
-                      </td>
-                      <td>
-                        <%= product.Product %>
-                      </td>
-                      <td>
-                        <%= product.category %>
-                      </td>
-                      <td>₹<%= product.price.toLocaleString() %>
-                      </td>
-                      <td>
-                        <%= product.soldCount %>
-                      </td>
+                        <td class="d-flex align-items-center">
+                            <img src="<%= product.productImage %>" 
+                                 style="width:40px; height:40px; border-radius:4px; object-fit:cover;">
+                        </td>
+                        <td><%= product.Product %></td>
+                        <td><%= product.category %></td>
+                        <td>₹<%= product.price.toLocaleString() %></td>
+                        <td><%= product.soldCount %></td>
                     </tr>
-                    <% }) %>
-                      <% } else { %>
-                        <tr>
-                          <td colspan="4" class="text-center">No products found</td>
-                        </tr>
-                        <% } %>
-              </tbody>
-            </table>
-          </div>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="5" class="text-center">No products found</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
         </div>
       </div>
       <div class="col-lg-4 mb-3">

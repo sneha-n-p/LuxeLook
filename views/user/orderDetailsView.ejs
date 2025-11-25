@@ -27,49 +27,49 @@
             text-shadow: 2px 2px 8px black;
         }
 
-.sidebar {
-    background-color: #F2E8DC;
-    padding: 30px 20px;
-    height: auto;
-    color: #6B4C3B;
-    border-radius: 8px;
-  }
+        .sidebar {
+            background-color: #F2E8DC;
+            padding: 30px 20px;
+            height: auto;
+            color: #6B4C3B;
+            border-radius: 8px;
+        }
 
-  .sidebar h5 {
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
+        .sidebar h5 {
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
 
-  .sidebar a {
-    display: flex;
-    align-items: center; 
-    color: #333;
-    margin-bottom: 10px;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 10px 15px; 
-    border-radius: 5px; 
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: #333;
+            margin-bottom: 10px;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-  .sidebar a:hover {
-    color: #B5654B;
-    background-color: rgba(181, 101, 75, 0.1); 
-  }
+        .sidebar a:hover {
+            color: #B5654B;
+            background-color: rgba(181, 101, 75, 0.1);
+        }
 
-  .sidebar a i {
-    margin-right: 10px;
-    font-size: 16px; 
-    width: 20px;
-    text-align: center;
-    color: #333;
-    transition: color 0.3s ease;
-  }
+        .sidebar a i {
+            margin-right: 10px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            color: #333;
+            transition: color 0.3s ease;
+        }
 
-  .sidebar a:hover i {
-    color: #B5654B; 
-  }
+        .sidebar a:hover i {
+            color: #B5654B;
+        }
 
         .product-detail-section {
             background-color: #FCF4ED;
@@ -166,176 +166,311 @@
             transform: translateY(-2px);
         }
 
-         .custom-textarea {
-  width: 80%;
-  margin: 10px auto 0 auto;
-  display: block;
-  font-size: 15px;
-  resize: none; 
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  box-sizing: border-box;
-}
+        .custom-textarea {
+            width: 80%;
+            margin: 10px auto 0 auto;
+            display: block;
+            font-size: 15px;
+            resize: none;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+        }
 
         footer {
             background-color: #f8f9fa;
             padding: 20px;
         }
-        .back-arrow-btn {
-    position: absolute;
-    top: 247px;
-    left: 25px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-  }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
-    color: white;
-    transform: scale(1.1);
+        .back-arrow-btn {
+  position: absolute;
+  top: 20px;          /* smaller consistent spacing */
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.back-arrow-btn:hover {
+  background-color: #B5654B;
+  transform: scale(1.1);
+}
+
+/* ⭐ Mobile Fix: Move arrow up slightly */
+@media (max-width: 768px) {
+  .back-arrow-btn {
+    top: 10px;
+    left: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
   }
+}
+
+/* ⭐ Extra small screens */
+@media (max-width: 480px) {
+  .back-arrow-btn {
+    top: 8px;
+    left: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+}
+
+
+        /* Mobile top bar */
+        .mobile-settings-bar {
+            display: none;
+            background: #F2E8DC;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .mobile-settings-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6B4C3B;
+        }
+
+        .mobile-hamburger-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            font-weight: bold;
+            color: #6B4C3B;
+            cursor: pointer;
+        }
+
+        /* Hide sidebar on mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none !important;
+            }
+
+            .mobile-settings-bar {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .product-detail-section {
+                padding: 20px;
+            }
+
+            .product-detail-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .product-detail-card img {
+                width: 100px;
+                height: 120px;
+                margin-bottom: 10px;
+            }
+
+            .product-detail-left {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .submit-btn {
+                width: 100%;
+                text-align: center;
+                margin-top: 10px;
+            }
+        }
+
+        /* Dropdown mobile */
+        .mobile-dropdown {
+            display: none;
+            flex-direction: column;
+            background: #F2E8DC;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .mobile-dropdown a {
+            padding: 10px 12px;
+            font-size: 15px;
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .mobile-dropdown a:hover {
+            background: rgba(181, 101, 75, 0.15);
+            color: #B5654B;
+        }
+        
+      .order-banner {
+        height: 220px !important;
+        width: 100% !important;
+        object-fit: cover !important;
+      }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            
+        }
     </style>
 
     <!-- Banner -->
     <section class="hero text-center bg-light p-0 mb-4">
         <div class="banner">
-            <img src="\wallpaper\pageBanner-1.jpg" alt="Order Details Banner" class="img-fluid w-100">
+            <img src="\wallpaper\pageBanner-1.jpg" alt="Order Details Banner" class=" order-banner img-fluid w-100">
             <button onclick="window.history.back()" class="back-arrow-btn">
-            &#8592;
-        </button>
+                &#8592;
+            </button>
             <h1>ORDER DETAILS</h1>
         </div>
     </section>
 
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 sidebar">
-        <h5>SETTINGS</h5>
-        <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
-          <i class="fas fa-shopping-cart"></i> Orders
-        </a>
-        <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">
-          <i class="fas fa-user"></i> Personal Info
-        </a>
-        <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">
-          <i class="fas fa-map-marker-alt"></i> Addresses
-        </a>
-        <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">
-          <i class="fas fa-wallet"></i> Wallet
-        </a>
-      </div>
 
-            <!-- Content Area -->
+            <!-- MOBILE SETTINGS -->
+            <div class="mobile-settings-bar d-md-none">
+                <span class="mobile-settings-title">SETTINGS</span>
+                <button class="mobile-hamburger-btn" onclick="toggleDropdown()">
+                    <i class="material-icons">&#xe8b8;</i>
+                </button>
+            </div>
+
+            <!-- DROPDOWN MOBILE -->
+            <div id="mobileDropdown" class="mobile-dropdown d-md-none">
+                <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="/profile"><i class="fas fa-user"></i> Personal Info</a>
+                <a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+                <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+            </div>
+
+            <!-- SIDEBAR -->
+            <div class="col-md-2 sidebar d-none d-md-block">
+                <h5>SETTINGS</h5>
+                <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="/profile"><i class="fas fa-user"></i> Personal Info</a>
+                <a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+                <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+            </div>
+
+            <!-- CONTENT -->
             <div class="col-md-10 product-detail-section" id="product-detail-section">
+
                 <% if (!order || order.orderedItems.length===0) { %>
                     <p class="text-center text-muted">No order details found.</p>
-                    <% } else { %>
-                        <h5 class="mb-4 fw-bold">Order #<%= order.orderId %>
-                        </h5>
-                        <p><strong>Status:</strong>
-                            <% if (order.status.trim()==='Delivered' ) { %>
-                                <span class="badge-status badge-delivered">DELIVERED</span>
-                                <% } else if (order.status.trim()==='Pending' ) { %>
-                                    <span class="badge-status badge-pending">PENDING</span>
-                                    <% } else { %>
-                                        <span class="badge-status badge-other">
-                                            <%= order.status.trim().toUpperCase() %>
-                                        </span>
-                                        <% } %>
+
+                <% } else { %>
+
+                    <h5 class="mb-4 fw-bold">Order #<%= order.orderId %></h5>
+
+                    <p><strong>Status:</strong>
+                        <% if (order.status.trim()==='Delivered' ) { %>
+                            <span class="badge-status badge-delivered">DELIVERED</span>
+                        <% } else if (order.status.trim()==='Pending' ) { %>
+                            <span class="badge-status badge-pending">PENDING</span>
+                        <% } else { %>
+                            <span class="badge-status badge-other">
+                                <%= order.status.trim().toUpperCase() %>
+                            </span>
+                        <% } %>
+                    </p>
+
+                    <% if (order.address && order.address.length> 0) { %>
+                        <p><strong>Address:</strong>
+                            <%= order.address[0].name %>,
+                            <%= order.address[0].streetAddress %>,
+                            <%= order.address[0].city %>,
+                            <%= order.address[0].state %> -
+                            <%= order.address[0].pincode %><br>
+                            Phone: <%= order.address[0].phone %>
                         </p>
+                    <% } %>
 
+                    <p><strong>Total Price:</strong> ₹<%= order.totalPrice.toFixed(2) %></p>
 
-                        <% if (order.address && order.address.length> 0) { %>
-                            <p><strong>Address:</strong>
-                                <%= order.address[0].name %>,
-                                    <%= order.address[0].streetAddress %>
-                                        <% if (order.address[0].apartment) { %>, <%= order.address[0].apartment %>
-                                                <% } %>,
-                                                    <%= order.address[0].city %>,
-                                                        <%= order.address[0].state %> -
-                                                            <%= order.address[0].pincode %><br>
-                                                                Phone: <%= order.address[0].phone %>
-                                                                    <% if (order.address[0].altPhone) { %><br>Alt Phone:
-                                                                        <%= order.address[0].altPhone %>
-                                                                            <% } %>
-                            </p>
-                            <% } else { %>
-                                <p><strong>Address:</strong> Not provided</p>
-                                <% } %>
-                                    <p><strong>Total Price:</strong> ₹<%= order.totalPrice.toFixed(2) %>
+                    <%if(order.couponApplied){%>
+                        <p><strong>Coupon Applied:</strong> <%= order.couponApplied %></p>
+                        <p><strong>Discount:</strong> ₹<%= order.discount%></p>
+                    <%}%>
+
+                    <p><strong>Final Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %></p>
+
+                    <p><strong>Order Date:</strong> <%= order.createdOn.toDateString() %></p>
+
+                    <hr>
+                    <h5 class="mb-3 fw-bold">Ordered Items</h5>
+
+                    <% order.orderedItems.forEach(item=> { %>
+                        <div class="product-detail-card">
+
+                            <div class="product-detail-left">
+                                <img src="<%= item.product.productImage[0] %>" alt="Product">
+                                <div class="product-detail-text">
+                                    <h6 class="fw-bold"><%= item.product.productName %></h6>
+                                    <p>
+                                        Quantity: <%= item.quantity %> |
+                                        price: <%= item.price %> |
+                                        size: <%= item.size %> |
+                                        Status: <%= item.status.trim() %>
                                     </p>
-                                    <%if(order.couponApplied){%>
-                                        <p><strong>Coupon Applied:</strong>
-                                            <%= order.couponApplied %>
-                                        </p>
-                                        <p><strong>Discount:</strong>
-                                            ₹<%= order.discount%>
-                                        </p>
-                                        <%}%>
-                                            <p><strong>Final Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %>
-                                            </p>
-                                            <p><strong>Order Date:</strong>
-                                                <%= order.createdOn.toDateString() %>
-                                            </p>
-                                            <hr>
-                                            <h5 class="mb-3 fw-bold">Ordered Items</h5>
-                                            <% order.orderedItems.forEach(item=> { %>
-                                                <div class="product-detail-card">
-                                                    <div class="product-detail-left">
-                                                        <img src="<%= item.product.productImage[0] %>"
-                                                            alt="<%= item.product.productName %>">
-                                                        <div class="product-detail-text">
-                                                            <h6 class="fw-bold">
-                                                                <%= item.product.productName %>
-                                                            </h6>
-                                                            <p>Quantity: <%= item.quantity %> | Price: ₹<%=
-                                                                        item.price %> | Status: <%=
-                                                                            item.status.trim() %> | size : <%=item.size%>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <% if (item.status.trim()==='Delivered' ) { %>
-                                                            <button class="submit-btn btn-return"
-                                                                onclick="singleReturned('<%= order._id %>', '<%= item.product._id %>','<%=item.size%>')">RETURN</button>
-                                                            <% } else if (item.status.trim()==='Confirmed' ) { %>
-                                                                <button class="submit-btn btn-cancel"
-                                                                    onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>','<%= item.size%>')">CANCEL</button>
-                                                                <% } else if(item.status.trim()==='Return Request' ) {
-                                                                    %>
-                                                                    <button class="submit-btn ">RETURN
-                                                                        REQUESTED</button>
-                                                                    <% } else { %>
-                                                                        <span class="text-muted"></span>
-                                                                        <% } %>
-                                                    </div>
-                                                </div>
-                                                <% }) %>
-                                                    <div class="mt-4">
-                                                        <a href="/orders" class="submit-btn">← Back to Orders</a>
+                                </div>
+                            </div>
 
-                                                        <%if(order.status.trim()==='Delivered'){%>
+                            <div>
+                                <% if (item.status.trim()==='Delivered' ) { %>
+                                    <button class="submit-btn btn-return"
+                                        onclick="singleReturned('<%= order._id %>', '<%= item.product._id %>','<%=item.size%>')">RETURN</button>
 
-                                                            <button class="btn btn-success mt-2"
-                                                                onclick="showDownloadOptions('<%= order.orderId %>')">
-                                                                 Download Invoice
-                                                            </button>
-                                                             <%}%>
-                                                    </div>
-                                                    <% } %>
+                                <% } else if (item.status.trim()==='Confirmed' ) { %>
+                                    <button class="submit-btn btn-cancel"
+                                        onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>','<%= item.size%>')">CANCEL</button>
+
+                                <% } else if(item.status.trim()==='Return Request' ) { %>
+                                    <button class="submit-btn">RETURN REQUESTED</button>
+
+                                <% } %>
+                            </div>
+
+                        </div>
+                    <% }) %>
+
+                    <div class="mt-4">
+                        <a href="/orders" class="submit-btn">← Back to Orders</a>
+
+                        <% if(order.status.trim()==='Delivered') { %>
+                            <button class="btn btn-success mt-2"
+                                onclick="showDownloadOptions('<%= order.orderId %>')">Download Invoice</button>
+                        <% } %>
+                    </div>
+
+                <% } %>
+
             </div>
         </div>
     </div>
@@ -355,7 +490,7 @@
             });
         };
 
-        function cancelSingleProduct(productId, orderId,size) {
+        function cancelSingleProduct(productId, orderId, size) {
             const reasons = [
                 "Found a better price elsewhere",
                 "Ordered by mistake",
@@ -421,7 +556,7 @@
                             size,
                             reason: result.value
                         });
-                        console.log("response of cancelling single order:",response)
+                        console.log("response of cancelling single order:", response)
 
                         if (response.data.success) {
                             Swal.fire({
@@ -442,7 +577,7 @@
             });
         }
 
-        function singleReturned(orderId, productId,size) {
+        function singleReturned(orderId, productId, size) {
             const reasons = [
                 "Found a better price elsewhere",
                 "Order placed by mistake",
@@ -537,96 +672,122 @@
         }
 
 
-       function showDownloadOptions(orderId) {
-    Swal.fire({
-        title: 'Download Invoice',
-        text: 'Choose the format to download:',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Excel',
-        cancelButtonText: 'PDF',
-        showDenyButton: true,
-        denyButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            downloadExcel(orderId);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-            window.location.href = `/orders/downloadInvoice?orderId=${orderId}`;
+        function showDownloadOptions(orderId) {
+            Swal.fire({
+                title: 'Download Invoice',
+                text: 'Choose the format to download:',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Excel',
+                cancelButtonText: 'PDF',
+                showDenyButton: true,
+                denyButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    downloadExcel(orderId);
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    window.location.href = `/orders/downloadInvoice?orderId=${orderId}`;
+                }
+            });
         }
-    });
-}
 
 
         function downloadExcel() {
-  console.log("Generating Excel");
+            console.log("Generating Excel");
 
-  const orderData = {
-    orderId: "<%= order.orderId %>",
-    status: "<%= order.status %>",
-    totalPrice: "₹<%= order.totalPrice.toFixed(2) %>",
-    finalAmount: "₹<%= order.finalAmount.toFixed(2) %>",
-    address: `<% if(order.address && order.address.length > 0) { %>
+            const orderData = {
+                orderId: "<%= order.orderId %>",
+                status: "<%= order.status %>",
+                totalPrice: "₹<%= order.totalPrice.toFixed(2) %>",
+                finalAmount: "₹<%= order.finalAmount.toFixed(2) %>",
+                address: `<% if(order.address && order.address.length > 0) { %>
       <%= order.address[0].name %>, <%= order.address[0].streetAddress %><%= order.address[0].apartment ? ", " + order.address[0].apartment : "" %>, <%= order.address[0].city %>, <%= order.address[0].state %> - <%= order.address[0].pincode %>, Phone: <%= order.address[0].phone %><%= order.address[0].altPhone ? ", Alt Phone: " + order.address[0].altPhone : "" %>
     <% } else { %>
       No address provided
     <% } %>`,
-    couponApplied: "<%= order.couponApplied ? 'Yes' : 'No' %>",
-    orderDate: "<%= order.createdOn.toDateString() %>",
-    orderedItems: [
+                couponApplied: "<%= order.couponApplied ? 'Yes' : 'No' %>",
+                orderDate: "<%= order.createdOn.toDateString() %>",
+                orderedItems: [
       <% order.orderedItems.forEach(function (item, index) { %>
-        {
-          productName: "<%= item.product.productName %>",
-          quantity: <%= item.quantity %>,
-          price: "₹<%= item.price.toFixed(2) %>",
-          status: "<%= item.status %>"
-        } <%= index < order.orderedItems.length - 1 ? ',' : '' %>
+                {
+                    productName: "<%= item.product.productName %>",
+                    quantity: <%= item.quantity %>,
+                    price: "₹<%= item.price.toFixed(2) %>",
+                    status: "<%= item.status %>"
+                } <%= index < order.orderedItems.length - 1 ? ',' : '' %>
       <% }); %>
     ]
-  };
+        };
 
-  const worksheetData = [
-    ["Order ID", orderData.orderId],
-    ["Status", orderData.status],
-    ["Total Price", orderData.totalPrice],
-    ["Final Amount", orderData.finalAmount],
-    ["Address", orderData.address],
-    ["Coupon Applied", orderData.couponApplied],
-    ["Order Date", orderData.orderDate],
-    [],
-    ["Ordered Items"],
-    ["Product Name", "Quantity", "Price", "Status"]
-  ];
+        const worksheetData = [
+            ["Order ID", orderData.orderId],
+            ["Status", orderData.status],
+            ["Total Price", orderData.totalPrice],
+            ["Final Amount", orderData.finalAmount],
+            ["Address", orderData.address],
+            ["Coupon Applied", orderData.couponApplied],
+            ["Order Date", orderData.orderDate],
+            [],
+            ["Ordered Items"],
+            ["Product Name", "Quantity", "Price", "Status"]
+        ];
 
-  orderData.orderedItems.forEach(item => {
-    worksheetData.push([
-      item.productName,
-      item.quantity,
-      item.price,
-      item.status
-    ]);
-  });
+        orderData.orderedItems.forEach(item => {
+            worksheetData.push([
+                item.productName,
+                item.quantity,
+                item.price,
+                item.status
+            ]);
+        });
 
-  const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+        const ws = XLSX.utils.aoa_to_sheet(worksheetData);
 
-  const colWidths = worksheetData[0].map((_, colIndex) => {
-    let maxLength = 10;
-    worksheetData.forEach(row => {
-      if (row[colIndex]) {
-        const cellLength = row[colIndex].toString().length;
-        if (cellLength > maxLength) maxLength = cellLength;
-      }
-    });
-    return { wch: maxLength + 5 };
-  });
+        const colWidths = worksheetData[0].map((_, colIndex) => {
+            let maxLength = 10;
+            worksheetData.forEach(row => {
+                if (row[colIndex]) {
+                    const cellLength = row[colIndex].toString().length;
+                    if (cellLength > maxLength) maxLength = cellLength;
+                }
+            });
+            return { wch: maxLength + 5 };
+        });
 
-  ws['!cols'] = colWidths;
+        ws['!cols'] = colWidths;
 
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Order Details");
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Order Details");
 
-  XLSX.writeFile(wb, `Order_${orderData.orderId}.xlsx`);
+        XLSX.writeFile(wb, `Order_${orderData.orderId}.xlsx`);
 }
+function toggleDropdown() {
+      const drop = document.getElementById("mobileDropdown");
+      drop.style.display = drop.style.display === "flex" ? "none" : "flex";
+    }
 
     </script>
 
     <%- include("../../views/partials/userPartial/footer") %>
+     <!-- MOBILE OFFCANVAS SIDEBAR -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">SETTINGS</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+
+      <div class="offcanvas-body">
+        <a href="/orders" class="d-block mb-3">
+          <i class="fas fa-shopping-cart"></i> Orders
+        </a>
+        <a href="/profile" class="d-block mb-3">
+          <i class="fas fa-user"></i> Personal Info
+        </a>
+        <a href="/addresses" class="d-block mb-3">
+          <i class="fas fa-map-marker-alt"></i> Addresses
+        </a>
+        <a href="/wallet" class="d-block mb-3">
+          <i class="fas fa-wallet"></i> Wallet
+        </a>
+      </div>
+    </div>y

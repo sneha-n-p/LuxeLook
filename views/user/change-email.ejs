@@ -1,212 +1,407 @@
 <%- include("../../views/partials/userPartial/header") %>
 
-<style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #FFF8F3;
-  }
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #FFF8F3;
+    }
 
-  .sidebar {
-    background-color: #F2E8DC;
-    padding: 30px 20px;
-    height: auto;
-    color: #6B4C3B;
-    border-radius: 8px;
-  }
+    .sidebar {
+      background-color: #F2E8DC;
+      padding: 30px 20px;
+      height: auto;
+      color: #6B4C3B;
+      border-radius: 8px;
+    }
 
-  .sidebar h5 {
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
+    .sidebar h5 {
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
 
-  .sidebar a {
-    display: flex; 
-    align-items: center; 
-    color: #333;
-    margin-bottom: 10px;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 10px 15px; 
-    border-radius: 5px; 
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      color: #333;
+      margin-bottom: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 10px 15px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
 
-  .sidebar a:hover {
-    color: #B5654B;
-    background-color: rgba(181, 101, 75, 0.1);
-  }
+    .sidebar a:hover {
+      color: #B5654B;
+      background-color: rgba(181, 101, 75, 0.1);
+    }
 
-  .sidebar a i {
-    margin-right: 10px;
-    font-size: 16px; 
-    width: 20px; 
-    text-align: center; 
-    color: #333; 
-    transition: color 0.3s ease; 
-  }
+    .sidebar a i {
+      margin-right: 10px;
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: #333;
+      transition: color 0.3s ease;
+    }
 
-  .sidebar a:hover i {
-    color: #B5654B; 
-  }
-  .form-section {
-    background-color: #F2E8DC;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
+    .sidebar a:hover i {
+      color: #B5654B;
+    }
 
-  .form-label {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
+    .form-section {
+      background-color: #F2E8DC;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-  .form-control {
-    border-radius: 8px;
-    height: 45px;
-  }
+    .form-label {
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
 
-  .submit-btn {
-    background: linear-gradient(90deg, #B5654B, #D17C63);
-    color: white;
-    padding: 10px 30px;
-    border: none;
-    border-radius: 25px;
-    margin-top: 20px;
-    transition: 0.3s;
-  }
+    .form-control {
+      border-radius: 8px;
+      height: 45px;
+    }
 
-  .submit-btn:hover {
-    opacity: 0.9;
-  }
+    .submit-btn {
+      background: linear-gradient(90deg, #B5654B, #D17C63);
+      color: white;
+      padding: 10px 30px;
+      border: none;
+      border-radius: 25px;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
 
-  .banner {
-    position: relative;
-  }
+    .submit-btn:hover {
+      opacity: 0.9;
+    }
 
-  .banner img {
-    height: 350px;
-    object-fit: cover;
-    width: 100%;
-  }
+    .banner {
+      position: relative;
+    }
 
-  .banner h1 {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 42px;
-    font-weight: 700;
-    text-shadow: 2px 2px 5px #000;
-  }
+    .banner img {
+      height: 350px;
+      object-fit: cover;
+      width: 100%;
+    }
 
-  footer {
-    background-color: #f8f9fa;
-    padding: 20px;
-  }
-  .back-arrow-btn {
-    position: absolute;
-    top: 177px;
-    left: 25px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
-  }
+    .banner h1 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 42px;
+      font-weight: 700;
+      text-shadow: 2px 2px 5px #000;
+    }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
-    color: white;
-    transform: scale(1.1);
-  }
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
 
-</style>
+    .back-arrow-btn {
+      position: absolute;
+      top: 20px;
+      /* smaller consistent spacing */
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
 
-<!-- Banner/Header -->
-<section class="hero text-center bg-light p-0 mb-4">
-  <div class="banner">
-    <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100">
-    <button onclick="window.history.back()" class="back-arrow-btn">
-            &#8592;
+    .back-arrow-btn:hover {
+      background-color: #B5654B;
+      transform: scale(1.1);
+    }
+
+    /* ⭐ Mobile Fix: Move arrow up slightly */
+    @media (max-width: 768px) {
+      .back-arrow-btn {
+        top: 10px;
+        left: 10px;
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+      }
+    }
+
+    /* ⭐ Extra small screens */
+    @media (max-width: 480px) {
+      .back-arrow-btn {
+        top: 8px;
+        left: 8px;
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+      }
+    }
+
+    /* Sidebar (Desktop) */
+    .sidebar {
+      background-color: #F2E8DC;
+      padding: 25px 18px;
+      border-radius: 8px;
+    }
+
+    .sidebar h5 {
+      font-weight: bold;
+      margin-bottom: 18px;
+      color: #6B4C3B;
+    }
+
+    .sidebar a {
+      display: block;
+      margin-bottom: 12px;
+      color: #333;
+      font-weight: 500;
+      padding: 10px;
+      border-radius: 6px;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      background: rgba(181, 101, 75, 0.15);
+      color: #B5654B;
+    }
+
+    /* Mobile top bar */
+    .mobile-settings-bar {
+      display: none;
+      background: #F2E8DC;
+      padding: 12px 18px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .mobile-settings-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #6B4C3B;
+    }
+
+    .mobile-hamburger-btn {
+      background: none;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      color: #6B4C3B;
+      cursor: pointer;
+    }
+
+    /* Hide desktop sidebar on mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none !important;
+      }
+
+      .mobile-settings-bar {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    /* Drop-down (mobile) */
+    .mobile-dropdown {
+      display: none;
+      flex-direction: column;
+      background: #F2E8DC;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 15px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .mobile-dropdown a {
+      padding: 10px 12px;
+      font-size: 15px;
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      align-items: center;
+      border-radius: 6px;
+      transition: 0.2s;
+    }
+
+    .mobile-dropdown a:hover {
+      background: rgba(181, 101, 75, 0.15);
+      color: #B5654B;
+    }
+
+    .changeMail-banner {
+      height: 220px !important;
+      width: 100% !important;
+      object-fit: cover !important;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+
+  <!-- Banner/Header -->
+  <section class="hero text-center bg-light p-0 mb-4">
+    <div class="banner">
+      <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class=" changeMail-banner img-fluid w-100">
+      <button onclick="window.history.back()" class="back-arrow-btn">
+        &#8592;
+      </button>
+      <h1>CHANGE EMAIL</h1>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <div class="container mt-5">
+    <div class="row">
+      <!-- MOBILE SETTINGS TOP BAR -->
+      <div class="mobile-settings-bar d-md-none">
+        <span class="mobile-settings-title">SETTINGS</span>
+
+        <button class="mobile-hamburger-btn" onclick="toggleDropdown()">
+          <i class="material-icons">&#xe8b8;</i>
         </button>
-    <h1>CHANGE EMAIL</h1>
-  </div>
-</section>
+      </div>
+      <!-- DROPDOWN MENU (MOBILE) -->
+      <div id="mobileDropdown" class="mobile-dropdown d-md-none">
+        <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+        <a href="/profile"><i class="fas fa-user"></i> Personal Info</a>
+        <a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+        <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+      </div>
 
-<!-- Main Content -->
-<div class="container mt-5">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-2 sidebar">
+      <!-- NORMAL SIDEBAR (DESKTOP) -->
+      <div class="col-md-2 sidebar d-none d-md-block">
         <h5>SETTINGS</h5>
-        <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
+        <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+        <a href="/profile"><i class="fas fa-user"></i> Personal Info</a>
+        <a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+        <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+      </div>
+
+      <!-- Form Section -->
+      <div class="col-md-8 form-section">
+        <h4 class="mb-4">Change Email</h4>
+        <form>
+          <div class="mb-4">
+            <label for="currentEmail" class="form-label">Current Email</label>
+            <input type="email" name="currentEmail" id="currentEmail" class="form-control"
+              placeholder="Enter your current email">
+            <% if (message) { %>
+              <div class="error-message" id="error-message" style="color: darkred;">
+                <%= message %>
+              </div>
+              <% } %>
+          </div>
+          <div class="text-center">
+            <button type="button" onclick="ExistingEmailVerifing()" class="submit-btn">Verify</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function ExistingEmailVerifing() {
+      console.log('falo')
+      const emailInput = document.getElementById("currentEmail");
+      // const emailError = document.getElementById("error-message");
+      const email = emailInput.value.trim();
+      // const emailPattern = /^([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/;
+
+      // if (emailValue === "") {
+      //   emailError.textContent = "Please enter the email.";
+      //   emailInput.classList.add("is-invalid");
+      //   return false;
+      // } else if (!emailValue.match(emailPattern)) {
+      //   emailError.textContent = "Please enter a valid email address.";
+      //   emailInput.classList.add("is-invalid");
+      //   return false;
+      // } else {
+      //   emailError.textContent = "";
+      //   emailInput.classList.remove("is-invalid");
+      //   return true;
+      // }
+
+      const res = await axios.post('/profile/change-email', { currentEmail: email }, { validateStatus: (status) => status !== 500 })
+      console.log(res)
+      try {
+        if (!res.data.success) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: res.data.message
+          })
+        }else{
+          Swal.fire({
+            title:'Success',
+            icon:'success',
+            text:'Email verified successfully'
+          }).then(()=> window.location.href = res.data.redirectUrl)
+        }
+      } catch {
+        console.log('error in current email checking in profile change email', error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error occure while checking the email'
+        })
+      }
+
+    }
+    function toggleDropdown() {
+      const drop = document.getElementById("mobileDropdown");
+      drop.style.display = drop.style.display === "flex" ? "none" : "flex";
+    }
+  </script>
+
+  <%- include("../../views/partials/userPartial/footer") %>
+    <!-- MOBILE OFFCANVAS SIDEBAR -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">SETTINGS</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+      </div>
+
+      <div class="offcanvas-body">
+        <a href="/orders" class="d-block mb-3">
           <i class="fas fa-shopping-cart"></i> Orders
         </a>
-        <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">
+        <a href="/profile" class="d-block mb-3">
           <i class="fas fa-user"></i> Personal Info
         </a>
-        <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">
+        <a href="/addresses" class="d-block mb-3">
           <i class="fas fa-map-marker-alt"></i> Addresses
         </a>
-        <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">
+        <a href="/wallet" class="d-block mb-3">
           <i class="fas fa-wallet"></i> Wallet
         </a>
       </div>
-
-    <!-- Form Section -->
-    <div class="col-md-8 form-section">
-      <h4 class="mb-4">Change Email</h4>
-      <form action="/profile/reset-email" method="get" onsubmit="return validateLoginForm()">
-        <div class="mb-4">
-          <label for="currentEmail" class="form-label">Current Email</label>
-          <input type="email" name="currentEmail" id="currentEmail" class="form-control" placeholder="Enter your current email" required>
-          <% if (message) { %>
-            <div class="error-message" id="error-message" style="color: darkred;">
-              <%= message %>
-            </div>
-          <% } %>
-        </div>
-        <div class="text-center">
-          <button type="submit" class="submit-btn">Verify</button>
-        </div>
-      </form>
     </div>
-  </div>
-</div>
-
-<script>
-  function validateLoginForm() {
-    const emailInput = document.getElementById("currentEmail");
-    const emailError = document.getElementById("error-message");
-    const emailValue = emailInput.value.trim();
-    const emailPattern = /^([a-zA-Z0-9._-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,4})$/;
-
-    if (emailValue === "") {
-      emailError.textContent = "Please enter the email.";
-      emailInput.classList.add("is-invalid");
-      return false;
-    } else if (!emailValue.match(emailPattern)) {
-      emailError.textContent = "Please enter a valid email address.";
-      emailInput.classList.add("is-invalid");
-      return false;
-    } else {
-      emailError.textContent = "";
-      emailInput.classList.remove("is-invalid");
-      return true;
-    }
-  }
-</script>
-
-<%- include("../../views/partials/userPartial/footer") %>

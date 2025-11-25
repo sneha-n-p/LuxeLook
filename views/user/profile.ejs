@@ -1,335 +1,345 @@
 <%- include("../../views/partials/userPartial/header") %>
 
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #FFF8F3;
-    }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #FFF8F3;
+  }
 
-    .banner {
-      position: relative;
-    }
-
-    .banner img {
-      height: 404px;
-      object-fit: cover;
-      width: 100%;
-    }
-
-    .banner h1 {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-size: 42px;
-      font-weight: 700;
-      text-shadow: 2px 2px 8px black;
-    }
-
-    .sidebar {
-      background-color: #F2E8DC;
-      padding: 30px 20px;
-      height: auto;
-      color: #6B4C3B;
-      border-radius: 8px;
-    }
-
-    .sidebar h5 {
-      font-weight: bold;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-    }
-
-    .sidebar a {
-      display: flex;
-      align-items: center;
-      color: #333;
-      margin-bottom: 10px;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 10px 15px;
-      border-radius: 5px;
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-
-    .sidebar a:hover {
-      color: #B5654B;
-      background-color: rgba(181, 101, 75, 0.1);
-    }
-
-    .sidebar a i {
-      margin-right: 10px;
-      font-size: 16px;
-      width: 20px;
-      text-align: center;
-      color: #333;
-      transition: color 0.3s ease;
-    }
-
-    .sidebar a:hover i {
-      color: #B5654B;
-    }
-
-    .profile-container {
-      background-color: #FCF4ED;
-      padding: 40px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .profile-img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #ddd;
-      margin-bottom: 15px;
-    }
-
-    .user-info {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .user-info:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-custom {
-      background: linear-gradient(90deg, #B5654B, #D17C63);
-      color: white;
-      padding: 8px 20px;
-      border: none;
-      border-radius: 25px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: opacity 0.3s ease, transform 0.2s ease;
-      text-decoration: none;
-      display: inline-block;
-      text-align: center;
-      margin-right: 10px;
-    }
-
-    .btn-custom:hover {
-      opacity: 0.9;
-      transform: translateY(-2px);
-    }
-
-    .referral-container {
-      background: #fff;
-      max-height: 100%;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 15px;
-      overflow-wrap: break-word;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-
-    .referral-container:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .referral-code {
-      background-color: #f5f5f5;
-      padding: 10px 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-family: monospace;
-      font-size: 16px;
-    }
-
-    .btn-copy {
-      background: linear-gradient(90deg, #6B4C3B, #8a2c3b);
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 25px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: opacity 0.3s ease, transform 0.2s ease;
-      cursor: pointer;
-    }
-
-    .btn-copy:hover {
-      opacity: 0.9;
-      transform: translateY(-2px);
-    }
-
-    .order-box {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      min-width: 200px;
-    }
-
-    .order-box:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .order-box h6 {
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    h5.fw-bold {
-      color: #6B4C3B;
-      text-transform: uppercase;
-    }
-    .back-arrow-btn {
+  /* Banner */
+  .banner {
+    position: relative;
+  }
+  .banner img {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+  }
+  .banner h1 {
     position: absolute;
-    top: 247px;
-    left: 25px;
-    background-color: rgba(0, 0, 0, 0.5);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     color: white;
+    font-size: 42px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px black;
+  }
+
+  /* Sidebar (Desktop) */
+  .sidebar {
+    background-color: #F2E8DC;
+    padding: 25px 18px;
+    border-radius: 8px;
+  }
+  .sidebar h5 {
+    font-weight: bold;
+    margin-bottom: 18px;
+    color: #6B4C3B;
+  }
+  .sidebar a {
+    display: block;
+    margin-bottom: 12px;
+    color: #333;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 6px;
+    transition: 0.3s;
+    text-decoration: none;
+  }
+  .sidebar a:hover {
+    background: rgba(181, 101, 75, 0.15);
+    color: #B5654B;
+  }
+  /* Mobile top bar */
+  .mobile-settings-bar {
+    display: none;
+    background: #F2E8DC;
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  .mobile-settings-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #6B4C3B;
+  }
+  .mobile-hamburger-btn {
+    background: none;
     border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+    color: #6B4C3B;
     cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
   }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
+  /* Hide desktop sidebar on mobile */
+  @media (max-width: 768px) {
+    .sidebar { display: none !important; }
+    .mobile-settings-bar { display: flex; justify-content: space-between; }
+
+    .profile-banner {
+    height: 220px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+  .banner-text{
+    margin-top: 0;
+  }
+  }
+
+  /* Profile container */
+  .profile-container {
+    background: #FCF4ED;
+    padding: 35px;
+    border-radius: 10px;
+  }
+
+  .profile-img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+    margin-bottom: 15px;
+  }
+
+  .user-info {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 450px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+  }
+
+  .btn-custom {
+    background: linear-gradient(90deg, #B5654B, #D17C63);
     color: white;
-    transform: scale(1.1);
+    padding: 8px 22px;
+    border-radius: 25px;
+    margin: 5px;
+    font-size: 15px;
+    text-decoration: none;
+    display: inline-block;
   }
-  </style>
 
-  <body>
+  .referral-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
 
-    <section class="hero text-center bg-light p-0 mb-4">
-      <img src="\wallpaper\pageBanner-1.jpg" alt="Shop Banner" class="img-fluid w-100"
-        style="height: 417px; object-fit: cover;">
-        <button onclick="window.history.back()" class="back-arrow-btn">
-            &#8592;
-        </button>
-      <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg"
-        style="text-shadow: 2px 2px 8px black;">PROFILE</h1>
-    </section>
+  .referral-code {
+    background: #f5f5f5;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-family: monospace;
+  }
 
-    <div class="container-fluid">
-      <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-2 sidebar">
-          <h5>SETTINGS</h5>
-          <a href="/orders" class="<%= currentPath === '/orders' ? 'fw-bold' : '' %>">
-            <i class="fas fa-shopping-cart"></i> Orders
-          </a>
-          <a href="/profile" class="<%= currentPath === '/profile' ? 'fw-bold' : '' %>">
-            <i class="fas fa-user"></i> Personal Info
-          </a>
-          <a href="/addresses" class="<%= currentPath === '/addresses' ? 'fw-bold' : '' %>">
-            <i class="fas fa-map-marker-alt"></i> Addresses
-          </a>
-          <a href="/wallet" class="<%= currentPath === '/wallet' ? 'fw-bold' : '' %>">
-            <i class="fas fa-wallet"></i> Wallet
-          </a>
-        </div>
+  .btn-copy {
+    background: #6B4C3B;
+    color: white;
+    padding: 6px 15px;
+    border-radius: 20px;
+    border: none;
+  }
 
-        <div class="col-md-10 profile-container d-flex flex-column align-items-center">
-          <!-- Centered Profile Image -->
-<img 
-  src="<%= user.image && user.image.length > 0 ? user.image[0] : '/wallpaper/banner.png' %>" 
-  alt="User Image" 
-  class="profile-img">
-          <!-- Centered User Info -->
-          <div class="user-info text-center mt-3 mb-4">
-            <div><strong>Name:</strong>
-              <%= user.name %>
-            </div>
-            <div>
-              <strong>Last Name:</strong>
-              <% if (user.lastName) { %>
-                <%= user.lastName %>
-                  <% } else { %>
-                    N/A
-                    <% } %>
-            </div>
-            <div><strong>Phone:</strong>
-              <%= user.phone %>
-            </div>
-            <div><strong>Gender:</strong>
-              <% if (user.gender) { %>
-                <%= user.gender %>
-                  <% } else { %>
-                    N/A
-                    <% } %>
-            </div>
-            <div><strong>Email:</strong>
-              <%= user.email %>
-            </div>
-          </div>
+  /* Orders */
+  .order-box {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    width: 220px;
+    border: 1px solid #ddd;
+  }
 
-          <!-- Centered Buttons -->
-          <%if(!user.password){%>
-                      <div class="text-center mb-4">
+  /* Back arrow */
+.back-arrow-btn {
+  position: absolute;
+  top: 20px;          /* smaller consistent spacing */
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
 
-            <a href="/profile/edit" class="btn btn-custom">Edit Profile</a>
-            <a href="/addresses/add-address" class="btn btn-custom">Add Address</a>
-            </div>
+.back-arrow-btn:hover {
+  background-color: #B5654B;
+  transform: scale(1.1);
+}
 
-            <%}else{%>
-          <div class="text-center mb-4">
-                <a href="/profile/edit" class="btn btn-custom">Edit Profile</a>
-                <a href="/profile/change-email" class="btn btn-custom">Change Email</a>
-                <a href="/profile/change-password" class="btn btn-custom">Change Password</a>
-                <a href="/addresses/add-address" class="btn btn-custom">Add Address</a>
-          </div>
-          <%}%>
+/* ⭐ Mobile Fix: Move arrow up slightly */
+@media (max-width: 768px) {
+  .back-arrow-btn {
+    top: 10px;
+    left: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+  }
+}
 
-          <div class="referral-container">
-            <span>Your Referral Code:</span>
-            <span class="referral-code" id="referralCode">
-              <%= user.referalCode %>
-            </span>
-            <button class="btn-copy" onclick="copyCoupon()">Copy</button>
-          </div>
+/* ⭐ Extra small screens */
+@media (max-width: 480px) {
+  .back-arrow-btn {
+    top: 8px;
+    left: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+}
 
-          
 
-              <!-- Recent Orders -->
-              <h5 class="text-center mb-3"><strong>Recent Orders</strong></h5>
-              <div class="d-flex flex-row flex-wrap justify-content-center gap-3">
-                <% latestOrders.forEach(order=> { %>
-                  <div class="order-box p-3" style="background-color: #FCF4ED; min-width: 200px;">
-                    <h6>Order ID: <%= order.orderId %>
-                    </h6>
-                    <p><strong>Date:</strong> <span class="order-date" data-date="<%= order.createdOn %>">
-                        <%= order.createdOn.toDateString() %>
-                      </span></p>
-                    <p><strong>Status:</strong>
-                      <%= order.status %>
-                    </p>
-                    <p><strong>Total:</strong> ₹<%= order.finalAmount.toFixed(2) %>
-                    </p>
-                  </div>
-                  <% }) %>
-              </div>
-        </div>
+  /* Drop-down (mobile) */
+.mobile-dropdown {
+  display: none;
+  flex-direction: column;
+  background: #F2E8DC;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+  animation: fadeIn 0.3s ease;
+}
+
+.mobile-dropdown a {
+  padding: 10px 12px;
+  font-size: 15px;
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.mobile-dropdown a:hover {
+  background: rgba(181, 101, 75, 0.15);
+  color: #B5654B;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+</style>
+
+<body>
+
+<section class="banner">
+  <img class="profile-banner" src="/wallpaper/pageBanner-1.jpg">
+  <button onclick="history.back()" class="back-arrow-btn">←</button>
+  <h1 class="banner-text">PROFILE</h1>
+</section>
+
+<div class="container-fluid mt-4">
+  <div class="row">
+
+    <!-- MOBILE SETTINGS TOP BAR -->
+<div class="mobile-settings-bar d-md-none">
+  <span class="mobile-settings-title">SETTINGS</span>
+
+  <button class="mobile-hamburger-btn" onclick="toggleDropdown()">
+    <i class="material-icons">&#xe8b8;</i>
+  </button>
+</div>
+
+<!-- DROPDOWN MENU (MOBILE) -->
+<div id="mobileDropdown" class="mobile-dropdown d-md-none">
+  <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+  <a href="/profile"><i class="fas fa-user"></i> Personal Info</a>
+  <a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+  <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+</div>
+
+<!-- NORMAL SIDEBAR (DESKTOP) -->
+<div class="col-md-2 sidebar d-none d-md-block">
+  <h5>SETTINGS</h5>
+  <a href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+  <a href="/profile"><i class="fas fa-user"></i> Personal Info</a>
+  <a href="/addresses"><i class="fas fa-map-marker-alt"></i> Addresses</a>
+  <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+</div>
+
+
+    <!-- MAIN CONTENT -->
+    <div class="col-md-10 d-flex flex-column align-items-center profile-container">
+
+      <img src="<%= user.image[0] || '/wallpaper/banner.png' %>" class="profile-img">
+
+      <div class="user-info text-center">
+        <div><strong>Name:</strong> <%= user.name %></div>
+        <div><strong>Last Name:</strong> <%= user.lastName || 'N/A' %></div>
+        <div><strong>Phone:</strong> <%= user.phone %></div>
+        <div><strong>Gender:</strong> <%= user.gender || 'N/A' %></div>
+        <div><strong>Email:</strong> <%= user.email %></div>
       </div>
+
+      <!-- Buttons -->
+      <div class="text-center mb-3">
+        <a href="/profile/edit" class="btn-custom">Edit Profile</a>
+        <a href="/profile/change-email" class="btn-custom">Change Email</a>
+        <a href="/profile/change-password" class="btn-custom">Change Password</a>
+        <a href="/addresses/add-address" class="btn-custom">Add Address</a>
+      </div>
+
+      <!-- Referral box -->
+      <div class="referral-container">
+        <span class="referral-code" id="referralCode"><%= user.referalCode %></span>
+        <button class="btn-copy" onclick="copyReferralCode()">Copy</button>
+      </div>
+
+      <!-- Orders -->
+      <h5 class="fw-bold mt-4">Recent Orders</h5>
+
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <% latestOrders.forEach(order => { %>
+          <div class="order-box">
+            <h6>Order ID: <%= order.orderId %></h6>
+            <p><strong>Date:</strong> <%= order.createdOn.toDateString() %></p>
+            <p><strong>Status:</strong> <%= order.status %></p>
+            <p><strong>Total:</strong> ₹<%= order.finalAmount %></p>
+          </div>
+        <% }) %>
+      </div>
+
     </div>
+  </div>
+</div>
+
+<!-- MOBILE OFFCANVAS SIDEBAR -->
+<div class="offcanvas offcanvas-start" id="mobileSidebar">
+  <div class="offcanvas-header">
+    <h5>SETTINGS</h5>
+    <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <a href="/orders" class="d-block mb-3">Orders</a>
+    <a href="/profile" class="d-block mb-3">Personal Info</a>
+    <a href="/addresses" class="d-block mb-3">Addresses</a>
+    <a href="/wallet" class="d-block mb-3">Wallet</a>
+  </div>
+</div>
 
     <script>
 
@@ -354,24 +364,53 @@
       }
 
       function copyReferralCode() {
-        const referralCode = document.getElementById('referralCode').innerText;
-        console.log('referralCode:', referralCode)
-        navigator.clipboard.writeText(referralCode).then(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Copied!',
-            text: 'Referral code copied to clipboard.',
-            timer: 2000,
-            showConfirmButton: false
-          });
-        }).catch(err => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to copy referral code.',
-          });
+  const referralCode = document.getElementById("referralCode").innerText.trim();
+
+  // Modern browser attempt
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(referralCode)
+      .then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Copied!',
+          text: 'Referral code copied.',
+          timer: 1500,
+          showConfirmButton: false
         });
-      }
+      })
+      .catch(() => fallbackCopy(referralCode));
+  } else {
+    fallbackCopy(referralCode);
+  }
+}
+
+function fallbackCopy(text) {
+  const tempInput = document.createElement("input");
+  tempInput.value = text;
+  document.body.appendChild(tempInput);
+  tempInput.select();
+  tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+  try {
+    document.execCommand("copy");
+    Swal.fire({
+      icon: 'success',
+      title: 'Copied!',
+      text: 'Referral code copied.',
+      timer: 1500,
+      showConfirmButton: false
+    });
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Failed',
+      text: 'Unable to copy on this device.',
+    });
+  }
+
+  document.body.removeChild(tempInput);
+}
+
 
       document.querySelectorAll('.order-date').forEach(el => {
         const rawDate = el.getAttribute('data-date');
@@ -386,8 +425,35 @@
         });
         el.textContent = formattedDate;
       });
+
+      function toggleDropdown() {
+    const drop = document.getElementById("mobileDropdown");
+    drop.style.display = drop.style.display === "flex" ? "none" : "flex";
+  }
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <%- include("../../views/partials/userPartial/footer") %>
   </body>
+  <!-- MOBILE OFFCANVAS SIDEBAR -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">SETTINGS</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+
+    <div class="offcanvas-body">
+      <a href="/orders" class="d-block mb-3">
+        <i class="fas fa-shopping-cart"></i> Orders
+      </a>
+      <a href="/profile" class="d-block mb-3">
+        <i class="fas fa-user"></i> Personal Info
+      </a>
+      <a href="/addresses" class="d-block mb-3">
+        <i class="fas fa-map-marker-alt"></i> Addresses
+      </a>
+      <a href="/wallet" class="d-block mb-3">
+        <i class="fas fa-wallet"></i> Wallet
+      </a>
+    </div>
+  </div>

@@ -156,29 +156,188 @@
       z-index: 1;
     }
     .back-arrow-btn {
-    position: absolute;
-    top: 247px;
-    left: 25px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
+  position: absolute;
+  top: 20px;          /* smaller consistent spacing */
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.back-arrow-btn:hover {
+  background-color: #B5654B;
+  transform: scale(1.1);
+}
+
+/* ⭐ Mobile Fix: Move arrow up slightly */
+@media (max-width: 768px) {
+  .back-arrow-btn {
+    top: 10px;
+    left: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+  }
+}
+
+/* ⭐ Extra small screens */
+@media (max-width: 480px) {
+  .back-arrow-btn {
+    top: 8px;
+    left: 8px;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+}
+
+
+ /* Hide mobile filter button + mobile filter area on desktop */
+.mobile-filter-btn,
+#mobileFilters {
+  display: none;
+}
+
+/* Reduce product card width on laptop/desktop */
+@media (min-width: 992px) {
+  .product-card-wrapper {
+    flex: 0 0 22% !important;  /* reduce width */
+    max-width: 22% !important;
+    margin-left: 1.5%;
+    margin-right: 1.5% ;
+  }
+}
+
+/* Show mobile filter button and dropdowns in mobile */
+@media (max-width: 768px) {
+
+  /* Mobile filter button */
+  .mobile-filter-btn {
+    display: inline-block;
+    background: #000;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-left: 8px;
+    font-size: 0.9rem;
     border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 10;
   }
 
-  .back-arrow-btn:hover {
-    background-color: #B5654B;
-    color: white;
-    transform: scale(1.1);
+  /* Mobile filter dropdown area */
+  #mobileFilters {
+    display: none;
+    width: 100%;
+    background: #f2e8dc;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 10px;
   }
+
+  /* Show filters only when opened */
+  #mobileFilters.active {
+    display: block;
+  }
+
+  /* Hide desktop filters in mobile */
+  #desktopFilters {
+    display: none !important;
+  }
+
+  /* Make search input take full width */
+  #searchInput {
+    flex: 1;
+    max-width: 100% !important;
+  }
+  .hero img {
+    height: 250px !important;
+    object-fit: cover;
+  }
+
+  /* Search bar layout fix */
+  .search-bar {
+    flex-wrap: wrap !important;
+    gap: 10px;
+    justify-content: start !important;
+  }
+
+  #searchInput {
+    width: 100% !important;
+    margin-bottom: 10px;
+  }
+
+  /* SHOW the Mobile Filter Button */
+  .mobile-filter-btn {
+    display: inline-block !important;
+    background: #000;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.9rem;
+  }
+
+  /* Mobile Filters Hidden initially */
+  #mobileFilters {
+    display: none;
+    width: 100%;
+    background: #f2e8dc;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+
+  #mobileFilters.active {
+    display: block !important;
+  }
+
+  /* HIDE all desktop filters in MOBILE */
+  #desktopFilters {
+    display: none !important;
+  }
+
+  /* TWO PRODUCTS PER ROW */
+  .row .col-sm-6 {
+    width: 50% !important;
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+
+  .card-img-top {
+    height: 180px !important;
+  }
+  /* Fix banner for mobile */
+@media (max-width: 768px) {
+  .hero img {
+    height: 220px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .hero h1 {
+    font-size: 1.8rem !important;   /* smaller heading */
+  }
+
+  .back-arrow-btn {
+    top: 120px !important;   /* adjust arrow position for mobile */
+    left: 15px !important;
+  }
+  .banner-text{
+    margin-top: -30%;
+  }
+}
+
+}
+
   </style>
 
   <!-- Banner Section -->
@@ -187,47 +346,78 @@
     <button onclick="window.history.back()" class="back-arrow-btn">
             &#8592;
         </button>
-    <h1 class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg"
+    <h1 class="banner-text position-absolute top-50 start-50 translate-middle text-white fw-bold display-4 shadow-lg"
       style="text-shadow: 2px 2px 8px black;">SHOP</h1>
 
   </section>
 
   <body>
-    <!-- Shop Section -->
-    <div class="container mt-5">
-      <!-- Search -->
-      <div class="search-bar d-flex align-items-center">
-        <input id="searchInput" type="text" class="form-control me-2" value="<%= search %>"
-          placeholder="Search products...">
+    <div class="search-bar d-flex align-items-center flex-wrap">
 
-        <!-- Sort Dropdown -->
-        <select id="sortSelect" class="form-select me-2" style="width: auto;">
-          <option value="">Sort By</option>
-          <option value="price-asc" <%=sort==='price-asc' ? 'selected' : '' %>>Price: Low to High</option>
-          <option value="price-desc" <%=sort==='price-desc' ? 'selected' : '' %>>Price: High to Low</option>
-          <option value="name-asc" <%=sort==='name-asc' ? 'selected' : '' %>>Name: A to Z</option>
-          <option value="name-desc" <%=sort==='name-desc' ? 'selected' : '' %>>Name: Z to A</option>
-        </select>
+  <input id="searchInput" type="text" class="form-control me-2"
+         value="<%= search %>" placeholder="Search products...">
 
-        <select id="selectCat" class="form-select me-2" style="width: auto;">
-          <option value="">All Category</option>
-          <%for(let i=0;i<categories.length;i++) {%>
-            <option value="<%= categories[i].name %>" <%=selectCategory===categories[i].name ? 'selected' : '' %>>
-              <%= categories[i].name %>
-            </option>
-            <%}%>
-        </select>
-        <select id="priceFilter" class="form-select me-2" style="width: auto;">
-          <option value="">All Prices</option>
-          <option value="lt-500" <%=priceFilter==='lt-500' ? 'selected' : '' %>>Less than ₹500</option>
-          <option value="lt-1000" <%=priceFilter==='lt-1000' ? 'selected' : '' %>>Less than ₹1000</option>
-          <option value="500-1000" <%=priceFilter==='lt-1000' ? 'selected' : '' %>>₹500-₹1000</option>
-          <option value="gt-1000" <%=priceFilter==='gt-1000' ? 'selected' : '' %>>Greater than ₹1000</option>
-        </select>
+  <button class="mobile-filter-btn" onclick="toggleFilters()">Filters ▾</button>
 
-        <button class="btn btn-dark ms-2" onclick="searchProducts()">Search</button>
-        <a href="/shop"><button class="btn btn-dark ms-2">clear</button></a>
-      </div>
+  <div id="mobileFilters">
+    <select id="sortSelectMobile" class="form-select mb-2">
+      <option value="">Sort By</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="name-asc">Name: A to Z</option>
+      <option value="name-desc">Name: Z to A</option>
+    </select>
+
+    <select id="selectCatMobile" class="form-select mb-2">
+      <option value="">All Category</option>
+      <% categories.forEach(cat => { %>
+        <option value="<%= cat.name %>"><%= cat.name %></option>
+      <% }) %>
+    </select>
+
+    <select id="priceFilterMobile" class="form-select mb-2">
+      <option value="">All Prices</option>
+      <option value="lt-500">Less than ₹500</option>
+      <option value="lt-1000">Less than ₹1000</option>
+      <option value="500-1000">₹500 - ₹1000</option>
+      <option value="gt-1000">Greater than ₹1000</option>
+    </select>
+
+    <button class="btn btn-dark w-100 mt-2" onclick="searchProducts()">Apply Filters</button>
+  </div>
+
+  <div id="desktopFilters" class="d-flex align-items-center">
+    <select id="sortSelect" class="form-select me-2" style="width: auto;">
+      <option value="">Sort By</option>
+      <option value="price-asc" <%=sort==='price-asc' ? 'selected' : '' %>>Price: Low to High</option>
+      <option value="price-desc" <%=sort==='price-desc' ? 'selected' : '' %>>Price: High to Low</option>
+      <option value="name-asc" <%=sort==='name-asc' ? 'selected' : '' %>>Name: A to Z</option>
+      <option value="name-desc" <%=sort==='name-desc' ? 'selected' : '' %>>Name: Z to A</option>
+    </select>
+
+    <select id="selectCat" class="form-select me-2" style="width: auto;">
+      <option value="">All Category</option>
+      <% categories.forEach(cat => { %>
+        <option value="<%= cat.name %>" <%= selectCategory === cat.name ? 'selected' : '' %>>
+          <%= cat.name %>
+        </option>
+      <% }) %>
+    </select>
+
+    <select id="priceFilter" class="form-select me-2" style="width: auto;">
+      <option value="">All Prices</option>
+      <option value="lt-500" <%=priceFilter==='lt-500' ? 'selected' : '' %>>Less than ₹500</option>
+      <option value="lt-1000" <%=priceFilter==='lt-1000' ? 'selected' : '' %>>Less than ₹1000</option>
+      <option value="500-1000" <%=priceFilter==='500-1000' ? 'selected' : '' %>>₹500 - ₹1000</option>
+      <option value="gt-1000" <%=priceFilter==='gt-1000' ? 'selected' : '' %>>Greater than ₹1000</option>
+    </select>
+  </div>
+
+  <!-- Search + Clear Buttons -->
+  <button class="btn btn-dark ms-2" onclick="searchProducts()">Search</button>
+  <a href="/shop"><button class="btn btn-dark ms-2">Clear</button></a>
+
+</div>
 
       <div id="productCard"></div>
 
@@ -235,7 +425,7 @@
       <!-- Products -->
       <div class="row">
         <% for(let i=0; i<products.length; i++) { %>
-          <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex">
+<div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex product-card-wrapper">
             <div class="card w-100">
               <img src="<%= products[i].productImage[0] %>" class="card-img-top" alt="<%= products[i].productName %>">
               <div class="card-body d-flex flex-column">
@@ -243,10 +433,7 @@
                   <h5 class="card-title">
                     <%= products[i].productName %>
                   </h5>
-                  <p>
-                    <%= products[i].description %>
-                  </p>
-
+                
                   <% if (products[i].offer> 0) { %>
                     <p class="card-text mb-1">
                       <s class="text-muted">₹<%= products[i].regularPrice %></s>
@@ -329,6 +516,10 @@
             });
         }
 
+        function toggleFilters() {
+    document.getElementById("mobileFilters").classList.toggle("active");
+  }
+
         // function addToCart(productId) {
         //   axios.post("/addToCart", { productId })
         //     .then(function (responce) {
@@ -376,19 +567,33 @@
 
 
         function searchProducts() {
-          const query = document.getElementById("searchInput").value.trim();
-          const sort = document.getElementById('sortSelect').value;
-          const selectCategory = document.getElementById('selectCat').value.trim()
-          const priceFilter = document.getElementById('priceFilter').value;
+  const query = document.getElementById("searchInput").value.trim();
 
-          const url = new URL(window.location.origin + "/shop");
-          url.searchParams.set("search", query);
-          url.searchParams.set("sort", sort);
-          url.searchParams.set("page", 1);
-          url.searchParams.set('selectCategory', selectCategory)
-          url.searchParams.set("priceFilter", priceFilter);
-          window.location.href = url.toString();
-        }
+  let sort, selectCategory, priceFilter;
+
+  // If MOBILE FILTERS are visible → use mobile values
+  if (window.innerWidth <= 768) {
+    sort = document.getElementById("sortSelectMobile").value;
+    selectCategory = document.getElementById("selectCatMobile").value.trim();
+    priceFilter = document.getElementById("priceFilterMobile").value;
+  } 
+  // Else → use desktop values
+  else {
+    sort = document.getElementById("sortSelect").value;
+    selectCategory = document.getElementById("selectCat").value.trim();
+    priceFilter = document.getElementById("priceFilter").value;
+  }
+
+  const url = new URL(window.location.origin + "/shop");
+  url.searchParams.set("search", query);
+  url.searchParams.set("sort", sort);
+  url.searchParams.set("page", 1);
+  url.searchParams.set("selectCategory", selectCategory);
+  url.searchParams.set("priceFilter", priceFilter);
+
+  window.location.href = url.toString();
+}
+
 
       </script>
     </div>

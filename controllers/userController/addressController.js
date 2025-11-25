@@ -61,9 +61,9 @@ const AddAddress = async (req, res) => {
         const address = `${streetAddress},${city},${state},${pincode}`
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
         const { data } = await axios.get(url);
-        logger.debug('data:',data)
-        if (data.status !== "OK" || !data.results.length||data.results[0].partial_match) {
-            return res.json({ success: false, message: "Invalid or incomplete address. Please check street, city, or pincode."});
+        logger.debug('data:', data)
+        if (data.status !== "OK" || !data.results.length || data.results[0].partial_match) {
+            return res.json({ success: false, message: "Invalid or incomplete address. Please check street, city, or pincode." });
         }
         const components = data.results[0].address_components;
 
@@ -109,7 +109,7 @@ const loadEditAddress = async (req, res) => {
 
         const addressId = new mongoose.Types.ObjectId(id)
         for (let add of addressData.address) {
-            logger.debug('add:',add)
+            logger.debug('add:', add)
             if (add._id.equals(addressId)) {
                 logger.debug(`add:${add}`)
                 res.render("edit-Address", { user: userData, address: add, activePage: " edit-addresses", currentPath: '/addresses' })
@@ -132,9 +132,9 @@ const editAddress = async (req, res) => {
         const address = `${streetAddress},${city},${state},${pincode}`
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
         const { data } = await axios.get(url);
-        logger.debug( data.results[0].address_components)
-        if(!data) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid Address" })
-        if (data.status !== "OK" || !data.results.length||data.results[0].partial_match) {
+        logger.debug(data.results[0].address_components)
+        if (!data) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid Address" })
+        if (data.status !== "OK" || !data.results.length || data.results[0].partial_match) {
             return res.json({ success: false, message: "Invalid or incomplete address. Please check street, city, or pincode." });
         }
         const components = data.results[0].address_components;
@@ -215,12 +215,12 @@ const cartAddAddress = async (req, res) => {
 
         const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
         const { data } = await axios.get(url);
-        if(!addressType||!name||!phone&&phone!==altPhone){
-            return res.json({success:false,message:'please fill the field correctly'})
+        if (!addressType || !name || !phone && phone !== altPhone) {
+            return res.json({ success: false, message: 'please fill the field correctly' })
         }
-        if (data.status !== "OK" || !data.results.length||data.results[0].partial_match) {
+        if (data.status !== "OK" || !data.results.length || data.results[0].partial_match) {
             logger.debug(`data:,data`)
-            return res.json({ success: false, message:  "Invalid or incomplete address. Please check street, city, or pincode." });
+            return res.json({ success: false, message: "Invalid or incomplete address. Please check street, city, or pincode." });
         }
         const components = data.results[0].address_components;
 
@@ -259,6 +259,7 @@ const cartAddAddress = async (req, res) => {
     }
 }
 
+
 module.exports = {
     loadAddress,
     loadAddAddress,
@@ -267,5 +268,5 @@ module.exports = {
     loadEditAddress,
     deleteAddress,
     loadcartAddAddress,
-    cartAddAddress
+    cartAddAddress,
 }
