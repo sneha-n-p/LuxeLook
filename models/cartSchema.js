@@ -1,4 +1,3 @@
-const { status } = require("init")
 const mongoose = require("mongoose")
 const {Schema} = mongoose
 
