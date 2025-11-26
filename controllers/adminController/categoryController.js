@@ -38,7 +38,7 @@ const categoryInfo = async (req, res) => {
 
     logger.debug(`Data:${Data}`)
 
-    res.render("Category", {
+    res.render("category", {
       categories: Data,
       currentPage: page,
       totalPages: totalPage,
