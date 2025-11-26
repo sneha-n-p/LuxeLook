@@ -9,6 +9,7 @@ const path = require('path')
 const fs = require('fs')
 const StatusCode = require("../../statusCode")
 const logger = require('../../helpers/logger')
+const cloudinary = require('../../dbConfig/cloudinary')
 
 function generateOtp() {
   logger.debug(`otp`)
@@ -196,41 +197,26 @@ const loadEditProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const userId = req.session.user
-    const { firstName, lastName, phone, gender } = req.body
+    const userId = req.session.user;
 
-    const user = await User.findById(userId)
+    const { firstName, lastName, phone, gender } = req.body;
+    const user = await User.findById(userId);
 
-    user.firstName = firstName
-    user.lastName = lastName
-    user.phone = phone
-    user.gender = gender
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.phone = phone;
+    user.gender = gender;
 
-    if (req.body.croppedImage) {
-      const base64Data = req.body.croppedImage.replace(/^data:image\/\w+;base64,/, '');
-      const buffer = Buffer.from(base64Data, 'base64');
+    await user.save();
 
-      const fileName = `profile_${Date.now()}.png`;
-      const filePath = path.join(__dirname, '../public/uploads/profile', fileName);
-
-      fs.writeFileSync(filePath, buffer);
-
-      if (user.image) {
-        const oldPath = path.join(__dirname, '../public', user.image);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      }
-
-      user.image = '/uploads/profile/' + fileName;
-    }
-    await user.save()
-    res.status(StatusCode.OK).json({ success: true })
-
+    return res.json({ success: true });
 
   } catch (error) {
-    logger.error(error)
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: "server Error" })
+    console.log(error);
+    return res.status(500).json({ message: "Server Error" });
   }
-}
+};
+
 
 const loadChangeEmail = async (req, res) => {
   try {
@@ -502,19 +488,55 @@ const resetPassword = async (req, res) => {
   }
 }
 
-const addProfile = async (req, res) => {
-  try {
-    const userId = req.params.id
-    const imagePath = `/uploads/${req.file.filename}`
-
-    await User.findByIdAndUpdate(userId, { image: imagePath })
-
-    res.status(StatusCode.OK).json({ success: true, imagePath })
-  } catch (error) {
-    logger.error(error)
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Error uploading image' })
-  }
+function getPublicIdFromUrl(imageUrl) {
+  const parts = imageUrl.split("/");
+  const fileName = parts.pop();        // myimage.jpg
+  const folder = parts.slice(parts.indexOf("upload") + 2).join("/"); 
+  return folder.replace(`/${fileName}`, "") + "/" + fileName.split(".")[0];
 }
+
+const uploadCroppedImage = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    const user = await User.findById(userId);
+    if (!user) return res.json({ success: false, message: "User not found" });
+
+    // New file from cropper
+    const file = req.file;
+
+    if (!file) {
+      return res.json({ success: false, message: "No file uploaded" });
+    }
+
+    // DELETE OLD IMAGE FROM CLOUDINARY
+    if (user.image) {
+      try {
+        const publicId = getPublicIdFromUrl(user.image[0])
+        console.log(publicId)
+        await cloudinary.uploader.destroy(publicId,(error,result)=>{
+          if (error) {
+          console.log("Cloudinary delete error:", error);
+        } else {
+          console.log("Cloudinary delete result:", result);
+        }
+        });
+      } catch (err) {
+        console.log("Old image delete failed:", err);
+      }
+    }
+
+    user.image = req.file.path;
+    await user.save();
+
+    return res.json({ success: true, url: user.image });
+
+  } catch (err) {
+    console.error(err);
+    return res.json({ success: false, message: "Server error" });
+  }
+};
+
 
 module.exports = {
   loadForgotPassword,
@@ -532,13 +554,12 @@ module.exports = {
   loadEmailVerifyOtp,
   EmailVerifyOtp,
   loadResetEmail,
-  // resetEmail,
   changePassword,
   changePasswordValid,
   loadPasswordVerifyingOtp,
   PasswordVerifyingOtp,
   loadresetPassword,
   resetPassword,
-  addProfile,
+  uploadCroppedImage,
 
 }

@@ -8,7 +8,7 @@ const orderController = require('../controllers/adminController/orderController'
 const couponController = require('../controllers/adminController/couponController')
 const salesRepoartController = require("../controllers/adminController/salesReportController")
 const dashboardController = require('../controllers/adminController/dashboardController')
-const upload = require("../helpers/multer")
+const upload = require("../middlewares/cloudinaryUpload");
 const { adminAuth, adminAuthCheck } = require('../middlewares/auth')
 
 

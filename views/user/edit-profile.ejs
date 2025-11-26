@@ -404,6 +404,7 @@
               <input type="radio" name="gender" value="Other" <%= user.gender==='Other'?'checked':'' %> class="ms-3"> Other
             </div>
 
+
             <!-- BUTTON BLOCK -->
             <div class="button-block">
               <button type="button" onclick="editProfile()" class="action-btn">Save Changes</button>
@@ -416,41 +417,92 @@
       </div>
     </div>
   </div>
+  <!-- CROP MODAL -->
+<div id="cropModal" class="modal" style="display:none;">
+  <div class="modal-content" style="padding:20px;background:#fff;border-radius:10px;max-width:400px;margin:auto;">
+    <h4>CROP IMAGE</h4>
+    <img id="cropImage" style="width:100%; max-height:300px;"/>
+    <button onclick="cropImageNow()" class="btn btn-primary mt-3">Crop & Save</button>
+    <button onclick="closeCropModal()" class="btn btn-secondary mt-2">Cancel</button>
+  </div>
+</div>
+
 
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
   <script>
-    async function handleImageUpload() {
-      const input = document.getElementById('profileImage');
-      const file = input.files[0];
-      if (!file) return;
+    
+let cropper; 
+let selectedFile;
 
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-      if (!allowedTypes.includes(file.type)) {
-        Swal.fire('Invalid File!', 'Please upload an image (jpg, jpeg, png only).', 'warning');
-        input.value = '';
-        return;
-      }
+// When user selects image
+function handleImageUpload() {
+  const input = document.getElementById("profileImage");
+  const file = input.files[0];
 
-      const formData = new FormData();
-      formData.append('profileImage', file);
+  if (!file) return;
 
-      try {
-        const response = await fetch(`/profile/upload-profile-pic/<%= user._id %>`, {
-          method: 'POST',
-          body: formData
-        });
-        const data = await response.json();
+  selectedFile = file;
 
-        if (data.success) {
-          document.querySelector('.profile-picture').src = data.imagePath;
-          Swal.fire('Success!', 'Profile picture updated successfully.', 'success');
-        } else {
-          Swal.fire('Error!', 'Failed to upload image.', 'error');
-        }
-      } catch (error) {
-        Swal.fire('Error!', 'Something went wrong.', 'error');
-      }
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    document.getElementById("cropImage").src = e.target.result;
+    openCropModal();
+
+    // Wait for image to load before creating cropper
+    setTimeout(() => {
+      if (cropper) cropper.destroy();
+
+      cropper = new Cropper(document.getElementById("cropImage"), {
+        aspectRatio: 1,
+        viewMode: 1,
+        responsive: true,
+      });
+    }, 300);
+  };
+  reader.readAsDataURL(file);
+}
+
+// Open modal
+function openCropModal() {
+  document.getElementById("cropModal").style.display = "block";
+}
+
+// Close modal
+function closeCropModal() {
+  document.getElementById("cropModal").style.display = "none";
+}
+async function cropImageNow() {
+  if (!cropper) return;
+
+  const canvas = cropper.getCroppedCanvas({
+    width: 500,
+    height: 500,
+  });
+
+  canvas.toBlob(async function (blob) {
+    const formData = new FormData();
+    formData.append("profileImage", blob, "cropped.jpg");  // IMPORTANT
+
+    const response = await fetch(`/profile/upload-profile-pic/<%= user._id %>`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      document.querySelector(".profile-picture").src = data.url;
+      Swal.fire("Success!", "Profile updated successfully.", "success");
+      closeCropModal();
+    } else {
+      Swal.fire("Error!", "Upload failed.", "error");
     }
+  }, "image/jpeg", 0.9);
+}
+
+
 
     async function editProfile() {
       const firstName = document.getElementById('firstName').value.trim();
@@ -491,11 +543,14 @@
         return;
       }
 
-      const formData = new FormData();
-      formData.append('firstName', firstName);
-      formData.append('lastName', lastName);
-      formData.append('phone', phone);
-      formData.append('gender', gender);
+      const formData = {
+        firstName,
+        lastName,
+        phone,
+        gender,
+        croppedImage: croppedImageBase64 ?? null
+    };
+
 
       try {
         const response = await axios.post('/profile/edit', formData, {
@@ -516,6 +571,7 @@
         Swal.fire('Something went wrong!', '', 'error');
       }
     }
+
     function toggleDropdown() {
       const drop = document.getElementById("mobileDropdown");
       drop.style.display = drop.style.display === "flex" ? "none" : "flex";

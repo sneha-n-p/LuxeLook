@@ -6,7 +6,7 @@ const path = require("path")
 const sharp = require("sharp")
 const mongoose = require("mongoose")
 const StatusCode = require("../../statusCode")
-const multer = require('multer')
+const cloudinary = require('../../dbConfig/cloudinary')
 const logger = require('../../helpers/logger')
 
 
@@ -173,32 +173,7 @@ const addproduct = async (req, res) => {
   });
 }
 
-    let imagesPaths = [];
-
-    for (let i = 1; i <= 4; i++) {
-      const file = req.files.find(f => f.fieldname === `image${i}`);
-      if (file) {
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!allowedTypes.includes(file.mimetype)) {
-          errors[i] = "Only JPG, JPEG, and PNG images are allowed";
-        } else {
-          const fileName = `product-${Date.now()}-${i}-${file.originalname.replace(/\s+/g, "-")}.webp`;
-          const outputPath = path.join(__dirname, "../../public/uploads/products", fileName);
-
-          try {
-            await sharp(file.path)
-              .resize(800, 800, { fit: 'inside', withoutEnlargement: true })
-              .toFormat("webp")
-              .toFile(outputPath);
-
-            imagesPaths.push(`/uploads/products/${fileName}`);
-          } catch (err) {
-            logger.error(`Image processing error: ${err}`);
-            errors[i] = "Failed to process image";
-          }
-        }
-      }
-    }
+    let imagesPaths = req.files.map((image)=>image.path)
 
     if (imagesPaths.length === 0) {
       errors.image1 = "At least one image is required";
@@ -251,42 +226,82 @@ const editProduct = async (req, res) => {
   }
 }
 
+function getPublicIdFromUrl(imageUrl) {
+  const parts = imageUrl.split("/");
+  const fileName = parts.pop();        // myimage.jpg
+  const folder = parts.slice(parts.indexOf("upload") + 2).join("/"); 
+  return folder.replace(`/${fileName}`, "") + "/" + fileName.split(".")[0];
+}
 const deleteSingleImage = async (req, res) => {
   try {
-    const { imageNameToServer, productIdToServer, imageIndex } = req.body
+    const { imageNameToServer, productIdToServer, imageIndex } = req.body;
 
-    const product = await Product.findById(productIdToServer)
+    const product = await Product.findById(productIdToServer);
     if (!product) {
-      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: "Product not found" })
+      return res.status(StatusCode.NOT_FOUND).json({
+        success: false,
+        message: "Product not found"
+      });
     }
 
-    product.productImage.splice(imageIndex, 1)
+    const imageUrl = product.productImage[imageIndex];
 
+    //  Remove from array
+    product.productImage.splice(imageIndex, 1);
+
+    // Fill with empty strings
     while (product.productImage.length < 4) {
-      product.productImage.push("")
+      product.productImage.push("");
     }
 
-    if (imageNameToServer) {
-      const imagePath = path.join(__dirname, "../../public", imageNameToServer)
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath)
-      }
+    //  Delete from Cloudinary
+    if (imageUrl) {
+      const publicId = getPublicIdFromUrl(imageUrl);
+
+      await cloudinary.uploader.destroy(publicId, (error, result) => {
+        if (error) {
+          console.log("Cloudinary delete error:", error);
+        } else {
+          console.log("Cloudinary delete result:", result);
+        }
+      });
     }
 
-    await product.save()
-    res.status(StatusCode.OK).json({ success: true, message: "Image deleted successfully" })
+    await product.save();
+
+    res.status(StatusCode.OK).json({
+      success: true,
+      message: "Image deleted successfully"
+    });
   } catch (error) {
-    logger.error(error)
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" })
+    logger.error(error);
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Server error"
+    });
   }
-}
+};
+
 
 const postEditProduct = async (req, res) => {
   try {
-    logger.debug('Received body:', req.body);
-    logger.debug('Received files:',req.files)
-
     const productId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Invalid product ID"
+      });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(StatusCode.NOT_FOUND).json({
+        success: false,
+        message: "Product not found"
+      });
+    }
+
     const {
       name,
       description,
@@ -302,71 +317,84 @@ const postEditProduct = async (req, res) => {
       existingImage4
     } = req.body;
 
-    const product = await Product.findById(productId)
-    const findCategory = await Category.findById(category)
-    logger.debug('findCategory:',findCategory)
+    const findCategory = await Category.findById(category);
 
     if (!name || !description || !category || !price || !variantSize || !variantQuantity) {
-      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'All required fields must be provided' });
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "All required fields must be provided"
+      });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid product ID' });
+    
+    const fileMap = {};
+    if (req.files && Object.keys(req.files).length> 0) {
+      for(let img in req.files){
+        console.log(req.files[img])
+        fileMap[img] = req.files[img][0].path
+      }
     }
 
-    const images = [];
+    console.log('fileMap',fileMap)
+    console.log(req.files)
+
+    //  CLOUDINARY IMAGE HANDLING
+    let finalImages = [existingImage1, existingImage2, existingImage3, existingImage4];
+
     for (let i = 1; i <= 4; i++) {
-      if (req.files[`image${i}`]) {
-        images[i - 1] = `/uploads/${req.files[`image${i}`][0].filename}`;
-      } else if (req.body[`existingImage${i}`]) {
-        images[i - 1] = req.body[`existingImage${i}`];
-      } else {
-        images[i - 1] = null;
+      const fieldName = `image${i}`;
+
+      if (fileMap[fieldName]) {
+        const file = fileMap[fieldName];
+        finalImages[i - 1] = file
       }
     }
 
-    const filteredImages = images.filter(img => img !== null);
+    finalImages = finalImages.filter(img => img);
 
-    let variant = []
-    let stock = 0
-    const addVariant = async () => {
-      for (i = 0; i < variantSize.length; i++) {
-        let obj = {
-          size: variantSize[i],
-          salePrice: Number(variantPrice[i]),
-          quantity: Number(variantQuantity[i])
-        }
-        stock += Number(variantQuantity[i])
-        variant.push(obj)
-      }
-    }
-    addVariant()
-
-    let pareseOffer = Number(offer)
-    let parseCAtegoryOffer = Number(findCategory.offer) || 0
-    let previousProductOffer = product.productOffer || 0
-    let previousBestOffer = Math.max(previousProductOffer, parseCAtegoryOffer)
-    if (Array.isArray(variant)) {
-      variant = variant.map(item => {
-        const originalPrice = item.salePrice / (1 - (previousBestOffer / 100))
-        const RoundtheOgPrice = Math.round(originalPrice)
-        return { ...item, salePrice: RoundtheOgPrice }
-      })
+    if (finalImages.length === 0) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "At least one image is required"
+      });
     }
 
-    let bestOffer = Math.max(pareseOffer, parseCAtegoryOffer)
-    if (Array.isArray(variant)) {
-      variant = variant.map(item => {
-        const offerAppliedPrice = item.salePrice - (item.salePrice * bestOffer / 100)
-        const RoundThePrice = Math.round(offerAppliedPrice)
-        return { ...item, salePrice: RoundThePrice }
-      })
+    //  VARIANT PROCESSING
+    
+    let variant = [];
+    let stock = 0;
+
+    for (let i = 0; i < variantSize.length; i++) {
+      const obj = {
+        size: variantSize[i],
+        salePrice: Number(variantPrice[i]),
+        quantity: Number(variantQuantity[i])
+      };
+      stock += Number(variantQuantity[i]);
+      variant.push(obj);
     }
 
+    let parseOffer = Number(offer);
+    let parseCategoryOffer = Number(findCategory.offer) || 0;
 
-    if (filteredImages.length === 0) {
-      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'At least one image is required' });
-    }
+    let previousProductOffer = product.productOffer || 0;
+    let previousBestOffer = Math.max(previousProductOffer, parseCategoryOffer);
+
+    variant = variant.map(item => {
+      const originalPrice = item.salePrice / (1 - previousBestOffer / 100);
+      item.salePrice = Math.round(originalPrice);
+      return item;
+    });
+
+    let bestOffer = Math.max(parseOffer, parseCategoryOffer);
+
+    variant = variant.map(item => {
+      const discounted = item.salePrice * (1 - bestOffer / 100);
+      item.salePrice = Math.round(discounted);
+      return item;
+    });
+
+    //  UPDATE PRODUCT IN DB
 
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
@@ -374,33 +402,34 @@ const postEditProduct = async (req, res) => {
         productName: name,
         description,
         category,
-        productOffer: offer ? parseFloat(offer) : 0,
-        offer: parseFloat(bestOffer) || 0,
+        productOffer: parseFloat(offer) || 0,
+        offer: bestOffer || 0,
         regularPrice: parseFloat(price),
         size: variantSize,
         variant: variant,
         quatity: stock,
-        productImage: filteredImages
+        productImage: finalImages
       },
-      { new: true, runValidators: true }
+      { new: true }
     );
 
-    if (!updatedProduct) {
-      return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
-    }
+    return res.json({
+      success: true,
+      message: "Product updated successfully",
+      product: updatedProduct
+    });
 
-    res.json({ success: true, message: 'Product updated successfully', product: updatedProduct });
   } catch (error) {
-    logger.error(`Error updating product: ${error}`);
-    if (error instanceof multer.MulterError) {
-      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `File upload error: ${error.message}` });
-    }
-    if (error.message.includes('Only JPEG/PNG images are allowed')) {
-      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: error.message });
-    }
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to update product' });
+    logger.error("Error updating product:", error);
+    return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Failed to update product",
+      error: error.message
+    });
   }
-}
+};
+
+
 
 const blockProduct = async (req, res) => {
   try {

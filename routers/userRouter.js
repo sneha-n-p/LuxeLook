@@ -11,7 +11,7 @@ const orderController = require("../controllers/userController/orderController")
 const walletController = require("../controllers/userController/walletController")
 const couponController = require("../controllers/userController/couponController")
 const {userAuth,userAuthCheck} = require('../middlewares/auth')
-const upload = require("../helpers/multer")
+const upload = require("../middlewares/cloudinaryUpload");
 const User = require('../models/userSchema')
 
 
@@ -85,7 +85,7 @@ router.get("/profile/changePassword-otp",userAuth,profileController.loadPassword
 router.post("/profile/changePassword-otp",profileController.PasswordVerifyingOtp)
 router.get("/profile/reset-password",userAuth,profileController.loadresetPassword)
 router.post("/profile/reset-password",userAuth,profileController.resetPassword) 
-router.post('/profile/upload-profile-pic/:id', upload.single('profileImage'),profileController.addProfile)
+router.post('/profile/upload-profile-pic/:id', upload.single('profileImage'),profileController.uploadCroppedImage)
 
 //product Controller//
 

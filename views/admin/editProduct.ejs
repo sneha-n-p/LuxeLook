@@ -293,7 +293,7 @@
             async function deleteSingleImage(imageName, productId, index) {
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
+                    text: 'this image delete from the coudinary',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
@@ -486,6 +486,63 @@
                 const row = button.closest(".variant-row");
                 if (row) row.remove();
             }
+
+            async function cropImage(index) {
+    if (!croppers[index]) {
+        console.error("Cropper not found for index", index);
+        Swal.fire("Error", "No image selected to crop!", "error");
+        return;
+    }
+
+    try {
+        const canvas = croppers[index].getCroppedCanvas({
+            width: 800,
+            height: 800,
+        });
+
+        if (!canvas) {
+            Swal.fire("Error", "Cannot crop this image.", "error");
+            return;
+        }
+
+        const blob = await new Promise((resolve) =>
+            canvas.toBlob(resolve, "image/jpeg", 0.9)
+        );
+
+        const previewContainer = document.querySelector(`.croppedPreview${index}`);
+        previewContainer.innerHTML = "";
+
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(blob);
+        img.className = "w-32 h-32 object-cover rounded shadow mx-auto";
+
+        previewContainer.appendChild(img);
+
+        // Replace the real file input value with cropped blob
+        const fileInput = document.querySelector(`input[name="image${index + 1}"]`);
+        if (fileInput) {
+            const file = new File([blob], `cropped-${Date.now()}.jpg`, {
+                type: "image/jpeg",
+            });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "Image Saved!",
+            text: `Image ${index + 1} cropped and ready to upload.`,
+            timer: 1200,
+            showConfirmButton: false,
+        });
+
+    } catch (error) {
+        console.error("Crop error:", error);
+        Swal.fire("Error", "Failed to crop image", "error");
+    }
+}
+
 
         </script>
 
