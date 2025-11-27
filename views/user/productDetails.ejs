@@ -383,7 +383,7 @@
         return;
       }
 
-      axios.post("/wishlist/addToWishlist", { productId, size })
+      axios.post("/wishlist/addToWishlist", { productId, size },{validateStatus:(status)=>status!==500})
         .then(function (response) {
           if (response.data.success) {
             Swal.fire({
@@ -437,7 +437,7 @@
         return;
       }
 
-      axios.post("/cart/addToCart", { productId, quantity, size })
+      axios.post("/cart/addToCart", { productId, quantity, size },{validateStatus:(status)=>status!==500})
         .then(function (response) {
           if (response.data.success) {
             Swal.fire({
@@ -450,7 +450,7 @@
               console.log("length:", length)
               if (length > 0) {
                 const cartEl = document.getElementById('cartLength');
-                cartEl.innerHTML = length;
+                cartEl.innerText = length;
                 cartEl.style.display = 'inline-block';
               } else {
                 document.getElementById('cartLength').style.display = 'none';

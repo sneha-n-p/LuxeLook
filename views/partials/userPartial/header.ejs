@@ -142,7 +142,7 @@
                         <a class="nav-link <%= activePage === 'cart' ? 'active fw-bold' : '' %>" href="/cart">
                             <i class="fas fa-shopping-cart"></i> Cart
                             <% if (cartCount > 0) { %>
-                                <span class="position-absolute translate-middle badge rounded-pill bg-danger badge-cart">
+                                <span class="position-absolute translate-middle badge rounded-pill bg-danger badge-cart" id="cartLength">
                                     <%= cartCount %>
                                 </span>
                             <% } %>
