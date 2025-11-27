@@ -286,7 +286,7 @@
     const formData = new FormData(form);
 
     try {
-      const response = await axios.post('/admin/Coupons/createCoupon', Object.fromEntries(formData));
+      const response = await axios.post('/admin/Coupons/createCoupon', Object.fromEntries(formData) , {validateStatus:(status)=>status!=500});
 
       if (response.data.success) {
         Swal.fire({
@@ -299,8 +299,8 @@
         });
       } else {
         Swal.fire({
-          icon: 'warning',
-          title: 'Duplicate Coupon',
+          icon: 'error',
+          title: 'Coupon Error',
           text: response.data.message,
           confirmButtonColor: '#6c63ff'
         });
@@ -334,7 +334,7 @@
         showCancelButton: true
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.patch("/admin/Coupons/Unlist-Coupon", { id })
+          axios.patch("/admin/Coupons/Unlist-Coupon", { id } , {validateStatus:(status)=>status!=500})
             .then(function (responce) {
               if (responce.data.success) {
                 Swal.fire({
@@ -360,7 +360,7 @@
         showCancelButton: true
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.patch("/admin/Coupons/list-Coupon", { id })
+          axios.patch("/admin/Coupons/list-Coupon", { id } , {validateStatus:(status)=>status!=500})
             .then(function (responce) {
               if (responce.data.success) {
                 Swal.fire({

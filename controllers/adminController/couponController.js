@@ -34,7 +34,7 @@ const loadCoupon = async (req, res) => {
       search
     })
   } catch (error) {
-    logger.error( `coupon pageee:${error}`)
+    logger.error(`coupon pageee:${error}`)
     res.status(StatusCode.NOT_FOUND).redirect('/admin/pageError')
   }
 }
@@ -46,6 +46,21 @@ const createCoupon = async (req, res) => {
     const existingCoupon = await Coupon.findOne({
       name: { $regex: new RegExp(`^${couponName}$`, 'i') }
     });
+
+    if (couponName.trim() === '') {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Coupon Name Can't Empty"
+      });
+    }
+
+    const numberOnlyPattern = /^[0-9]+$/;
+    if (numberOnlyPattern.test(couponName)) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Coupon Name cannot contain only numbers"
+      });
+    }
 
     if (existingCoupon) {
       return res.json({
@@ -96,7 +111,7 @@ const loadEditCoupon = async (req, res) => {
       findCoupon: formattedCouponData,
     });
   } catch (error) {
-    logger.error( `edit coupon error:${error}`);
+    logger.error(`edit coupon error:${error}`);
     res.status(StatusCode.NOT_FOUND).redirect("/admin/pageerror");
   }
 };
@@ -106,17 +121,32 @@ const updateCoupon = async (req, res) => {
     const { couponId, couponName, startDate, endDate, offerPrice, minimumPrice } = req.body;
     const objectId = new mongoose.Types.ObjectId(couponId);
     const selectedCoupon = await Coupon.findById(objectId);
-    const existingCoupon = await Coupon.findOne({name:couponName});
-    if(existingCoupon&&existingCoupon._id.toString()!==selectedCoupon._id.toString()) return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'Coupon name already exist'})
-      
-      if (!selectedCoupon) {
+    const existingCoupon = await Coupon.findOne({ name: couponName });
+    if (existingCoupon && existingCoupon._id.toString() !== selectedCoupon._id.toString()) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Coupon name already exist' })
+
+    if (!selectedCoupon) {
       logger.info(existingCoupon)
       return res.status(StatusCode.NOT_FOUND).send("Coupon not found");
     }
 
+    if (couponName.trim() === '') {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Coupon Name Can't Empty"
+      });
+    }
+
+    const numberOnlyPattern = /^[0-9]+$/;
+    if (numberOnlyPattern.test(couponName)) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Coupon Name cannot contain only numbers"
+      });
+    }
+
     const startDateObj = new Date(startDate);
     const endDateObj = new Date(endDate);
-    
+
 
     const updatedCoupon = await Coupon.updateOne(
       { _id: objectId },
@@ -132,13 +162,13 @@ const updateCoupon = async (req, res) => {
     );
 
     if (updatedCoupon.modifiedCount > 0) {
-      res.status(StatusCode.CREATED).json({success:true,message:"Coupon updated successfully"});
+      res.status(StatusCode.CREATED).json({ success: true, message: "Coupon updated successfully" });
     } else {
-      res.status(StatusCode.BAD_REQUEST).json({success:false,message:"Coupon update failed"});
+      res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Coupon update failed" });
     }
   } catch (error) {
-    logger.error( `Update coupon error: ${error}`);
-    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({success:false,message:"Server error"});
+    logger.error(`Update coupon error: ${error}`);
+    res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Server error" });
   }
 };
 
