@@ -431,7 +431,7 @@
     <script>
 
         function QuantityIncreament(productId, size) {
-            axios.patch("/cart/Quantity", { productId, size, Action: "increment" })
+            axios.patch("/cart/Quantity", { productId, size, Action: "increment" },{validateStatus:(status)=>status!==500})
                 .then((res) => {
                     if (res.data.success) {
                         const updatedCart = res.data.data;
@@ -490,6 +490,12 @@
                         document.getElementById("subTotal").textContent = `₹${subtotal}`;
                         document.getElementById("finalTotal").textContent = `₹${subtotal}`;
                         console.log('updated CArt:', updatedCart)
+                    }else{
+                        Swal.fire({
+                            icon:'warning',
+                            titile:'Warning',
+                            text:res.data.message
+                        })
                     }
                 })
 
@@ -499,7 +505,7 @@
         }
 
         function QuantityDecrement(productId, size) {
-            axios.patch("/cart/Quantity", { productId, size, Action: 'decrement' })
+            axios.patch("/cart/Quantity", { productId, size, Action: 'decrement' },{validateStatus:(status)=>status!==500})
                 .then((res) => {
                     if (res.data.success) {
                         const updatedCart = res.data.data
@@ -531,6 +537,12 @@
                         document.getElementById("subTotal").textContent = `₹${subtotal}`;
                         document.getElementById("finalTotal").textContent = `₹${subtotal}`;
 
+                    }else{
+                        Swal.fire({
+                            icon:'warning',
+                            titile:'Warning',
+                            text:res.data.message
+                        })
                     }
                 }).catch((err) => {
                     console.error('error in Cart Quantity decrement: ', err);

@@ -120,6 +120,10 @@ const changeCartQuantity = async (req, res) => {
         const cart = await Cart.findOne({ userId })
         const product = await Product.findById(productId)
         let maxLimit;
+
+        if(product.isBlocked){
+            return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'Product Is Blocked By Admin'})
+        }
         product.variant.forEach(v => {
             if (v.size === size) {
 
@@ -174,7 +178,7 @@ const addToCart = async (req, res) => {
         const CarQquantity = parseInt(quantity);
         const productData = await Product.findById(productId);
         const variant = productData.variant.find(v => v.size === size);
-        const stock = variant.stock;
+        const stock = variant.quantity;
 
         if (!variant) {
             return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Invalid product variant" });

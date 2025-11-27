@@ -117,6 +117,7 @@ const loadProductDetails = async (req, res) => {
 
     const recommendedProducts = await Product.find({
       _id: { $ne: product._id },
+      isBlocked:false,
       category: product.category
     }).limit(4);
 

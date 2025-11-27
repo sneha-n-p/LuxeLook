@@ -202,7 +202,7 @@ const updateProfile = async (req, res) => {
     const { firstName, lastName, phone, gender } = req.body;
     const user = await User.findById(userId);
 
-    user.firstName = firstName;
+    user.name = firstName;
     user.lastName = lastName;
     user.phone = phone;
     user.gender = gender;

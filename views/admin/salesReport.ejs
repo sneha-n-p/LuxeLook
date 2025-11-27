@@ -93,7 +93,7 @@
 
     <!-- REPORT SUMMARY -->
     <% if (salesData) { %>
-    <div class="bg-white text-black p-4 rounded-lg mt-6 max-w-6xl mx-auto">
+    <div class="bg-white text-black p-4 rounded-lg mt-6 max-w-6xl mx-auto report-summary">
         <p><strong>Overall Sales Count:</strong> <%= salesData.totalSales %></p>
         <p><strong>Overall Order Amount:</strong> Rs.<%= salesData.totalAmount %></p>
         <p><strong>Overall Discount:</strong> Rs.<%= salesData.totalDiscount.toFixed(2) %></p>
@@ -101,7 +101,7 @@
 
     <!-- DESKTOP TABLE -->
 <div class="desktop-table mt-6 overflow-x-auto max-w-6xl mx-auto rounded-xl shadow-lg">
-    <table class="w-full bg-white text-black border-collapse">
+    <table class="w-full bg-white text-black border-collapse sales-table" >
 
         <thead class="bg-[#1c2b45] text-white">
             <tr>

@@ -385,7 +385,7 @@
 
           <!-- Responsive coupon layout: stacks on small screens -->
           <div class="coupon-input-row mb-2">
-            <input type="text" class="form-control" name="coupon" value='<%= couponApplied ? JSON.stringify(couponApplied) : "" %>' id="couponInput" placeholder="Enter Coupon Code">
+            <input type="text" class="form-control" name="coupon" value='<%= couponApplied ? couponApplied : "" %>' id="couponInput" placeholder="Enter Coupon Code">
           
             <div class="d-flex gap-2">
               <button class="apply-coupon-btn" type="button" id="applyCouponBtn">Apply</button>

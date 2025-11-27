@@ -543,7 +543,7 @@
                 text: result.message,
                 showConfirmButton: true
               }).then(() => {
-                window.location.href = result.redirectUrl;
+                window.location.href = '/cart';
               });
               return;
             }
@@ -578,7 +578,7 @@
                       text: placeOrderResult.message,
                       showConfirmButton: true
                     }).then(() => {
-                      window.location.href = '/cart/checkout';
+                      window.location.href = '/cart';
                     });
                     return;
                   }
@@ -676,7 +676,7 @@
               timer: 2000,
               showConfirmButton: false
             }).then(() => {
-              window.location.href = '/cart/checkout';
+              window.location.href = '/cart';
             });
           }
         } else {

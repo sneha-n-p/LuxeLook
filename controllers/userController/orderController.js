@@ -577,24 +577,24 @@ const razorpay = async (req, res) => {
       const product = item.productId;
       const category = await Category.findById(product.category)
       logger.info(`category,${category}`)
-      if (product.isBlocked) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `${product.productName} Product Blocked By Admin`, redirectUrl: '/cart/checkout' })
-      if (category.status == 'Unlisted') return res.json({ success: false, message: `${category.name} Category Blocked By Admin`, redirectUrl: '/cart/checkout' })
+      if (product.isBlocked) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `${product.productName} Product Blocked By Admin`, redirectUrl: '/cart' })
+      if (category.status == 'Unlisted') return res.json({ success: false, message: `${category.name} Category Blocked By Admin`, redirectUrl: '/cart' })
 
       const variant = product.variant.find(v => v.size === item.size);
 
       if (!variant) {
-        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `Variant not found for ${product.productName}`, redirectUrl: '/cart/checkout' });
+        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `Variant not found for ${product.productName}`, redirectUrl: '/cart' });
       }
 
       if (variant.quantity <= 0) {
-        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `${product.productName} is OUT OF STOCK`, redirectUrl: '/cart/checkout' });
+        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: `${product.productName} is OUT OF STOCK`, redirectUrl: '/cart' });
       }
 
       if (variant.quantity < item.quantity) {
         return res.status(StatusCode.BAD_REQUEST).json({
           success: false,
           message: `Only ${variant.quantity} left for ${product.productName} (${item.size})`,
-          redirectUrl: '/cart/checkout'
+          redirectUrl: '/cart'
         });
       }
     }

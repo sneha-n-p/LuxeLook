@@ -447,7 +447,7 @@
                                     <button class="submit-btn btn-return"
                                         onclick="singleReturned('<%= order._id %>', '<%= item.product._id %>','<%=item.size%>')">RETURN</button>
 
-                                <% } else if (item.status.trim()==='Confirmed' ) { %>
+                                <% } else if (item.status.trim()==='Confirmed' || item.status.trim()==='Pending') { %>
                                     <button class="submit-btn btn-cancel"
                                         onclick="cancelSingleProduct('<%= item.product._id %>', '<%= order._id %>','<%= item.size%>')">CANCEL</button>
 

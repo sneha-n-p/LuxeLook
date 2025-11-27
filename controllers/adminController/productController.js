@@ -42,7 +42,7 @@ const productInfo = async (req, res) => {
       totalProducts = await Product.countDocuments(query);
       totalPage = Math.ceil(totalProducts / limit);
     }
-
+    
     res.render("product", {
       products: Data,
       currentPage: page,
@@ -98,6 +98,13 @@ const addproduct = async (req, res) => {
       errors.price = "Enter a valid price greater than 0";
     }
 
+    const existingProduct = await Product.findOne({productName:{ $regex: new RegExp(`^${ProductName.trim()}$`, "i") }})
+    if(existingProduct){
+       return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Product Name is Already Existing, Try Another Name"
+      });
+    }
 
     let stock = 0
     let variants = [];
@@ -188,9 +195,10 @@ const addproduct = async (req, res) => {
     categories: await Category.find()
   });
 }
+let Description = description.trim()
     const newProduct = new Product({
       productName: ProductName,
-      description,
+      description:Description,
       productOffer: offer,
       quatity: stock,
       size: variants.map(v => v.size),
@@ -326,7 +334,60 @@ const postEditProduct = async (req, res) => {
       });
     }
 
+    if(variantPrice == 0 || variantSize == ''){
+       return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Varients are required"
+      });
+    }
+
+    const existingProduct = await Product.findOne({productName:{ $regex: new RegExp(`^${name.trim()}$`, "i") }})
+    if(existingProduct  && existingProduct._id.toString() !== productId){
+       return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Product Name is Already Existing, Try Another Name"
+      });
+    }
     
+    const clean = description.trim();
+
+    if (clean.length === 0) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Description cannot be empty"
+      });
+    }
+
+    if (clean.length < 5) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Description must be at least 5 characters long"
+      });
+    }
+
+    if (clean.length > 300) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Description cannot exceed 300 characters"
+      });
+    }
+
+    const allowedPattern = /^[A-Za-z0-9 ,.()\-]+$/;
+    if (!allowedPattern.test(clean)) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Description contains invalid characters"
+      });
+    }
+
+    const numberOnlyPattern = /^[0-9]+$/;
+    if (numberOnlyPattern.test(clean)) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Description cannot contain only numbers"
+      });
+    }
+
     const fileMap = {};
     if (req.files && Object.keys(req.files).length> 0) {
       for(let img in req.files){
@@ -395,12 +456,12 @@ const postEditProduct = async (req, res) => {
     });
 
     //  UPDATE PRODUCT IN DB
-
+    let Description = description.trim()
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       {
         productName: name,
-        description,
+        description:Description,
         category,
         productOffer: parseFloat(offer) || 0,
         offer: bestOffer || 0,
