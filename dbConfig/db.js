@@ -6,7 +6,7 @@ const logger = require('../helpers/logger')
 const connectDB = async () => {
     try {
 
-      await mongoose.connect(process.env.MONGODB_URI);
+      await mongoose.connect(process.env.MONGODB_URI,{dbName:'LuxeLook'});
       logger.http('MongoDB Connected');
 
     } catch (err) {
