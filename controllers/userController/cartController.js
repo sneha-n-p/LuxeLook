@@ -120,6 +120,10 @@ const changeCartQuantity = async (req, res) => {
         const cart = await Cart.findOne({ userId })
         const product = await Product.findById(productId)
         let maxLimit;
+
+        if(product.isBlocked){
+            return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'Product Is Blocked By Admin'})
+        }
         product.variant.forEach(v => {
             if (v.size === size) {
 

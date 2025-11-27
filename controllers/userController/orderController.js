@@ -805,8 +805,9 @@ const loadRetryPlaceOrder = async (req, res) => {
   try {
     const { coupon, orderId, paymentMethod } = req.body
     const order = await Order.findById(orderId)
-
+    logger.info(`coupon${coupon}`)
     if (coupon.trim() !== '') {
+
       const applycoupon = await Coupon.findOne({ name: coupon })
       order.discount = applycoupon.offerPrice
       order.couponApplied = coupon
