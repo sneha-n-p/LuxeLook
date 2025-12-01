@@ -21,14 +21,9 @@ const loadHomePage = async (req, res) => {
     try {
         const user = req.session.user;
 
-        const products = await Product.find({ isBlocked: false }).populate('category');
-        const categorys = await Category.find({ status: "Listed" });
-
-        const filteredProducts = products.filter((product) => {
-            return product.category && product.category.status === "Listed"
-        })
-
-        const processedProducts = filteredProducts.map(product => {
+        const products = await Product.find({}).populate('category');
+        
+        const processedProducts = products.map(product => {
             const productOffer = product.offer || 0;
             const categoryOffer = product.category?.offer || 0;
             const bestOffer = Math.max(productOffer, categoryOffer);
@@ -56,12 +51,11 @@ const loadHomePage = async (req, res) => {
             };
         });
 
-        logger.debug(`processedProducts: ${filteredProducts}`)
         if (user) {
             const userData = await User.findById(user);
-            return res.render("home", { user: userData, products: processedProducts, categorys, activePage: "home" });
+            return res.render("home", { user: userData, products: processedProducts, activePage: "home" });
         } else {
-            return res.render("home", { user: null, products: processedProducts, categorys, activePage: "home" });
+            return res.render("home", { user: null, products: processedProducts, activePage: "home" });
         }
 
     } catch (error) {

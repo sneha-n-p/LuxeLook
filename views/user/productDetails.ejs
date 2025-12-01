@@ -311,7 +311,11 @@
 
               <% if (product.quantity===0) { %>
                 <p class="text-danger fw-bold mb-3">Out of Stock</p>
-                <% } %>
+                <% }else if(product.isBlocked){ %>
+                  <p class="text-danger fw-bold mb-3">Product Blocked By Admin</p>
+                  <%} else if(product.category.status == 'Unlisted'){%>
+                    <p class="text-danger fw-bold mb-3">Category Blocked By Admin</p>
+                    <%}%>
                   <p id="stock-warning" class="text-danger fw-bold mb-0" style="display: none;">Only 5 limited quantity
                     of
                     product can be added</p>
@@ -322,9 +326,15 @@
     Add to Wishlist
   </button>
 
-  <button class="action-btn" onclick="addToCart('<%= product._id %>')" <%=product.quantity===0 ? 'disabled' : '' %>>
+  <%if(product.isBlocked || product.category.status === 'Unlisted'){%>
+    <button class="action-btn" disabled>
     Add to Cart
   </button>
+  <%}else{%>
+    <button class="action-btn" onclick="addToCart('<%= product._id %>')" <%=product.quantity===0 ? 'disabled' : '' %>>
+    Add to Cart
+  </button>
+  <%}%>
 </div>
 
         </div>
@@ -450,7 +460,8 @@
               console.log("length:", length)
               if (length > 0) {
                 const cartEl = document.getElementById('cartLength');
-                cartEl.innerText = length;
+                console.log(cartEl)
+                cartEl.innerHTML = length;
                 cartEl.style.display = 'inline-block';
               } else {
                 document.getElementById('cartLength').style.display = 'none';

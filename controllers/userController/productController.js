@@ -20,7 +20,6 @@ const loadShop = async (req, res) => {
     const limit = 8;
 
     const query = {
-      isBlocked: false,
       $or: [
         { productName: { $regex: ".*" + search + ".*", $options: "i" } }
       ]
@@ -64,20 +63,17 @@ const loadShop = async (req, res) => {
       .exec();
     logger.debug('productData:',productData)
 
-    const filteredProducts = productData.filter(
-      (product) => product.category && product.category.status === "Listed"
-    );
-
+   
     const count = await Product.find(query).countDocuments();
     const totalPages = Math.ceil(count / limit);
 
-    const categories = await Category.find({ status: "Listed" });
+    const categories = await Category.find();
 
 
     if (req.session.user) {
       const user = await User.findById(req.session.user);
       res.render("shop", {
-        products: filteredProducts,
+        products: productData,
         user,
         totalPages,
         categories,
@@ -90,7 +86,7 @@ const loadShop = async (req, res) => {
       });
     } else {
       res.render("shop", {
-        products: filteredProducts,
+        products: productData,
         user: null,
         totalPages,
         categories,
@@ -110,14 +106,13 @@ const loadShop = async (req, res) => {
 
 const loadProductDetails = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product || product.isBlocked) {
+    const product = await Product.findById(req.params.id).populate('category');
+    if (!product) {
       return res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound");
     }
 
     const recommendedProducts = await Product.find({
       _id: { $ne: product._id },
-      isBlocked:false,
       category: product.category
     }).limit(4);
 

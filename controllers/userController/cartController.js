@@ -2,7 +2,7 @@ const User = require("../../models/userSchema")
 const Wishlist = require("../../models/wishlistSchema")
 const Wallet = require('../../models/walletSchema')
 const Product = require("../../models/productSchema")
-const Category = require("../../models/cartSchema")
+const Category = require("../../models/categorySchema")
 const Cart = require("../../models/cartSchema")
 const Address = require("../../models/addressSchema")
 const Coupon = require("../../models/couponSchema")
@@ -119,10 +119,16 @@ const changeCartQuantity = async (req, res) => {
         const userId = req.session.user
         const cart = await Cart.findOne({ userId })
         const product = await Product.findById(productId)
+        const category = await Category.findById(product.category)
+        
         let maxLimit;
+        console.log(product.category)
 
         if(product.isBlocked){
             return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'Product Is Blocked By Admin'})
+        }
+        if(category.status == 'Unlisted'){
+            return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'Category Is Blocked By Admin'})
         }
         product.variant.forEach(v => {
             if (v.size === size) {
