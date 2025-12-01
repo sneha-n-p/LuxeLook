@@ -50,7 +50,7 @@ const loadcart = async (req, res) => {
             }, 0);
 
             logger.debug('subTotal:', subTotal)
-
+            logger.info(`item ${items}`)
             res.render("cart", {
                 cart: items,
                 user,

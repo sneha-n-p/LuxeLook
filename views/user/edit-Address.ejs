@@ -494,14 +494,14 @@ const pincodeInput = document.getElementById('pincode');
       hideError('Error5');
     }
 
-    if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
+    if (!/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(phone) ||/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(phone)) {
       showError('Error6', 'Phone must be 10 digits and not all same digits.');
       isValid = false;
     } else {
       hideError('Error6');
     }
 
-    if (altPhone && (!/^\d{10}$/.test(altPhone) || /^(\d)\1{9}$/.test(altPhone) || altPhone === phone)) {
+    if (altPhone && (!/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(altPhone) ||/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(altPhone) || altPhone === phone)) {
       showError('Error7', 'Alternate phone must be 10 digits, not all same digits, and different from primary phone.');
       isValid = false;
     } else {

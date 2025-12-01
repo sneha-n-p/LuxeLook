@@ -8,7 +8,7 @@ const orderController = require('../controllers/adminController/orderController'
 const couponController = require('../controllers/adminController/couponController')
 const salesRepoartController = require("../controllers/adminController/salesReportController")
 const dashboardController = require('../controllers/adminController/dashboardController')
-const upload = require("../middlewares/cloudinaryUpload");
+const {upload,cloudinaryMiddleware} = require("../middlewares/cloudinaryUpload");
 const { adminAuth, adminAuthCheck } = require('../middlewares/auth')
 
 
@@ -43,11 +43,11 @@ router.patch('/categories/edit-category-offer', categoryController.editCategoryO
 
 router.get("/Products", adminAuth, productController.productInfo)
   .get("/Products/add-product", adminAuth, productController.loadAddProduct)
-  .post("/Products/add-product", upload.any(), productController.addproduct)
+  .post("/Products/add-product", upload.any(),cloudinaryMiddleware, productController.addproduct)
   .get("/Products/edit-product/:id", adminAuth, productController.editProduct)
   .post('/Products/edit-product/:id', upload.fields([
     { name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }
-  ]), productController.postEditProduct)
+  ]),cloudinaryMiddleware, productController.postEditProduct)
   .post('/Products/blockProduct', productController.blockProduct)
   .post('/Products/unblockProduct', productController.unblockProduct)
   .post("/Products/deleteImage", productController.deleteSingleImage)

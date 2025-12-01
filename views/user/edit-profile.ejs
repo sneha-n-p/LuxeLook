@@ -532,7 +532,7 @@ async function cropImageNow() {
           return;
         }
       }
-      if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
+      if (!/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(phone) || /^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(phone)) {
         Error4.style.display = 'block';
         Error4.innerHTML = 'Phone number must be 10 digits and not all same digits.';
         return;
