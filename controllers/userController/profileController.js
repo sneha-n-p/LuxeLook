@@ -74,7 +74,14 @@ const loadForgotPassword = async (req, res) => {
 const forgotEmailValid = async (req, res) => {
   try {
     const { email } = req.body
+console.log(req.body)
+    const EmailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|net|org|co|info)$/;
+    if(email == ''||!EmailPattern.test(email)){
+      return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'Enter Valied email',redirectUrl:'/login/forgot-password'})
+    }
+
     const findUser = await User.findOne({ email })
+    console.log(findUser)
     if (findUser) {
       const otp = generateOtp()
       logger.debug(`otp: ${otp}`)
@@ -82,20 +89,27 @@ const forgotEmailValid = async (req, res) => {
       if (emailSent) {
         await OTPModal.create({email:email,otp:otp})
         req.session.email = email
-        res.render('sent-otp')
+        res.status(StatusCode.OK).json({success:true,message:'Email verified Successfully',redirectUrl:'/login/verifying-forgetpass-otp'})
       } else {
-        res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Failed to send OTP,please try again" })
+        res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Failed to send OTP,please try again",redirectUrl:'/login/forgot-password' })
       }
     } else {
-      res.render("forgotPassword", {
-        message: "User with this email dose not exist"
-      })
+      res.status(StatusCode.BAD_REQUEST).json({success:false, message: "User with this email dose not exist",redirectUrl:'/login/forgot-password'})
     }
   } catch (error) {
     logger.error(error)
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
+
+const loadverifyOtp = async(req,res)=>{
+  try {
+    return res.render('sent-otp')
+  } catch (error) {
+    logger.debug(`error in loadVerifing otp:${error}`)
+  }
+}
+
 
 const resendOtp = async (req, res) => {
   try {
@@ -550,6 +564,7 @@ module.exports = {
   loadForgotPassword,
   forgotEmailValid,
   resendOtp,
+  loadverifyOtp,
   verifyOtp,
   loadResetPassword,
   confirmPassword,

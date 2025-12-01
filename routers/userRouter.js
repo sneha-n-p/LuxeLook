@@ -62,6 +62,7 @@ router.get(
 //login forgotpassword
 router.get("/login/forgot-password",userAuthCheck,profileController.loadForgotPassword)
 router.post("/login/forgot-password",profileController.forgotEmailValid)
+router.get("/login/verifying-forgetpass-otp",profileController.loadverifyOtp)
 router.post("/login/verifying-forgetpass-otp",profileController.verifyOtp)
 router.post("/login/send-otp",profileController.resendOtp)
 router.get("/login/reset-password",userAuthCheck,profileController.loadResetPassword)
