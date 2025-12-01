@@ -233,6 +233,12 @@
     </div>
 
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
   const nameID = document.getElementById("name");
   const emailID = document.getElementById("email");
@@ -240,7 +246,6 @@
   const passwordID = document.getElementById("password");
   const CpasswordID = document.getElementById("Cpassword");
   const referalCode = document.getElementById("referalCode");
-  const termsCheckbox = document.getElementById("terms");
 
   const signupError1 = document.getElementById("signupError1");
   const signupError2 = document.getElementById("signupError2");
@@ -269,7 +274,7 @@
 
   function emailValidateChecking() {
     const emailValue = emailID.value.trim();
-const emailPattern = /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|protonmail\.com)$/;
+const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|net|org|co|info)$/;
     if (!emailValue) {
       signupError2.textContent = "Email is required";
       signupError2.style.display = "block";
@@ -285,7 +290,7 @@ const emailPattern = /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|
 
   function phoneValidateChecking() {
     const phoneValue = phoneNum.value.trim();
-    const phoneRegex = /^(?!0{10})\d{10}$/;
+    const phoneRegex =/^(?!.*(\d)\1{9})[6-9]\d{9}$/
     if (!phoneValue) {
       signupError3.textContent = "Phone number is required";
       signupError3.style.display = "block";
@@ -361,14 +366,42 @@ const emailPattern = /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|
     referalCode.addEventListener("blur", referralCodeValidateChecking);
 
     signform.addEventListener("submit", function (e) {
+      e.preventDefault();
       const isNameValid = nameValidateChecking();
       const isEmailValid = emailValidateChecking();
       const isPhoneValid = phoneValidateChecking();
       const isPasswordValid = passwordValidateChecking();
       const isReferralValid = referralCodeValidateChecking();
 
-      if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid || !isReferralValid) {
-        e.preventDefault();
+      if (isNameValid && isEmailValid && isPhoneValid && isPasswordValid && isReferralValid) {
+        const formData = {
+          name : nameID.value,
+          email:emailID.value,
+          phone:phoneNum.value,
+          password:passwordID.value,
+          Cpassword:CpasswordID.value,
+          referalCode:referalCode.value,
+        }
+        axios.post('/signup',formData,{validateStatus:((status)=>status!=500)})
+        .then((res)=>{
+          if(!res.data.success){
+          Swal.fire({
+            icon :'error',
+            title:'Error',
+            text:res.data.message
+          }).then(()=>{
+            window.location.href = res.data.redirectUrl
+          })
+        }else{
+          Swal.fire({
+            icon:'success',
+            title:'Success',
+            text:res.data.message
+          }).then(()=>{
+            window.location.href = res.data.redirectUrl
+          })
+        }
+        })
       }
     });
   });

@@ -10,6 +10,7 @@ const fs = require('fs')
 const StatusCode = require("../../statusCode")
 const logger = require('../../helpers/logger')
 const cloudinary = require('../../dbConfig/cloudinary')
+const OTPModal = require("../../models/otpSchema")
 
 function generateOtp() {
   logger.debug(`otp`)
@@ -73,28 +74,42 @@ const loadForgotPassword = async (req, res) => {
 const forgotEmailValid = async (req, res) => {
   try {
     const { email } = req.body
+console.log(req.body)
+    const EmailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|net|org|co|info)$/;
+    if(email == ''||!EmailPattern.test(email)){
+      return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'Enter Valied email',redirectUrl:'/login/forgot-password'})
+    }
+
     const findUser = await User.findOne({ email })
+    console.log(findUser)
     if (findUser) {
       const otp = generateOtp()
       logger.debug(`otp: ${otp}`)
       const emailSent = await sendVarificationEmail(email)
       if (emailSent) {
-        req.session.userOtp = otp
+        await OTPModal.create({email:email,otp:otp})
         req.session.email = email
-        res.render('sent-otp')
+        res.status(StatusCode.OK).json({success:true,message:'Email verified Successfully',redirectUrl:'/login/verifying-forgetpass-otp'})
       } else {
-        res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Failed to send OTP,please try again" })
+        res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Failed to send OTP,please try again",redirectUrl:'/login/forgot-password' })
       }
     } else {
-      res.render("forgotPassword", {
-        message: "User with this email dose not exist"
-      })
+      res.status(StatusCode.BAD_REQUEST).json({success:false, message: "User with this email dose not exist",redirectUrl:'/login/forgot-password'})
     }
   } catch (error) {
     logger.error(error)
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
   }
 }
+
+const loadverifyOtp = async(req,res)=>{
+  try {
+    return res.render('sent-otp')
+  } catch (error) {
+    logger.debug(`error in loadVerifing otp:${error}`)
+  }
+}
+
 
 const resendOtp = async (req, res) => {
   try {
@@ -105,7 +120,7 @@ const resendOtp = async (req, res) => {
 
     const email = req.session.email
     const newOtp = generateOtp()
-    req.session.userOtp = newOtp
+    await OTPModal.create({email:email,otp:newOtp})
     logger.debug(`newOtp:${newOtp}`)
     const emailSent = await sendVarificationEmail(email, newOtp)
 
@@ -123,7 +138,10 @@ const resendOtp = async (req, res) => {
 
 const verifyOtp = async (req, res) => {
   const { otp } = req.body
-  if (req.session.userOtp === otp) {
+  const email = req.session.email
+  const OTP = await OTPModal.findOne({email:email})
+  logger.info(`${OTP} sunn`)
+  if (OTP.otp == otp) {
     res.status(StatusCode.OK).json({ success: true, redirectUrl: "/login/reset-password" })
   } else {
     return res.render('send-otp', { error: "Invalid OTP" })
@@ -265,8 +283,7 @@ const changeEmailValidation = async (req, res) => {
     const userExist = await User.findById(userId);
     logger.info(`userExist: ${userExist}`);
 
-    const emailPattern = /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|protonmail\.com)$/;
-
+    const emailPattern =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|net|org|co|info)$/;
     if (!userExist) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "User not found" });
     if (!emailPattern.test(newEmail)) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Please enter an valid mail' })
 
@@ -280,7 +297,7 @@ const changeEmailValidation = async (req, res) => {
       logger.debug(newEmail)
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Email is already in use" });
     }
-    
+
     if (userExist.email !== newEmail) {
       const otp = generateOtp();
       logger.debug(`otp: ${otp}`);
@@ -288,12 +305,12 @@ const changeEmailValidation = async (req, res) => {
       const emailSent = await sendVarificationEmail(newEmail, otp);
       if (emailSent) {
         logger.debug('email sended')
-        req.session.userOtp = otp;
+        await OTPModal.create({email:newEmail,otp:otp})
         req.session.userData = req.body;
         req.session.email = newEmail;
         logger.debug(`Email Sent: ${newEmail}`);
         logger.debug(`OTP: ${otp}`);
-        return res.status(StatusCode.OK).json({success:true,redirectUrl:'/change-email-otp'})
+        return res.status(StatusCode.OK).json({ success: true, redirectUrl: '/change-email-otp' })
       } else {
         res.status(StatusCode.OK).json("email-error");
       }
@@ -314,35 +331,37 @@ const changeEmailValidation = async (req, res) => {
 
 const EmailVerifyOtp = async (req, res) => {
   const { otp } = req.body
-  
+  logger.info('duck')
+  const newEmail = req.session.email
+  const OTP = await OTPModal.findOne({email:newEmail})
+  logger.info(`${otp} sunn`)
   logger.debug('otp coming:', otp)
-  logger.debug('req.session.userOtp:', req.session.userOtp)
-  
-  if (req.session.userOtp === otp) {
+  logger.debug(OTP.otp === otp)
+
+  if (OTP.otp == otp) {
     const userId = req.session.user
     const userData = await User.findById(userId)
-    const newEmail = req.session.email
     // if (userData === req.session.userData) {
-      logger.debug('verified')
-      userData.email = newEmail
-      const saved = await userData.save()
-      if (saved) {
-        logger.debug('done')
-        return res.json({ success: true, redirectUrl: '/profile' })
-      }
-      res.json({ success: true, redirectUrl: '/pageNotfound' })
-      // }
-    } else {
-      return res.render('change-email-otp', { success: false, user: null, message: "Invalid OTP" })
+    logger.debug('verified')
+    userData.email = newEmail
+    const saved = await userData.save()
+    if (saved) {
+      logger.debug('done')
+      return res.json({ success: true, redirectUrl: '/profile' })
     }
-  };
-  
-  const loadResetEmail = async (req, res) => {
-    try {
-      const userId = req.session.user
-      const user = await User.findById(userId)
-      const {currentEmail} = req.body
-      const emailPattern = /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|protonmail\.com)$/;
+    res.json({ success: true, redirectUrl: '/pageNotfound' })
+    // }
+  } else {
+    return res.render('change-email-otp', { success: false, user: null, message: "Invalid OTP" })
+  }
+};
+
+const loadResetEmail = async (req, res) => {
+  try {
+    const userId = req.session.user
+    const user = await User.findById(userId)
+    const { currentEmail } = req.body
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|net|org|co|info)$/;
 
     if (!user) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "User not found" });
     if (!emailPattern.test(currentEmail)) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Please enter an valid mail' })
@@ -351,7 +370,7 @@ const EmailVerifyOtp = async (req, res) => {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: " email should be the same as the existing email" });
     }
     console.log('duck')
-    res.status(StatusCode.OK).json({success:true,redirectUrl:'/profile/reset-email'})
+    res.status(StatusCode.OK).json({ success: true, redirectUrl: '/profile/reset-email' })
   } catch (error) {
     logger.error(error)
     res.status(StatusCode.NOT_FOUND).redirect("/pageNotFound")
@@ -394,8 +413,7 @@ const changePasswordValid = async (req, res) => {
       const otp = generateOtp()
       const emailSent = await sendVarificationEmail(currentEmail, otp)
       if (emailSent) {
-
-        req.session.userOtp = otp
+        await OTPModal.create({email:currentEmail,otp:otp})
         req.session.userDate = req.body
         req.session.email = currentEmail
         res.render("change-password-otp")
@@ -433,9 +451,11 @@ const loadPasswordVerifyingOtp = async (req, res) => {
 const PasswordVerifyingOtp = async (req, res) => {
   const { otp } = req.body
   logger.debug('otp coming:', otp)
-  logger.debug('req.session.userOtp:', req.session.userOtp)
+  const email = req.session.email
+  const OTP = await OTPModal.findOne({email:email})
+  logger.debug(`OTP:, ${otp}`)
 
-  if (req.session.userOtp === otp) {
+  if (OTP.otp == otp) {
     res.status(StatusCode.OK).json({ success: true, redirectUrl: "/profile/reset-password" })
   } else {
     return res.status(StatusCode.BAD_REQUEST).json({ success: false, user: null, message: "Invalid OTP" })
@@ -490,15 +510,15 @@ const resetPassword = async (req, res) => {
 
 function getPublicIdFromUrl(imageUrl) {
   const parts = imageUrl.split("/");
-  const fileName = parts.pop();        // myimage.jpg
-  const folder = parts.slice(parts.indexOf("upload") + 2).join("/"); 
+  const fileName = parts.pop();
+  const folder = parts.slice(parts.indexOf("upload") + 2).join("/");
   return folder.replace(`/${fileName}`, "") + "/" + fileName.split(".")[0];
 }
 
 const uploadCroppedImage = async (req, res) => {
   try {
     const userId = req.params.id;
-    
+
     const user = await User.findById(userId);
     if (!user) return res.json({ success: false, message: "User not found" });
 
@@ -509,20 +529,22 @@ const uploadCroppedImage = async (req, res) => {
       return res.json({ success: false, message: "No file uploaded" });
     }
 
-    // DELETE OLD IMAGE FROM CLOUDINARY
-    if (user.image) {
+    if (user.image && user.image[0]) {
       try {
-        const publicId = getPublicIdFromUrl(user.image[0])
-        console.log(publicId)
-        await cloudinary.uploader.destroy(publicId,(error,result)=>{
-          if (error) {
-          console.log("Cloudinary delete error:", error);
+        const publicId = getPublicIdFromUrl(user.image[0]);
+
+        console.log("Deleting:", publicId);
+
+        const result = await cloudinary.uploader.destroy(publicId);
+
+        if (result.result === "ok") {
+          console.log("Image deleted:", result);
         } else {
-          console.log("Cloudinary delete result:", result);
+          console.log("Image delete failed:", result);
         }
-        });
+
       } catch (err) {
-        console.log("Old image delete failed:", err);
+        console.log("Cloudinary delete error:", err);
       }
     }
 
@@ -542,6 +564,7 @@ module.exports = {
   loadForgotPassword,
   forgotEmailValid,
   resendOtp,
+  loadverifyOtp,
   verifyOtp,
   loadResetPassword,
   confirmPassword,

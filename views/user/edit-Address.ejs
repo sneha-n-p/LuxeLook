@@ -401,6 +401,12 @@
     </div>
   </div>
 </div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Axios for AJAX requests -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<!-- SweetAlert2 for alerts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
   const editAddressForm = document.getElementById('editAddressForm');
@@ -494,14 +500,14 @@ const pincodeInput = document.getElementById('pincode');
       hideError('Error5');
     }
 
-    if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone)) {
+    if (!/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(phone) ||/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(phone)) {
       showError('Error6', 'Phone must be 10 digits and not all same digits.');
       isValid = false;
     } else {
       hideError('Error6');
     }
 
-    if (altPhone && (!/^\d{10}$/.test(altPhone) || /^(\d)\1{9}$/.test(altPhone) || altPhone === phone)) {
+    if (altPhone && (!/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(altPhone) ||/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(altPhone) || altPhone === phone)) {
       showError('Error7', 'Alternate phone must be 10 digits, not all same digits, and different from primary phone.');
       isValid = false;
     } else {
@@ -571,12 +577,6 @@ const pincodeInput = document.getElementById('pincode');
     }
 </script>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Axios for AJAX requests -->
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<!-- SweetAlert2 for alerts -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <%- include("../../views/partials/userPartial/footer") %>
   <!-- MOBILE OFFCANVAS SIDEBAR -->

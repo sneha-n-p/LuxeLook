@@ -21,14 +21,9 @@ const loadHomePage = async (req, res) => {
     try {
         const user = req.session.user;
 
-        const products = await Product.find({ isBlocked: false }).populate('category');
-        const categorys = await Category.find({ status: "Listed" });
-
-        const filteredProducts = products.filter((product) => {
-            return product.category && product.category.status === "Listed"
-        })
-
-        const processedProducts = filteredProducts.map(product => {
+        const products = await Product.find({}).populate('category');
+        
+        const processedProducts = products.map(product => {
             const productOffer = product.offer || 0;
             const categoryOffer = product.category?.offer || 0;
             const bestOffer = Math.max(productOffer, categoryOffer);
@@ -56,12 +51,11 @@ const loadHomePage = async (req, res) => {
             };
         });
 
-        logger.debug(`processedProducts: ${filteredProducts}`)
         if (user) {
             const userData = await User.findById(user);
-            return res.render("home", { user: userData, products: processedProducts, categorys, activePage: "home" });
+            return res.render("home", { user: userData, products: processedProducts, activePage: "home" });
         } else {
-            return res.render("home", { user: null, products: processedProducts, categorys, activePage: "home" });
+            return res.render("home", { user: null, products: processedProducts, activePage: "home" });
         }
 
     } catch (error) {
@@ -114,18 +108,18 @@ const postSignup = async (req, res) => {
     try {
 
         const { name, email, phone, password, Cpassword, referalCode } = req.body
-
+        console.log(req.body)
 
         if (!name || !email || !phone || !password || !Cpassword) {
-            return res.render('signup', { message: 'Please fill the fields' })
+            return res.status(StatusCode.BAD_REQUEST).json({success:false,message: 'Please fill the fields',redirectUrl:'/signup' })
         }
 
         if (password !== Cpassword) {
-            return res.render("signup", { message: "password do not match" })
+             return res.status(StatusCode.BAD_REQUEST).json({success:false, message: "password do not match",redirectUrl:'/signup' })
         }
         const findUser = await User.findOne({ email })
         if (findUser) {
-            return res.render("signup", { message: " User with this email already exist" })
+            return res.status(StatusCode.BAD_REQUEST).json({success:false, message: " User with this email already exist ,Please Login" ,redirectUrl:'/login'})
         }
 
         const otp = generateOtp()
@@ -136,7 +130,7 @@ const postSignup = async (req, res) => {
         req.session.userOtp = otp
         req.session.userData = { name, phone, email, password, referalCode }
 
-        res.render('signupOtp')
+        res.status(StatusCode.OK).json({success:true,message:'signUp SuccessFully',redirectUrl:'/signup/verify-otp'})
         logger.debug(`OTP sent ${otp}`)
 
     } catch (error) {
@@ -206,6 +200,16 @@ const securePassword = async (password) => {
         logger.error(error)
     }
 }
+
+const getSignupOTP =async(req,res)=>{
+    try {
+        res.render('signupOtp')
+    } catch (error) {
+        logger.debug(`error in render signupOtp page `,error)
+        res.status(StatusCode.NOT_FOUND).redirect('/pageNotFound')
+    }
+}
+
 const verifyOtp = async (req, res) => {
     try {
         const { otp } = req.body;
@@ -364,10 +368,11 @@ module.exports = {
     loadShopping,
     loadSignup,
     postSignup,
+    getSignupOTP,
     verifyOtp,
     resendOtp,
     loadLogin,
     postLogin,
     logout,
-    sample
+    sample,
 } 

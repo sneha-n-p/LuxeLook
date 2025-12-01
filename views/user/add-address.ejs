@@ -446,6 +446,8 @@
     </div>
   </div>
 
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const addAddressForm = document.getElementById('addAddressForm');
     const phoneInput = document.getElementById('phone')
@@ -545,7 +547,7 @@
       // PHONE
       phone = phone.replace(/\s+/g, '');
       phone = phone.replace(/^\+?91/, '');
-      if (!/^\d{10}$/.test(phone) || /^(\d)\1{9}$/.test(phone) || phone.startsWith('0')) {
+      if (!/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(phone) || /^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(phone) || phone.startsWith('0')) {
         showError('Error6', 'Phone must be 10 digits, not all same, and not start with 0.');
         isValid = false;
       } else {
@@ -553,7 +555,7 @@
       }
 
       // ALT PHONE
-      if (altPhone && (!/^\d{10}$/.test(altPhone) || /^(\d)\1{9}$/.test(altPhone) || altPhone === phone)) {
+      if (altPhone && (!/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(altPhone) ||/^(?!.*(\d)\1{9})[6-9]\d{9}$/.test(altPhone) || altPhone === phone)) {
         showError('Error7', 'Alternate phone must be valid, different from primary.');
         isValid = false;
       } else {
@@ -606,8 +608,6 @@
 
   </script>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <%- include("../../views/partials/userPartial/footer") %>
    <!-- MOBILE OFFCANVAS SIDEBAR -->
