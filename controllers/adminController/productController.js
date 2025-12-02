@@ -172,11 +172,37 @@ const addproduct = async (req, res) => {
         categories: await Category.find()
       });
     }
+    console.log('sarasu',req.files)
+    const fileMap = {};
+    if (req.files && Object.keys(req.files).length > 0) {
+      for (let img in req.files) {
+        console.log(req.files[img])
+        fileMap[img] = req.files[img][0].path
+      }
+    }
 
-    let imagesPaths = req.files.map((image) => image.path)
+    console.log('fileMap', fileMap)
+    console.log(req.files)
 
-    if (imagesPaths.length === 0) {
-      return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'At least one image is required'})
+    //  CLOUDINARY IMAGE HANDLING
+    let finalImages =[]
+
+    for (let i = 1; i <= 4; i++) {
+      const fieldName = `image${i}`;
+
+      if (fileMap[fieldName]) {
+        const file = fileMap[fieldName];
+        finalImages[i - 1] = file
+      }
+    }
+
+    finalImages = finalImages.filter(img => img);
+
+    if (finalImages.length === 0) {
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "At least one image is required"
+      });
     }
 
     let Description = description.trim()
@@ -189,7 +215,7 @@ const addproduct = async (req, res) => {
       category: categoryDoc._id,
       offer: parseFloat(bestOffer) || 0,
       regularPrice: parseFloat(price),
-      productImage: imagesPaths,
+      productImage: finalImages,
       variant: variants
     });
 
@@ -197,11 +223,7 @@ const addproduct = async (req, res) => {
     return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });
   } catch (error) {
     logger.error(`Error adding product: ${error}`);
-    return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("addProduct", {
-      message: "Failed to add product. Please try again.",
-      categories: await Category.find(),
-      formData: req.body
-    });
+    return res.status(StatusCode.INTERNAL_SERVER_ERROR).json( {success:false, message: "Failed to add product. Please try again.",error:error });
   }
 
 }
