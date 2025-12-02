@@ -244,6 +244,7 @@ const deleteSingleImage = async (req, res) => {
 
     const imageUrl = product.productImage[imageIndex];
 
+
     //  Remove from array
     product.productImage.splice(imageIndex, 1);
 
@@ -328,6 +329,10 @@ const postEditProduct = async (req, res) => {
         success: false,
         message: "Varients are required"
       });
+    }
+
+    for(let i=0;i<variantPrice;i++){
+      if(variantPrice[i] > price) return res.status(StatusCode.BAD_REQUEST).json({message:'SalePrice must be less than RegularPrice'})
     }
 
     const existingProduct = await Product.findOne({ productName: { $regex: new RegExp(`^${name.trim()}$`, "i") } })

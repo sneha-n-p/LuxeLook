@@ -31,17 +31,16 @@
                         <!-- Product Name -->
                         <div>
                             <label class="block text-sm font-medium mb-1">Product Name:</label>
-                            <p id="name-error" class="text-red-400 text-sm mb-1"></p>
                             <input type="text"
                                 class="form-control w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
                                 id="name" name="name" value="<%=product.productName%>" pattern="^[A-Za-z ]+$"
                                 title="Only alphabets and spaces allowed." maxlength="100" />
+                            <p id="name-error" class="text-red-400 text-sm mb-1"></p>
                         </div>
 
                         <!-- Category -->
                         <div>
                             <label class="block text-sm font-medium mb-1">Product Category:</label>
-                            <p id="category-error" class="text-red-400 text-sm mb-1"></p>
                             <select
                                 class="form-select w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
                                 id="category" name="category">
@@ -53,37 +52,38 @@
                                     </option>
                                     <% }) %>
                             </select>
+                            <p id="category-error" class="text-red-400 text-sm mb-1"></p>
                         </div>
 
                         <!-- Description (span both columns) -->
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium mb-1">Product Description:</label>
-                            <p id="description-error" class="text-red-400 text-sm mb-1"></p>
                             <textarea
                                 class="form-control w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
                                 id="description" name="description" rows="3" pattern="^[A-Za-z]+$"
                                 title="Only alphabets allowed, no spaces or numbers."
                                 maxlength="100"><%= product.description %></textarea>
+                            <p id="description-error" class="text-red-400 text-sm mb-1"></p>
                         </div>
 
                         <!-- Offer -->
                         <div>
                             <label class="block text-sm font-medium mb-1">Offer (%):</label>
-                            <p id="offer-error" class="text-red-400 text-sm mb-1"></p>
                             <input type="number"
                                 class="form-control w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
                                 id="offer" value="<%=product.productOffer%>" name="offer" min="0" max="99"
                                 placeholder="Optional" />
+                            <p id="offer-error" class="text-red-400 text-sm mb-1"></p>
                         </div>
 
                         <!-- Price -->
                         <div>
                             <label class="block text-sm font-medium mb-1">Price</label>
-                            <p id="price-error" class="text-red-400 text-sm mb-1"></p>
                             <input type="number"
                                 class="form-control w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
                                 id="price" value="<%=product.regularPrice%>" name="price" min="0"
                                 placeholder="Greater than SalesPrice" />
+                            <p id="price-error" class="text-red-400 text-sm mb-1"></p>
                         </div>
 
                     </div> <!-- end grid -->
@@ -95,41 +95,59 @@
                         <div id="variant-container" class="space-y-3">
                             <% if (product.variant && product.variant.length> 0) { %>
                                 <% product.variant.forEach((v, i)=> { %>
-                                    <div class="variant-row grid grid-cols-3 gap-3 items-center mb-3"
-                                        data-index="<%= i %>">
-                                        <input type="text" name="variantSize[]"
-                                            class="form-control p-3 rounded bg-white text-black outline-none"
-                                            value="<%= v.size %>" placeholder="Size" />
-                                        <input type="number" name="variantPrice[]"
-                                            class="form-control p-3 rounded bg-white text-black outline-none"
-                                            value="<%= v.salePrice %>" placeholder="Sales Price" />
-                                        <div class="flex items-center gap-2">
+                                    <div class="grid grid-cols-3 gap-3 items-center" data-index="<%= i %>">
+                                        <div>
+                                            <input type="text" name="variantSize[]"
+                                                class="form-control p-3 rounded bg-white text-black outline-none"
+                                                value="<%= v.size %>" placeholder="Size" />
+                                            <span id="variantSize-error-1"
+                                                class="text-red-400 text-sm error-message"></span>
+                                        </div>
+                                        <div>
+                                            <input type="number" name="variantPrice[]"
+                                                class="form-control p-3 rounded bg-white text-black outline-none"
+                                                value="<%= v.salePrice %>" placeholder="Sales Price" />
+                                            <span id="variantPrice-error-1"
+                                                class="text-red-400 text-sm error-message"></span>
+                                        </div>
+                                        <div>
                                             <input type="number" name="variantQuantity[]"
                                                 class="form-control p-3 rounded bg-white text-black outline-none"
                                                 value="<%= v.quantity %>" placeholder="Stock" />
-                                            </div>
-                                            <button type="button"
-                                                class="btn btn-danger bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
-                                                onclick="removeVariant(this)">Remove</button>
+                                            <span id="variantQuantity-error-1"
+                                                class="text-red-400 text-sm error-message"></span>
+                                        </div>
+                                        <button type="button"
+                                            class="btn btn-danger bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
+                                            onclick="removeVariant(this)">Remove</button>
                                     </div>
                                     <% }) %>
                                         <% } else { %>
-                                            <div class="variant-row grid grid-cols-3 gap-3 items-center mb-3"
-                                                data-index="0">
-                                                <input type="text" name="variantSize[]"
-                                                    class="form-control p-3 rounded bg-white text-black outline-none"
-                                                    placeholder="Size" />
-                                                <input type="number" name="variantPrice[]"
-                                                    class="form-control p-3 rounded bg-white text-black outline-none"
-                                                    placeholder="Sales Price" />
-                                                <div class="flex items-center gap-2">
+                                            <div class="grid grid-cols-3 gap-3 items-center" data-index="0">
+                                                <div>
+                                                    <input type="text" name="variantSize[]"
+                                                        class="form-control p-3 rounded bg-white text-black outline-none"
+                                                        placeholder="Size" />
+                                                    <span id="variantSize-error-1"
+                                                        class="text-red-400 text-sm error-message"></span>
+                                                </div>
+                                                <div>
+                                                    <input type="number" name="variantPrice[]"
+                                                        class="form-control p-3 rounded bg-white text-black outline-none"
+                                                        placeholder="Sales Price" />
+                                                    <span id="variantPrice-error-1"
+                                                        class="text-red-400 text-sm error-message"></span>
+                                                </div>
+                                                <div>
                                                     <input type="number" name="variantQuantity[]"
                                                         class="form-control p-3 rounded bg-white text-black outline-none"
                                                         placeholder="Stock" />
-                                                    </div>
-                                                    <button type="button"
-                                                        class="btn btn-danger bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
-                                                        onclick="removeVariant(this)">Remove</button>
+                                                    <span id="variantQuantity-error-1"
+                                                        class="text-red-400 text-sm error-message"></span>
+                                                </div>
+                                                <button type="button"
+                                                    class="btn btn-danger bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded"
+                                                    onclick="removeVariant(this)">Remove</button>
                                             </div>
                                             <% } %>
                         </div>
@@ -227,8 +245,122 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>
-
+            let variantCount = 0
             let croppers = [];
+
+            function clearErrorMessages() {
+                const errorElements = document.querySelectorAll(".error-message");
+                errorElements.forEach((el) => {
+                    el.textContent = "";
+                    el.style.display = "none";
+                });
+            }
+
+            function displayErrorMessage(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                console.log(errorElement)
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = "block";
+                }
+            }
+
+            function validateForm() {
+                clearErrorMessages();
+                let isValid = true;
+
+                const name = document.getElementById("name").value.trim();
+                console.log(name)
+                const description = document.getElementById("description").value.trim();
+                const category = document.getElementById("category").value;
+                const offer = document.getElementById("offer").value.trim();
+                const price = document.getElementById("price").value.trim();
+                const variant = document.getElementById("variant-container");
+
+                const namePattern = /^[A-Za-z ,.-]+$/;
+                const numberPattern = /^\d+(\.\d{1,2})?$/;
+
+                if (!name) {
+                    displayErrorMessage("name-error", "Product name is required");
+                    isValid = false;
+                } else if (!namePattern.test(name)) {
+                    displayErrorMessage("name-error", "Only alphabets and spaces allowed");
+                    isValid = false;
+                }
+
+                if (!description) {
+                    displayErrorMessage("description-error", "Description is required");
+                    isValid = false;
+                } else if (!namePattern.test(description)) {
+                    displayErrorMessage("description-error", "Only alphabets and spaces allowed");
+                    isValid = false;
+                }
+                if (!category) {
+                    displayErrorMessage("category-error", "Please select a category");
+                    isValid = false;
+                }
+                if (offer) {
+                    const numOffer = parseInt(offer);
+                    if (isNaN(numOffer) || numOffer < 0 || numOffer > 99) {
+                        displayErrorMessage("offer-error", "Offer must be a number between 0 and 99");
+                        isValid = false;
+                    }
+                }
+
+                if (!price) {
+                    displayErrorMessage("price-error", "Price is required");
+                    isValid = false;
+                } else if (!numberPattern.test(price) || parseFloat(price) <= 0) {
+                    displayErrorMessage("price-error", "Enter a valid price greater than 0");
+                    isValid = false;
+                }
+
+                // Variant validations
+                const variantSizes = document.getElementsByName("variantSize[]");
+                const variantSalePrices = document.getElementsByName("variantPrice[]");
+                const variantQuantities = document.getElementsByName("variantQuantity[]");
+
+                for (let i = 0; i < variantSizes.length; i++) {
+                    const size = variantSizes[i].value.trim();
+                    const salePrice = variantSalePrices[i].value.trim();
+                    const quantity = variantQuantities[i].value.trim();
+
+                    if (!size) {
+                        displayErrorMessage(`variantSize-error-${i + 1}`, "Size is required");
+                        isValid = false;
+                    }
+                    if (!salePrice || !numberPattern.test(salePrice) || parseFloat(salePrice) <= 0) {
+                        displayErrorMessage(`variantPrice-error-${i + 1}`, "Valid sale price required");
+                        isValid = false;
+                    }
+                    if (!quantity || isNaN(quantity) || parseInt(quantity) < 0) {
+                        displayErrorMessage(`variantQuantity-error-${i + 1}`, "Valid quantity required");
+                        isValid = false;
+                    }
+                }
+                let imageUploaded = false;
+
+                for (let i = 0; i < 4; i++) {
+
+                    const existing = document.querySelector(`input[name="existingImage${i + 1}"]`);
+
+                    const fileInput = document.querySelector(`input[name="image${i + 1}"]`);
+                    const fileSelected = fileInput && fileInput.files && fileInput.files.length > 0;
+
+                    const cropped = document.querySelector(`.croppedPreview${i} img`);
+
+                    if (existing || fileSelected || cropped) {
+                        imageUploaded = true;
+                        break;
+                    }
+                }
+
+                if (!imageUploaded) {
+                    displayErrorMessage("image1-error", "Please upload at least one image");
+                    isValid = false;
+                }
+                return isValid;
+            }
 
             function previewImage(event, index) {
                 const input = event.target;
@@ -441,6 +573,14 @@
                 }
 
                 try {
+                    if (!validateForm()) {
+                        Swal.fire({
+                            title: 'Warning',
+                            icon: 'warning',
+                            text: 'Fix the above errors'
+                        })
+                        return
+                    }
                     console.log('Submitting to:', this.action);
                     const response = await fetch(this.action, {
                         method: 'POST',
@@ -458,7 +598,11 @@
                             icon: 'success'
                         }).then(() => window.location.href = '/admin/products');
                     } else {
-                        Swal.fire('Warnning', data.message || 'Failed to update product.', 'Warnning');
+                        Swal.fire({
+                            title:'Warning',
+                            text:data.message,
+                            icon:'warning'
+                        });
                     }
                 } catch (error) {
                     console.error('Submission error:', error);
@@ -467,16 +611,28 @@
             });
 
             function addVariant() {
+                variantCount++
                 const container = document.getElementById("variant-container");
                 const index = container.children.length;
                 const newVariant = document.createElement("div");
                 newVariant.className = "variant-row mb-3";
                 newVariant.dataset.index = index;
                 newVariant.innerHTML = `
-        <input type="text" name="variantSize[]" class="form-control d-inline w-25 me-2 p-3 rounded bg-white text-black outline-none" placeholder="Size"  />
-        <input type="number" name="variantPrice[]" class="form-control d-inline w-25 me-2 p-3 rounded bg-white text-black outline-none" placeholder="Sales Price"  />
-        <input type="number" name="variantQuantity[]" class="form-control d-inline w-25 me-2 p-3 rounded bg-white text-black outline-none" placeholder="Stock"  />
-        <button type="button" class="btn btn-danger bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded" onclick="removeVariant(this)">Remove</button>
+        <div class="grid grid-cols-3 gap-3 items-center" data-index=${variantCount}>
+            <div>
+                <input type="text" name="variantSize[]" class="form-control p-3 rounded bg-white text-black outline-none" placeholder="Size"  />
+                <span id="variantSize-error-${variantCount + 1}" class="text-red-400 text-sm error-message"></span>
+            </div>
+            <div>
+                <input type="number" name="variantPrice[]" class="form-control p-3 rounded bg-white text-black outline-none" placeholder="Sales Price"  />
+                <span id="variantPrice-error-${variantCount + 1}" class="text-red-400 text-sm error-message"></span>
+            </div>
+            <div>
+                <input type="number" name="variantQuantity[]" class="form-control p-3 rounded bg-white text-black outline-none" placeholder="Stock"  />
+                <span id="variantQuantity-error-${variantCount + 1}" class="text-red-400 text-sm error-message"></span>
+            </div>
+            <button type="button" class="btn btn-danger bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded" onclick="removeVariant(this)">Remove</button>
+        </div>
       `;
                 container.appendChild(newVariant);
             }
@@ -487,60 +643,60 @@
             }
 
             async function cropImage(index) {
-    if (!croppers[index]) {
-        console.error("Cropper not found for index", index);
-        Swal.fire("Error", "No image selected to crop!", "error");
-        return;
-    }
+                if (!croppers[index]) {
+                    console.error("Cropper not found for index", index);
+                    Swal.fire("Error", "No image selected to crop!", "error");
+                    return;
+                }
 
-    try {
-        const canvas = croppers[index].getCroppedCanvas({
-            width: 800,
-            height: 800,
-        });
+                try {
+                    const canvas = croppers[index].getCroppedCanvas({
+                        width: 800,
+                        height: 800,
+                    });
 
-        if (!canvas) {
-            Swal.fire("Error", "Cannot crop this image.", "error");
-            return;
-        }
+                    if (!canvas) {
+                        Swal.fire("Error", "Cannot crop this image.", "error");
+                        return;
+                    }
 
-        const blob = await new Promise((resolve) =>
-            canvas.toBlob(resolve, "image/jpeg", 0.9)
-        );
+                    const blob = await new Promise((resolve) =>
+                        canvas.toBlob(resolve, "image/jpeg", 0.9)
+                    );
 
-        const previewContainer = document.querySelector(`.croppedPreview${index}`);
-        previewContainer.innerHTML = "";
+                    const previewContainer = document.querySelector(`.croppedPreview${index}`);
+                    previewContainer.innerHTML = "";
 
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(blob);
-        img.className = "w-32 h-32 object-cover rounded shadow mx-auto";
+                    const img = document.createElement("img");
+                    img.src = URL.createObjectURL(blob);
+                    img.className = "w-32 h-32 object-cover rounded shadow mx-auto";
 
-        previewContainer.appendChild(img);
+                    previewContainer.appendChild(img);
 
-        // Replace the real file input value with cropped blob
-        const fileInput = document.querySelector(`input[name="image${index + 1}"]`);
-        if (fileInput) {
-            const file = new File([blob], `cropped-${Date.now()}.jpg`, {
-                type: "image/jpeg",
-            });
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
-        }
+                    // Replace the real file input value with cropped blob
+                    const fileInput = document.querySelector(`input[name="image${index + 1}"]`);
+                    if (fileInput) {
+                        const file = new File([blob], `cropped-${Date.now()}.jpg`, {
+                            type: "image/jpeg",
+                        });
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        fileInput.files = dataTransfer.files;
+                    }
 
-        Swal.fire({
-            icon: "success",
-            title: "Image Saved!",
-            text: `Image ${index + 1} cropped and ready to upload.`,
-            timer: 1200,
-            showConfirmButton: false,
-        });
+                    Swal.fire({
+                        icon: "success",
+                        title: "Image Saved!",
+                        text: `Image ${index + 1} cropped and ready to upload.`,
+                        timer: 1200,
+                        showConfirmButton: false,
+                    });
 
-    } catch (error) {
-        console.error("Crop error:", error);
-        Swal.fire("Error", "Failed to crop image", "error");
-    }
-}
+                } catch (error) {
+                    console.error("Crop error:", error);
+                    Swal.fire("Error", "Failed to crop image", "error");
+                }
+            }
 
 
         </script>

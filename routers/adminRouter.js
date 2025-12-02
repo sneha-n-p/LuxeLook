@@ -43,7 +43,9 @@ router.patch('/categories/edit-category-offer', categoryController.editCategoryO
 
 router.get("/Products", adminAuth, productController.productInfo)
   .get("/Products/add-product", adminAuth, productController.loadAddProduct)
-  .post("/Products/add-product", upload.any(),cloudinaryMiddleware, productController.addproduct)
+  .post("/Products/add-product", upload.fields([
+    {name:'image1'}, {name:'image2'}, {name:'image3'}, {name:'image4'}
+  ]),cloudinaryMiddleware, productController.addproduct)
   .get("/Products/edit-product/:id", adminAuth, productController.editProduct)
   .post('/Products/edit-product/:id', upload.fields([
     { name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }
