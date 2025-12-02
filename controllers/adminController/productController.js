@@ -42,7 +42,7 @@ const productInfo = async (req, res) => {
       totalProducts = await Product.countDocuments(query);
       totalPage = Math.ceil(totalProducts / limit);
     }
-    
+
     res.render("product", {
       products: Data,
       currentPage: page,
@@ -59,7 +59,7 @@ const productInfo = async (req, res) => {
 
 const loadAddProduct = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const categories = await Category.find({ status: 'Listed' });
     res.render("addProduct", { categories });
   } catch (error) {
     logger.error(error);
@@ -98,9 +98,9 @@ const addproduct = async (req, res) => {
       errors.price = "Enter a valid price greater than 0";
     }
 
-    const existingProduct = await Product.findOne({productName:{ $regex: new RegExp(`^${ProductName.trim()}$`, "i") }})
-    if(existingProduct){
-       return res.status(StatusCode.BAD_REQUEST).json({
+    const existingProduct = await Product.findOne({ productName: { $regex: new RegExp(`^${ProductName.trim()}$`, "i") } })
+    if (existingProduct) {
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: "Product Name is Already Existing, Try Another Name"
       });
@@ -148,17 +148,17 @@ const addproduct = async (req, res) => {
     if (Object.keys(errors).length > 0) {
       logger.error(`Error in validation : ${errors}`)
       return res.status(StatusCode.BAD_REQUEST).json({
-  success: false,
-  message: "Validation errors occurred",
-  errors,
-  formData: req.body,
-  categories: await Category.find()
-});
+        success: false,
+        message: "Validation errors occurred",
+        errors,
+        formData: req.body,
+        categories: await Category.find()
+      });
     }
 
     const categoryDoc = await Category.findOne({ name: category });
-
     let bestOffer = Math.max(categoryDoc.offer, offer)
+    console.log('chakka',categoryDoc)
     if (Array.isArray(variants)) {
       variants = variants.map(item => {
         let varinatAppliedDiscount = Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)))
@@ -168,37 +168,37 @@ const addproduct = async (req, res) => {
         }
       })
     }
-
+    
     if (!categoryDoc || !mongoose.Types.ObjectId.isValid(categoryDoc._id)) {
-  errors.category = "Invalid category";
-  return res.status(StatusCode.BAD_REQUEST).json({
-    success: false,
-    message: "Invalid category",
-    errors,
-    formData: req.body,
-    categories: await Category.find()
-  });
-}
+      errors.category = "Invalid category";
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Invalid category",
+        errors,
+        formData: req.body,
+        categories: await Category.find()
+      });
+    }
 
-    let imagesPaths = req.files.map((image)=>image.path)
+    let imagesPaths = req.files.map((image) => image.path)
 
     if (imagesPaths.length === 0) {
       errors.image1 = "At least one image is required";
     }
-
+    
     if (Object.keys(errors).length > 0) {
-  return res.status(StatusCode.BAD_REQUEST).json({
-    success: false,
-    message: "Image validation failed",
-    errors,
-    formData: req.body,
-    categories: await Category.find()
-  });
-}
-let Description = description.trim()
+      return res.status(StatusCode.BAD_REQUEST).json({
+        success: false,
+        message: "Image validation failed",
+        errors,
+        formData: req.body,
+        categories: await Category.find()
+      });
+    }
+    let Description = description.trim()
     const newProduct = new Product({
       productName: ProductName,
-      description:Description,
+      description: Description,
       productOffer: offer,
       quatity: stock,
       size: variants.map(v => v.size),
@@ -208,13 +208,14 @@ let Description = description.trim()
       productImage: imagesPaths,
       variant: variants
     });
-
+    
     await newProduct.save();
-return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });  } catch (error) {
+    return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });
+  } catch (error) {
     logger.error(`Error adding product: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("addProduct", {
       message: "Failed to add product. Please try again.",
-      errors:{},
+      errors: {},
       categories: await Category.find(),
       formData: req.body
     });
@@ -226,7 +227,13 @@ const editProduct = async (req, res) => {
   try {
     const id = req.params.id
     const product = await Product.findById(id).populate('category');
-    const categories = await Category.find();
+    let bestOffer = product.offer
+    product.variant.forEach(item => {
+      const originalPrice = item.salePrice / (1 - bestOffer / 100);
+      item.salePrice = Math.round(originalPrice)
+    })
+    console.log('product', product)
+    const categories = await Category.find({ status: 'Listed' });
     res.render("editProduct", { categories, product })
   } catch (error) {
     logger.error(error)
@@ -237,7 +244,7 @@ const editProduct = async (req, res) => {
 function getPublicIdFromUrl(imageUrl) {
   const parts = imageUrl.split("/");
   const fileName = parts.pop();        // myimage.jpg
-  const folder = parts.slice(parts.indexOf("upload") + 2).join("/"); 
+  const folder = parts.slice(parts.indexOf("upload") + 2).join("/");
   return folder.replace(`/${fileName}`, "") + "/" + fileName.split(".")[0];
 }
 const deleteSingleImage = async (req, res) => {
@@ -309,7 +316,6 @@ const postEditProduct = async (req, res) => {
         message: "Product not found"
       });
     }
-
     const {
       name,
       description,
@@ -334,21 +340,21 @@ const postEditProduct = async (req, res) => {
       });
     }
 
-    if(variantPrice == 0 || variantSize == ''){
-       return res.status(StatusCode.BAD_REQUEST).json({
+    if (variantPrice == 0 || variantSize == '') {
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: "Varients are required"
       });
     }
 
-    const existingProduct = await Product.findOne({productName:{ $regex: new RegExp(`^${name.trim()}$`, "i") }})
-    if(existingProduct  && existingProduct._id.toString() !== productId){
-       return res.status(StatusCode.BAD_REQUEST).json({
+    const existingProduct = await Product.findOne({ productName: { $regex: new RegExp(`^${name.trim()}$`, "i") } })
+    if (existingProduct && existingProduct._id.toString() !== productId) {
+      return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: "Product Name is Already Existing, Try Another Name"
       });
     }
-    
+
     const clean = description.trim();
 
     if (clean.length === 0) {
@@ -389,14 +395,14 @@ const postEditProduct = async (req, res) => {
     }
 
     const fileMap = {};
-    if (req.files && Object.keys(req.files).length> 0) {
-      for(let img in req.files){
+    if (req.files && Object.keys(req.files).length > 0) {
+      for (let img in req.files) {
         console.log(req.files[img])
         fileMap[img] = req.files[img][0].path
       }
     }
 
-    console.log('fileMap',fileMap)
+    console.log('fileMap', fileMap)
     console.log(req.files)
 
     //  CLOUDINARY IMAGE HANDLING
@@ -421,7 +427,7 @@ const postEditProduct = async (req, res) => {
     }
 
     //  VARIANT PROCESSING
-    
+
     let variant = [];
     let stock = 0;
 
@@ -438,20 +444,14 @@ const postEditProduct = async (req, res) => {
     let parseOffer = Number(offer);
     let parseCategoryOffer = Number(findCategory.offer) || 0;
 
-    let previousProductOffer = product.productOffer || 0;
-    let previousBestOffer = Math.max(previousProductOffer, parseCategoryOffer);
-
-    variant = variant.map(item => {
-      const originalPrice = item.salePrice / (1 - previousBestOffer / 100);
-      item.salePrice = Math.round(originalPrice);
-      return item;
-    });
-
     let bestOffer = Math.max(parseOffer, parseCategoryOffer);
+    console.log('bestOffer', bestOffer)
 
     variant = variant.map(item => {
+      console.log(' item.salePrice', item.salePrice)
       const discounted = item.salePrice * (1 - bestOffer / 100);
       item.salePrice = Math.round(discounted);
+      console.log('item', item)
       return item;
     });
 
@@ -461,7 +461,7 @@ const postEditProduct = async (req, res) => {
       productId,
       {
         productName: name,
-        description:Description,
+        description: Description,
         category,
         productOffer: parseFloat(offer) || 0,
         offer: bestOffer || 0,
@@ -542,7 +542,7 @@ const addProductOffer = async (req, res) => {
     if (!product) {
       return res.status(StatusCode.NOT_FOUND).json({ success: false, message: 'Product not found' });
     }
-    logger.debug('product:',product)
+    logger.debug('product:', product)
 
     const category = await Category.findById(product.category);
     const categoryOffer = category.offer
@@ -564,7 +564,7 @@ const addProductOffer = async (req, res) => {
     }
 
     await product.save();
-    logger.debug('product:',product)
+    logger.debug('product:', product)
     res.status(StatusCode.CREATED).json({
       success: true,
       message: "Product offer applied.", finalOffer, salePrice: product.variant[0].salePrice

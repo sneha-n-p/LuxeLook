@@ -126,8 +126,8 @@
                 <% coupons.forEach(c => { %>
                 <tr class="text-black">
                     <td><%= c.name %></td>
-                    <td><%= new Date(c.createdOn).toLocaleDateString("en-US") %></td>
-                    <td><%= new Date(c.expiredOn).toLocaleDateString("en-US") %></td>
+                    <td><%= new Date(c.createdOn).toLocaleDateString("en-IN") %></td>
+                    <td><%= new Date(c.expiredOn).toLocaleDateString("en-IN") %></td>
                     <td>₹<%= c.offerPrice %></td>
                     <td>₹<%= c.minimumPrice %></td>
 
@@ -164,8 +164,8 @@
             <p class="text-lg font-semibold mb-2"><%= c.name %></p>
 
             <div class="text-gray-300 text-sm space-y-1">
-                <p><strong>Created:</strong> <%= new Date(c.createdOn).toLocaleDateString('en-US') %></p>
-                <p><strong>Expires:</strong> <%= new Date(c.expiredOn).toLocaleDateString('en-US') %></p>
+                <p><strong>Created:</strong> <%= new Date(c.createdOn).toLocaleDateString('en-IN') %></p>
+                <p><strong>Expires:</strong> <%= new Date(c.expiredOn).toLocaleDateString('en-IN') %></p>
                 <p><strong>Offer:</strong> ₹<%= c.offerPrice %></p>
                 <p><strong>Min Price:</strong> ₹<%= c.minimumPrice %></p>
             </div>

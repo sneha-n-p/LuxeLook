@@ -109,9 +109,7 @@
                 <img src="/images/logo_forWhite.png" alt="LuxeLook Logo">
             </a>
 
-            <!-- Hamburger -->
-            <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav">
+            <button class="navbar-toggler shadow-none border-0" type="button">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -204,10 +202,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById("usernameClick").addEventListener("click", function () {
-            console.log("hello");
-        }, { passive: true });
-        </script>
+        const toggler = document.querySelector('.navbar-toggler');
+        const nav = document.getElementById('navbarNav');
+
+        toggler.addEventListener('click', () => {
+            nav.classList.toggle('show');  
+        });
+    </script>
 
 
 

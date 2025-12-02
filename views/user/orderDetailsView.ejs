@@ -421,7 +421,7 @@
 
                     <p><strong>Final Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %></p>
 
-                    <p><strong>Order Date:</strong> <%= order.createdOn.toDateString() %></p>
+                    <p><strong>Order Date:</strong> <%= order.createdOn.toLocaleDateString("en-IN") %></p>
 
                     <hr>
                     <h5 class="mb-3 fw-bold">Ordered Items</h5>
@@ -710,7 +710,7 @@
       No address provided
     <% } %>`,
                 couponApplied: "<%= order.couponApplied ? 'Yes' : 'No' %>",
-                orderDate: "<%= order.createdOn.toDateString() %>",
+                orderDate: "<%= order.createdOn.toLocaleDateString('en-IN') %>",
                 orderedItems: [
       <% order.orderedItems.forEach(function (item, index) { %>
                 {

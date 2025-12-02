@@ -314,7 +314,7 @@
         <% latestOrders.forEach(order => { %>
           <div class="order-box">
             <h6>Order ID: <%= order.orderId %></h6>
-            <p><strong>Date:</strong> <%= order.createdOn.toDateString() %></p>
+            <p><strong>Date:</strong> <%= order.createdOn.toLocaleDateString("en-IN") %></p>
             <p><strong>Status:</strong> <%= order.status %></p>
             <p><strong>Total:</strong> ₹<%= order.finalAmount %></p>
           </div>

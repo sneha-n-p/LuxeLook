@@ -34,24 +34,24 @@
         <span class="text-red-500 text-sm block mb-2"><%= message %></span>
 
         <!-- Login form -->
-        <form action="/admin/login" method="POST" class="space-y-4">
+        <form class="space-y-4">
 
           <div>
             <label for="email" class="block mb-1 text-sm">Email</label>
-            <input type="email" id="email" name="email" required
+            <input type="email" id="email" name="email" 
               class="w-full p-3 rounded bg-[#1a1a27] border border-gray-700 text-white focus:ring-2 focus:ring-purple-500 outline-none"
               placeholder="Enter your email">
           </div>
 
           <div>
             <label for="password" class="block mb-1 text-sm">Password</label>
-            <input type="password" id="password" name="password" required
+            <input type="password" id="password" name="password" 
               class="w-full p-3 rounded bg-[#1a1a27] border border-gray-700 text-white focus:ring-2 focus:ring-purple-500 outline-none"
               placeholder="Enter your password">
           </div>
 
           <button type="submit"
-            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded">
+            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded" onclick="Login(event)">
             Log in
           </button>
 
@@ -62,6 +62,49 @@
     </div>
 
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    
+  <script>
+    async function Login(e){
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim()
+      const password = document.getElementById('password').value
+      console.log(email)
+      console.log(password)
+      await axios.post('/admin/login',{email,password},{validateStatus:((status)=>status!==500)})
+      .then((res)=>{
+        if(!res.data.success){
+          Swal.fire({
+            icon:'error',
+            title:'Error',
+            text:res.data.message
+          }).then(()=>{
+            window.location.href = res.data.redirectUrl
+          })
+        }else{
+          Swal.fire({
+            icon:'success',
+            title:'Success',
+            text:res.data.message
+          }).then(()=>{
+            window.location.href = res.data.redirectUrl
+          })
+        }
+      })
+      .catch((error)=>{
+        Swal.fire({
+          icon:'error',
+          title:'Error',
+          text:'something error in admin login'
+        }).then(()=>{
+          window.location.href = '/admin/login'
+        })
+      })
+    }
+  </script>
 
 </body>
 </html>

@@ -365,7 +365,7 @@
                       <%= txn.description %>
                     </td>
                     <td>
-                      <%= new Date(txn.date).toISOString().split("T")[0] %>
+                      <%= new Date(txn.date).toLocaleDateString("en-IN").split("T")[0] %>
                     </td>
                   </tr>
                   <% }) %>
@@ -420,7 +420,7 @@
 
                 <p><span class="txn-label">Date</span>:
                   <span class="txn-value">
-                    <%= new Date(txn.date).toISOString().split('T')[0] %>
+                    <%= new Date(txn.date).toLocaleDateString("en-IN").split('T')[0] %>
                   </span>
                 </p>
               </div>

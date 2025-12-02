@@ -68,7 +68,7 @@
 
             <td class="p-3 text-gray-200">NO: <%= order.orderedItems.length %></td>
             <td class="p-3 text-gray-200">₹ <%= order.finalAmount.toFixed(2) %></td>
-            <td class="p-3 text-gray-200"><%= order.createdOn.toDateString() %></td>
+            <td class="p-3 text-gray-200"><%= order.createdOn.toLocaleDateString("en-IN") %></td>
 
             <td class="p-3">
               <% if (order.status === 'Delivered') { %>

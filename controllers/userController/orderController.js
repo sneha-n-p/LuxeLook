@@ -265,7 +265,6 @@ const loadOrders = async (req, res) => {
       .sort({ createdOn: -1 })
       .limit(limit)
       .skip((page - 1) * limit);
-    logger.info(`sanju ${JSON.stringify(orders)}`)
     res.render("orderDetails", {
       user,
       orders,

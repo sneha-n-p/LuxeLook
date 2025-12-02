@@ -118,7 +118,7 @@
             <% salesData.orders.forEach(order => { %>
             <tr class="border-b hover:bg-gray-100 transition">
                 <td class="py-3 px-4"><%= order.userName %></td>
-                <td class="py-3 px-4"><%= order.createdOn.toDateString() %></td>
+                <td class="py-3 px-4"><%= order.createdOn.toLocaleDateString("en-IN") %></td>
                 <td class="py-3 px-4"><%= order.orderId %></td>
                 <td class="py-3 px-4">Rs.<%= order.finalAmount.toFixed(2) %></td>
                 <td class="py-3 px-4">Rs.<%= order.discount.toFixed(2) %></td>
@@ -142,7 +142,7 @@
             </p>
 
             <div class="space-y-1 text-gray-300">
-                <p><strong>Date:</strong> <%= order.createdOn.toDateString() %></p>
+                <p><strong>Date:</strong> <%= order.createdOn..toLocaleDateString("en-IN") %></p>
                 <p><strong>Order ID:</strong> <%= order.orderId %></p>
                 <p><strong>Amount:</strong> Rs.<%= order.finalAmount %></p>
                 <p><strong>Discount:</strong> Rs.<%= order.discount %></p>

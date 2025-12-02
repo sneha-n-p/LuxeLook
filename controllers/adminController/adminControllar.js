@@ -29,18 +29,24 @@ const loadLogin = async (req, res) => {
 const postLogin = async (req, res) => {
     try {
         const { email, password } = req.body
+        console.log(req.body)
+        if(email==''||password=='') return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Email and Password are required', redirectUrl: '/admin/login' })
+
+        const emailPattern = /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|protonmail\.com)$/;
+        if (!emailPattern.test(email)) return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Enter valid email', redirectUrl: '/admin/login' })
+
         const admin = await User.findOne({ email: email, isAdmin: true })
         if (admin) {
             const passwordMatch = await bcrypt.compare(password, admin.password)
             if (!passwordMatch) {
-                req.session.message = 'invalid credentials'
-                return res.redirect('/admin/login')
+                return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Incorrect Password', redirectUrl: '/admin/login' })
             } else {
                 req.session.admin = true
-                return res.redirect("/admin")
+                return res.status(StatusCode.OK).json({ success: true, message: 'Validated Successfully ', redirectUrl: "/admin" })
             }
         } else {
-            return res.redirect('/admin/login')
+            console.log('hiiii')
+            return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'Admin Not Found', redirectUrl: '/admin/login' })
         }
     } catch (error) {
         logger.error(`login error ${error}`)

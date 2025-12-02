@@ -535,7 +535,7 @@
                   <td>₹<%= order.finalAmount.toFixed(2) %>
                   </td>
                   <td>
-                    <%= order.createdOn.toDateString() %>
+                    <%= order.createdOn.toLocaleDateString("en-IN") %>
                   </td>
                   <td>
                     <p>
@@ -635,7 +635,7 @@
           </div>
           <!-- Date -->
           <div class="mobile-order-date">
-            <%= order.createdOn.toDateString() %>
+            <%= order.createdOn.toLocaleDateString("en-IN") %>
           </div>
 
           <!-- Action Button -->
