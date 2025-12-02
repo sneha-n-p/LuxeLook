@@ -142,7 +142,7 @@
             </p>
 
             <div class="space-y-1 text-gray-300">
-                <p><strong>Date:</strong> <%= order.createdOn..toLocaleDateString("en-IN") %></p>
+                <p><strong>Date:</strong> <%= order.createdOn.toLocaleDateString("en-IN") %></p>
                 <p><strong>Order ID:</strong> <%= order.orderId %></p>
                 <p><strong>Amount:</strong> Rs.<%= order.finalAmount %></p>
                 <p><strong>Discount:</strong> Rs.<%= order.discount %></p>
@@ -189,7 +189,7 @@
       const startDateInput = document.getElementById('start-date');
       const endDateInput = document.getElementById('end-date');
 
-      const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toLocaleDateString("en-IN").split("T")[0];
 
       startDateInput.max = today;
       endDateInput.max = today;

@@ -25,7 +25,7 @@
           <!-- Product Name -->
           <div>
             <label class="block font-medium mb-1">Product Name</label>
-            <p id="name-error" class="text-red-400 text-sm"></p>
+            <p id="name-error" class="text-red-400 text-sm error-message"></p>
             <input type="text" id="name" name="ProductName"
               class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
               maxlength="100" />
@@ -34,7 +34,7 @@
           <!-- Product Category -->
           <div>
             <label class="block font-medium mb-1">Category</label>
-            <p id="category-error" class="text-red-400 text-sm"></p>
+            <p id="category-error" class="text-red-400 text-sm error-message"></p>
             <select id="category" name="category"
               class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400">
               <option value="" disabled selected>Select Category</option>
@@ -49,7 +49,7 @@
           <!-- Description -->
           <div class="md:col-span-2">
             <label class="block font-medium mb-1">Description</label>
-            <p id="description-error" class="text-red-400 text-sm"></p>
+            <p id="description-error" class="text-red-400 text-sm error-message"></p>
             <textarea id="description" name="description" rows="3"
               class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
               maxlength="150"></textarea>
@@ -58,7 +58,7 @@
           <!-- Offer -->
           <div>
             <label class="block font-medium mb-1">Offer (%)</label>
-            <p id="offer-error" class="text-red-400 text-sm"></p>
+            <p id="offer-error" class="text-red-400 text-sm error-message"></p>
             <input type="number" id="offer" name="offer"
               class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
               placeholder="Optional" />
@@ -67,7 +67,7 @@
           <!-- Price -->
           <div>
             <label class="block font-medium mb-1">Price</label>
-            <p id="price-error" class="text-red-400 text-sm"></p>
+            <p id="price-error" class="text-red-400 text-sm error-message"></p>
             <input type="number" id="price" name="price"
               class="w-full p-3 rounded bg-white text-black outline-none focus:ring-2 focus:ring-cyan-400"
               placeholder="Greater than Sale Price" />
@@ -78,47 +78,50 @@
         <!-- VARIANT SECTION -->
         <div>
           <label class="block font-medium mb-2">Product Variants</label>
-
           <div id="variant-container" class="space-y-3">
-
+            
             <!-- ONE DEFAULT VARIANT ROW -->
             <div class="grid grid-cols-3 gap-3 items-center">
               <div>
+                <p id="variantSize-error-1" class="text-red-400 text-sm error-message"></p>
                 <input type="text" name="variantSize[]" placeholder="Size"
-                  class="w-full p-3 rounded bg-white text-black outline-none">
+                class="w-full p-3 rounded bg-white text-black outline-none">
               </div>
-
+              
               <div>
+                <p id="variantSalePrice-error-1" class="text-red-400 text-sm error-message"></p>
                 <input type="number" name="variantSalePrice[]" placeholder="Sale Price"
-                  class="w-full p-3 rounded bg-white text-black outline-none">
+                class="w-full p-3 rounded bg-white text-black outline-none">
               </div>
-
-              <div class="flex items-center gap-2">
+              
+              <div>
+                <p id="variantQuantity-error-1" class="text-red-400 text-sm error-message"></p>
                 <input type="number" name="variantQuantity[]" placeholder="Qty"
-                  class="w-full p-3 rounded bg-white text-black outline-none">
-
-                </div>
-                <button type="button" onclick="removeVariant(this)"
-                  class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded">
-                  ✖
-                </button>
-            </div>
-
+                class="w-full p-3 rounded bg-white text-black outline-none">
+                
+              </div>
+              <button type="button" onclick="removeVariant(this)"
+              class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded">
+              ✖
+            </button>
           </div>
-
-          <button type="button" onclick="addVariant()"
-            class="mt-3 bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded">
-            + Add Variant
-          </button>
+          
         </div>
-
-        <!-- IMAGES -->
-        <div>
-          <label class="block font-medium mb-3">Product Images (4)</label>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-            <% for (let i=1; i<=4; i++) { %>
+        
+        <button type="button" onclick="addVariant()"
+        class="mt-3 bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded">
+        + Add Variant
+      </button>
+    </div>
+    
+    <!-- IMAGES -->
+    <div>
+      <label class="block font-medium mb-3">Product Images (4)</label>
+      
+      <span id="image1-error" class="text-red-400 text-sm error-message"></span>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        
+        <% for (let i=1; i<=4; i++) { %>
               <div class="border border-gray-600 rounded p-4">
                 <label class="block mb-2 font-medium">Image <%= i %></label>
 
@@ -190,11 +193,11 @@
       const category = document.getElementById("category").value;
       const offer = document.getElementById("offer").value.trim();
       const price = document.getElementById("price").value.trim();
-      // const salesPrice = document.getElementById("salesPrice").value.trim();
-
+      const variant = document.getElementById("variant-container");
+      
       const namePattern = /^[A-Za-z ,.-]+$/;
       const numberPattern = /^\d+(\.\d{1,2})?$/;
-
+      
       if (!name) {
         displayErrorMessage("name-error", "Product name is required");
         isValid = false;
@@ -229,24 +232,12 @@
         displayErrorMessage("price-error", "Enter a valid price greater than 0");
         isValid = false;
       }
-
-      // if (!salesPrice) {
-      //   displayErrorMessage("salesPrice-error", "Sales price is required");
-      //   isValid = false;
-      // } else if (!numberPattern.test(salesPrice) || parseFloat(salesPrice) <= 0) {
-      //   displayErrorMessage("salesPrice-error", "Enter a valid sales price greater than 0");
-      //   isValid = false;
-      // }
-
-      // if (price && salesPrice && parseFloat(price) <= parseFloat(salesPrice)) {
-      //   displayErrorMessage("salesPrice-error", "Price must be greater than sales price");
-      //   isValid = false;
-      // }
-
+      
       // Variant validations
       const variantSizes = document.getElementsByName("variantSize[]");
       const variantSalePrices = document.getElementsByName("variantSalePrice[]");
       const variantQuantities = document.getElementsByName("variantQuantity[]");
+      console.log('sonia',variantSizes)
 
       for (let i = 0; i < variantSizes.length; i++) {
         const size = variantSizes[i].value.trim();
@@ -254,15 +245,15 @@
         const quantity = variantQuantities[i].value.trim();
 
         if (!size) {
-          displayErrorMessage(`variantSize-error-${i}`, "Size is required");
+          displayErrorMessage(`variantSize-error-${i+1}`, "Size is required");
           isValid = false;
         }
         if (!salePrice || !numberPattern.test(salePrice) || parseFloat(salePrice) <= 0) {
-          displayErrorMessage(`variantSalePrice-error-${i}`, "Valid sale price required");
+          displayErrorMessage(`variantSalePrice-error-${i+1}`, "Valid sale price required");
           isValid = false;
         }
         if (!quantity || isNaN(quantity) || parseInt(quantity) < 0) {
-          displayErrorMessage(`variantQuantity-error-${i}`, "Valid quantity required");
+          displayErrorMessage(`variantQuantity-error-${i+1}`, "Valid quantity required");
           isValid = false;
         }
       }
@@ -290,6 +281,7 @@
         event.preventDefault();
 
         if (validateForm()) {
+          clearErrorMessages();
           const formData = new FormData(form);
 
           for (let i = 1; i <= 4; i++) {
@@ -493,6 +485,7 @@
 
       variantRow.innerHTML = `
     <div>
+      <p id="variantSize-error-${variantCount+1}" class="text-red-400 text-sm error-message"></p>
       <input 
         type="text" 
         name="variantSize[]" 
@@ -502,6 +495,7 @@
     </div>
 
     <div>
+      <p id="variantSalePrice-error-${variantCount+1}" class="text-red-400 text-sm error-message"></p>
       <input 
         type="number" 
         name="variantSalePrice[]" 
@@ -511,6 +505,7 @@
     </div>
 
     <div>
+      <p id="variantQuantity-error-${variantCount+1}" class="text-red-400 text-sm error-message"></p>
       <input 
         type="number" 
         name="variantQuantity[]" 

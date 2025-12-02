@@ -79,23 +79,23 @@ const addproduct = async (req, res) => {
       variantSalePrice,
       variantQuantity
     } = req.body;
-    let errors = {};
+
 
     // Validation 
     if (!ProductName || !/^[A-Za-z ]+$/.test(ProductName)) {
-      errors.name = "Product name is required and should contain only alphabetsDefaulters alphabets and spaces";
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: " Product name is required and should contain only alphabetsDefaulters alphabets and spaces" })
     }
 
     if (!description || !/^[A-Za-z ]+$/.test(description)) {
-      errors.description = "Description is required and should contain only alphabets and spaces";
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Description is required and should contain only alphabets and spaces" })
     }
 
     if (!category) {
-      errors.category = "Product category is required";
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Product category is required" })
     }
 
     if (!price || isNaN(price) || Number(price) <= 0) {
-      errors.price = "Enter a valid price greater than 0";
+      return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Enter a valid price greater than 0" })
     }
 
     const existingProduct = await Product.findOne({ productName: { $regex: new RegExp(`^${ProductName.trim()}$`, "i") } })
@@ -111,13 +111,19 @@ const addproduct = async (req, res) => {
     if (Array.isArray(variantSize)) {
       for (let i = 0; i < variantSize.length; i++) {
         if (!variantSize[i]) {
-          errors[`variantSize${i}`] = "Size is required";
+          return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Size is required" })
+
         }
         if (!variantSalePrice[i] || isNaN(variantSalePrice[i]) || Number(variantSalePrice[i]) <= 0) {
-          errors[`variantSalePrice${i}`] = "Enter a valid sale price greater than 0";
+          return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Enter a valid sale price greater than 0" })
+
+        }
+        if (variantSalePrice > price) {
+          return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: 'SalePrice must be less than RegularPrice' })
+
         }
         if (!variantQuantity[i] || isNaN(variantQuantity[i]) || Number(variantQuantity[i]) < 0) {
-          errors[`variantQuantity${i}`] = "Enter a valid non-negative quantity";
+          return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Enter a valid non-negative quantity" })
         }
         if (variantSize[i]) {
           variants.push({
@@ -130,13 +136,13 @@ const addproduct = async (req, res) => {
       }
     } else if (variantSize) {
       if (!variantSize) {
-        errors.variantSize = "Size is required";
+        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Size is required" })
       }
       if (!variantSalePrice || isNaN(variantSalePrice) || Number(variantSalePrice) <= 0) {
-        errors.variantSalePrice = "Enter a valid sale price greater than 0";
+        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Enter a valid sale price greater than 0" })
       }
       if (!variantQuantity || isNaN(variantQuantity) || Number(variantQuantity) < 0) {
-        errors.variantQuantity = "Enter a valid non-negative quantity";
+        return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Enter a valid non-negative quantity" })
       }
       variants.push({
         size: variantSize,
@@ -144,21 +150,10 @@ const addproduct = async (req, res) => {
         quantity: parseInt(variantQuantity),
       });
     }
-    logger.error(errors)
-    if (Object.keys(errors).length > 0) {
-      logger.error(`Error in validation : ${errors}`)
-      return res.status(StatusCode.BAD_REQUEST).json({
-        success: false,
-        message: "Validation errors occurred",
-        errors,
-        formData: req.body,
-        categories: await Category.find()
-      });
-    }
-
+   
     const categoryDoc = await Category.findOne({ name: category });
     let bestOffer = Math.max(categoryDoc.offer, offer)
-    console.log('chakka',categoryDoc)
+    console.log('chakka', categoryDoc)
     if (Array.isArray(variants)) {
       variants = variants.map(item => {
         let varinatAppliedDiscount = Math.round(item.salePrice - (item.salePrice * (bestOffer / 100)))
@@ -168,13 +163,11 @@ const addproduct = async (req, res) => {
         }
       })
     }
-    
+
     if (!categoryDoc || !mongoose.Types.ObjectId.isValid(categoryDoc._id)) {
-      errors.category = "Invalid category";
       return res.status(StatusCode.BAD_REQUEST).json({
         success: false,
         message: "Invalid category",
-        errors,
         formData: req.body,
         categories: await Category.find()
       });
@@ -183,18 +176,9 @@ const addproduct = async (req, res) => {
     let imagesPaths = req.files.map((image) => image.path)
 
     if (imagesPaths.length === 0) {
-      errors.image1 = "At least one image is required";
+      return res.status(StatusCode.BAD_REQUEST).json({success:false,message:'At least one image is required'})
     }
-    
-    if (Object.keys(errors).length > 0) {
-      return res.status(StatusCode.BAD_REQUEST).json({
-        success: false,
-        message: "Image validation failed",
-        errors,
-        formData: req.body,
-        categories: await Category.find()
-      });
-    }
+
     let Description = description.trim()
     const newProduct = new Product({
       productName: ProductName,
@@ -208,14 +192,13 @@ const addproduct = async (req, res) => {
       productImage: imagesPaths,
       variant: variants
     });
-    
+
     await newProduct.save();
     return res.status(StatusCode.OK).json({ success: true, message: 'Product added successfully', url: "/admin/products" });
   } catch (error) {
     logger.error(`Error adding product: ${error}`);
     return res.status(StatusCode.INTERNAL_SERVER_ERROR).render("addProduct", {
       message: "Failed to add product. Please try again.",
-      errors: {},
       categories: await Category.find(),
       formData: req.body
     });
