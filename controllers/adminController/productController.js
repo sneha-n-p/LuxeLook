@@ -228,8 +228,10 @@ function getPublicIdFromUrl(imageUrl) {
   const parts = imageUrl.split("/");
   const fileName = parts.pop();        // myimage.jpg
   const folder = parts.slice(parts.indexOf("upload") + 2).join("/");
-  return folder.replace(`/${fileName}`, "") + "/" + fileName.split(".")[0];
+   return folder.replace(`/${fileName}`, "") + "/" + fileName.split(".")[0];
 }
+
+
 const deleteSingleImage = async (req, res) => {
   try {
     const { imageNameToServer, productIdToServer, imageIndex } = req.body;
