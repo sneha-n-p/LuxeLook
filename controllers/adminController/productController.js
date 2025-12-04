@@ -515,7 +515,7 @@ const unblockProduct = async (req, res) => {
     const blocked = await Product.findByIdAndUpdate(id, { isBlocked: false }, { new: true })
 
     if (blocked) {
-      return res.status(StatusCode.OK).json({ success: true, message: "Product blocked successfully" })
+      return res.status(StatusCode.OK).json({ success: true, message: "Product Unblocked successfully" })
     } else {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Error occurred while blocking product. Please try again." })
     }
