@@ -258,7 +258,6 @@ const addToCart = async (req, res) => {
             cart.items.push(newCartItem);
             await cart.save();
             cartLength = cart.items.length
-            logger.debug('cartLength:', cartLength)
 
             return res.status(StatusCode.OK).json({ success: true, message: "Product added to cart", cartLength });
         }
