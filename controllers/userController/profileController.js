@@ -227,11 +227,11 @@ const updateProfile = async (req, res) => {
 
     await user.save();
 
-    return res.json({ success: true });
+    return res.status(StatusCode.OK).json({ success: true });
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Server Error" });
+    return res.status(StatusCode.INTERNAL_SERVER_ERROR).json({ message: "Server Error" });
   }
 };
 

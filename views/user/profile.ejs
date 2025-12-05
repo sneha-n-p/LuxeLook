@@ -296,8 +296,10 @@
       <!-- Buttons -->
       <div class="text-center mb-3">
         <a href="/profile/edit" class="btn-custom">Edit Profile</a>
-        <a href="/profile/change-email" class="btn-custom">Change Email</a>
-        <a href="/profile/change-password" class="btn-custom">Change Password</a>
+        <%if(user.password){%>
+          <a href="/profile/change-email" class="btn-custom">Change Email</a>
+          <a href="/profile/change-password" class="btn-custom">Change Password</a>
+        <%}%>
         <a href="/addresses/add-address" class="btn-custom">Add Address</a>
       </div>
 

@@ -131,8 +131,9 @@
                     <td>₹<%= c.offerPrice %></td>
                     <td>₹<%= c.minimumPrice %></td>
 
-                    <td>
-                        <% if (!c.islist) { %>
+                    <td >
+                        <div id="couponAction-<%= c._id %>">
+                          <% if (!c.islist) { %>
                         <button class="bg-green-600 text-white px-3 py-1 rounded"
                             onclick="Listed('<%= c._id %>','<%= c.name %>')">
                             List
@@ -143,6 +144,7 @@
                             Unlist
                         </button>
                         <% } %>
+                        </div>
                     </td>
 
                     <td>
@@ -170,7 +172,7 @@
                 <p><strong>Min Price:</strong> ₹<%= c.minimumPrice %></p>
             </div>
 
-            <div class="mt-4 flex flex-col gap-2">
+            <div class="mt-4 flex flex-col gap-2" id="MOBcouponAction-<%= c._id %>">
 
                 <% if (!c.islist) { %>
                 <button class="bg-green-600 py-2 rounded text-white"
@@ -343,7 +345,26 @@
                   showConfirmButton: false,
                   timer: 1500
                 }).then(() => {
-                  window.location.reload()
+                   const actionElem = document.getElementById(`couponAction-${id}`);
+
+              actionElem.innerHTML = `
+                <button class="bg-green-600 text-white px-3 py-1 rounded"
+                        onclick="Listed('${id}', '${name}')">
+                  List
+                </button>
+                
+              `;
+                   const MOBactionElem = document.getElementById(`MOBcouponAction-${id}`);
+              MOBactionElem.innerHTML = `
+                <button class="bg-green-600 py-2 rounded text-white"
+                    onclick="Listed('${id}', '${name}')">
+                    List
+                </button>
+                <a href="/admin/Coupons/editCoupon/${id}"
+                    class="bg-yellow-500 py-2 rounded text-center text-white">
+                    Edit
+                </a>
+              `;
                 })
               }
             })
@@ -369,7 +390,28 @@
                   showConfirmButton: false,
                   timer: 1500
                 }).then(() => {
-                  window.location.reload()
+                  const actionElem = document.getElementById(`couponAction-${id}`);
+
+              actionElem.innerHTML = `
+                
+                <button class="bg-red-600 text-white px-3 py-1 rounded"
+                        onclick="Unlisted('${id}', '${name}')">
+                  Unlist
+                </button>
+               
+              `;
+                  const MOBactionElem = document.getElementById(`MOBcouponAction-${id}`);
+
+              MOBactionElem.innerHTML = `
+                <button class="bg-red-600 py-2 rounded text-white"
+                    onclick="Unlisted('${id}', '${name}')">
+                    Unlist
+                </button>
+                <a href="/admin/Coupons/editCoupon/${id}"
+                    class="bg-yellow-500 py-2 rounded text-center text-white">
+                    Edit
+                </a>
+              `;
                 })
               }
             })
