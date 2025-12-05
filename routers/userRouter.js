@@ -17,7 +17,7 @@ const User = require('../models/userSchema')
 
 //user Controller//
 
-
+router.post('/search',userController.searchproduct)
 router.get("/pageNotFound",userController.pageNotFound)
 router.get("/",userController.loadHomePage)
 router.get("/signup",userAuthCheck,userController.loadSignup)

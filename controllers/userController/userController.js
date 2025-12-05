@@ -8,6 +8,57 @@ const Coupon = require('../../models/couponSchema')
 const StatusCode = require('../../statusCode')
 const logger = require('../../helpers/logger')
 
+const searchproduct = async (req, res) => {
+    let search = req.body.search || "";
+    let sort = req.body.sort || "";
+    let selectCategory = req.body.selectCategory || ''
+    const priceFilter = req.body.priceFilter || "";
+
+    const query = {
+        $or: [
+            { productName: { $regex: ".*" + search + ".*", $options: "i" } }
+        ]
+    };
+
+    if (selectCategory) {
+        const categoryDetails = await Category.findOne({ name: selectCategory });
+        if (categoryDetails) {
+            query.category = categoryDetails._id;
+        }
+    }
+
+    let sortOption = {};
+    if (sort === "price-asc") {
+        sortOption = { 'variant.salePrice': 1 };
+    } else if (sort === "price-desc") {
+        sortOption = { 'variant.salePrice': -1 };
+    } else if (sort === "name-asc") {
+        sortOption = { productName: 1 };
+    } else if (sort === "name-desc") {
+        sortOption = { productName: -1 };
+    }
+
+
+    if (priceFilter === "lt-500") {
+        query['variant.salePrice'] = { $lt: 500 };
+    } else if (priceFilter === "lt-1000") {
+        query['variant.salePrice'] = { $lt: 1000 };
+    } else if (priceFilter === "500-1000") {
+        query['variant.salePrice'] = { $lt: 1000, $gt: 500 };
+    }
+    else if (priceFilter === "gt-1000") {
+        query['variant.salePrice'] = { $gt: 1000 };
+    }
+
+
+    const products = await Product.find(query).populate('category')
+        .sort(sortOption)
+        .limit(4)
+        .exec();
+        
+    return res.status(StatusCode.OK).json({success:true,products})
+}
+
 const pageNotFound = async (req, res) => {
     try {
         res.render("pageNotFound")
@@ -21,7 +72,8 @@ const loadHomePage = async (req, res) => {
     try {
         const user = req.session.user;
 
-        const products = await Product.find({}).populate('category');
+        const products = await Product.find({}).populate('category').limit(4);
+        const categories = await Category.find({})
         
         const processedProducts = products.map(product => {
             const productOffer = product.offer || 0;
@@ -53,9 +105,9 @@ const loadHomePage = async (req, res) => {
 
         if (user) {
             const userData = await User.findById(user);
-            return res.render("home", { user: userData, products: processedProducts, activePage: "home" });
+            return res.render("home", { user: userData, products: processedProducts, categories,sort:'',selectCategory: '',priceFilter :'',search:'',activePage: "home" });
         } else {
-            return res.render("home", { user: null, products: processedProducts, activePage: "home" });
+            return res.render("home", { user: null, products: processedProducts, categories,sort:'',selectCategory:'' ,priceFilter :'',search:'',activePage: "home" });
         }
 
     } catch (error) {
@@ -363,6 +415,7 @@ const sample = async (req, res) => {
     }
 }
 module.exports = {
+    searchproduct,
     loadHomePage,
     pageNotFound,
     loadShopping,
