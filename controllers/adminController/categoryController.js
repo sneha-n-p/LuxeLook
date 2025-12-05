@@ -304,7 +304,7 @@ const removeCategoryOffer = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Category offer removed and variants updated correctly.',
+      message: 'Category offer removed and variants updated correctly.',offer:Category.offer
     });
   } catch (error) {
     logger.error(`Error removing category offer:${error}`);

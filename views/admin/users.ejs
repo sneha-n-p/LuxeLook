@@ -160,38 +160,56 @@
     });
   });
 
-  // Block / Unblock Functions
   function BlockUser(id, name) {
-    Swal.fire({
-      title: "Block User?",
-      text: "Do you want to block this user?",
-      icon: "warning",
-      showCancelButton: true
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios.patch("/admin/users/blockUser", { id }).then(res => {
-          if (res.data.success) {
-            location.reload();
-          }
-        });
-      }
-    });
-  }
+  Swal.fire({
+    title: "Block User?",
+    text: "Do you want to block this user?",
+    icon: "warning",
+    showCancelButton: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.patch("/admin/users/blockUser", { id }).then(res => {
+        if (res.data.success) {
+          let parentDiv = document.getElementById(`action-${id}`);
+          parentDiv.innerHTML = `
+            <button 
+              class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+              onclick="UnblockUser('${id}','${name}')"
+            >
+              Unblock
+            </button>
+          `;
+        }
+      });
+    }
+  });
+}
 
+  
   function UnblockUser(id, name) {
-    Swal.fire({
-      title: "Unblock User?",
-      text: "Do you want to unblock this user?",
-      icon: "question",
-      showCancelButton: true
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axios.patch("/admin/users/UnblockUser", { id }).then(res => {
-          if (res.data.success) {
-            location.reload();
-          }
-        });
-      }
-    });
-  }
+  Swal.fire({
+    title: "Unblock User?",
+    text: "Do you want to unblock this user?",
+    icon: "question",
+    showCancelButton: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.patch("/admin/users/UnblockUser", { id })
+      .then((res) => {
+        if (res.data.success) {
+            let parentDiv = document.getElementById(`action-${id}`);
+            parentDiv.innerHTML = `
+              <button 
+              class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+              onclick="BlockUser('${id}', '${name}')"
+            >
+              Block
+            </button>
+            `;
+        }
+      });
+    }
+  });
+}
+
 </script>

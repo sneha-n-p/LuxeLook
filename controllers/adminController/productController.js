@@ -537,7 +537,7 @@ const unblockProduct = async (req, res) => {
     const blocked = await Product.findByIdAndUpdate(id, { isBlocked: false }, { new: true })
 
     if (blocked) {
-      return res.status(StatusCode.OK).json({ success: true, message: "Product blocked successfully" })
+      return res.status(StatusCode.OK).json({ success: true, message: "Product Unblocked successfully" })
     } else {
       return res.status(StatusCode.BAD_REQUEST).json({ success: false, message: "Error occurred while blocking product. Please try again." })
     }
@@ -576,10 +576,13 @@ const addProductOffer = async (req, res) => {
     }
 
     await product.save();
-    logger.debug('product:', product)
+    const updatedSalePrices = product.variant.map(v => ({
+      size: v.size,
+      salePrice: v.salePrice
+    }));
     res.status(StatusCode.CREATED).json({
       success: true,
-      message: "Product offer applied.", finalOffer, salePrice: product.variant[0].salePrice
+      message: "Product offer applied.", finalOffer,  salePrices: updatedSalePrices 
     });
 
 
@@ -628,10 +631,15 @@ const editProductOffer = async (req, res) => {
     product.productOffer = newOffer;
 
     await product.save();
+     const salePrices = product.variant.map(v => ({
+      size: v.size,
+      salePrice: v.salePrice
+    }));
 
     res.json({
       success: true,
       finalOffer: bestOffer,
+      salePrices,
       message: 'Offer updated successfully'
     });
 
@@ -682,11 +690,16 @@ const removeProductOffer = async (req, res) => {
     product.productOffer = 0;
 
     await product.save();
+    const salePrices = product.variant.map(v => ({
+      size: v.size,
+      salePrice: v.salePrice
+    }));
 
     res.status(StatusCode.OK).json({
       success: true,
       message: 'Product offer removed',
-      finalOffer: bestOffer
+      finalOffer: bestOffer,
+      salePrices
     });
   } catch (error) {
     logger.error(`Error removing product offer: ${error}`);

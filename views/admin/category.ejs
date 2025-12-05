@@ -1,337 +1,497 @@
 <%- include("../../views/partials/adminPartial/header") %>
-<script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-<style>
-/* Prevent content from sliding under sidebar */
-.main-content {
-  margin-left: 240px; /* MATCH YOUR SIDEBAR WIDTH */
-  transition: all 0.3s ease;
-}
+  <style>
+    /* Prevent content from sliding under sidebar */
+    .main-content {
+      margin-left: 240px;
+      /* MATCH YOUR SIDEBAR WIDTH */
+      transition: all 0.3s ease;
+    }
 
-/* Mobile/tablet - remove margin-left */
-@media (max-width: 991px) {
-  .main-content {
-    margin-left: 0;
-  }
-}
-</style>
+    /* Mobile/tablet - remove margin-left */
+    @media (max-width: 991px) {
+      .main-content {
+        margin-left: 0;
+      }
+    }
+  </style>
 
-<body class="bg-[#0f172a] text-white font-sans">
+  <body class="bg-[#0f172a] text-white font-sans">
 
-<div class="main-content">
+    <div class="main-content">
 
-  <!-- PAGE HEADER -->
-  <div class="flex justify-between items-center mb-6 px-4 md:px-8">
-    <h2 class="text-2xl font-semibold">Categories</h2>
+      <!-- PAGE HEADER -->
+      <div class="flex justify-between items-center mb-6 px-4 md:px-8">
+        <h2 class="text-2xl font-semibold">Categories</h2>
 
-    <button onclick="window.history.back()"
-      class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded">
-      ⬅ Go Back
-    </button>
-  </div>
+        <button onclick="window.history.back()" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded">
+          ⬅ Go Back
+        </button>
+      </div>
 
-  <!-- ADD BUTTON -->
-  <div class="flex justify-end mb-4 px-4 md:px-8">
-    <a href="/admin/categories/add-category"
-      class="bg-cyan-400 hover:bg-cyan-300 text-black font-semibold px-4 py-2 rounded">
-      ADD CATEGORY +
-    </a>
-  </div>
+      <!-- ADD BUTTON -->
+      <div class="flex justify-end mb-4 px-4 md:px-8">
+        <a href="/admin/categories/add-category"
+          class="bg-cyan-400 hover:bg-cyan-300 text-black font-semibold px-4 py-2 rounded">
+          ADD CATEGORY +
+        </a>
+      </div>
 
-  <!-- SEARCH -->
-  <div class="px-4 md:px-8 mb-5">
-    <input type="text" id="categorySearch"
-      class="w-full bg-[#1e293b] text-white p-3 rounded outline-none focus:ring-2 focus:ring-cyan-400"
-      placeholder="Search for Categories"
-      value="<%= search ? search : '' %>">
-  </div>
+      <!-- SEARCH -->
+      <div class="px-4 md:px-8 mb-5">
+        <input type="text" id="categorySearch"
+          class="w-full bg-[#1e293b] text-white p-3 rounded outline-none focus:ring-2 focus:ring-cyan-400"
+          placeholder="Search for Categories" value="<%= search ? search : '' %>">
+      </div>
 
-  <!-- DESKTOP TABLE – LAPTOP VIEW ONLY -->
-  <div class="hidden md:block px-4 md:px-8">
-    <div class="bg-[#1e293b] rounded-lg p-4 overflow-x-auto">
+      <!-- DESKTOP TABLE – LAPTOP VIEW ONLY -->
+      <div class="hidden md:block px-4 md:px-8">
+        <div class="bg-[#1e293b] rounded-lg p-4 overflow-x-auto">
 
-      <table class="w-full text-white">
-        <thead class="bg-black">
-          <tr>
-            <th class="p-3">NO</th>
-            <th class="p-3">CATEGORY</th>
-            <th class="p-3">DESCRIPTION</th>
-            <th class="p-3">OFFER(%)</th>
-            <th class="p-3">ACTIONS</th>
-          </tr>
-        </thead>
+          <table class="w-full text-white">
+            <thead class="bg-black">
+              <tr>
+                <th class="p-3">NO</th>
+                <th class="p-3">CATEGORY</th>
+                <th class="p-3">DESCRIPTION</th>
+                <th class="p-3">OFFER(%)</th>
+                <th class="p-3">ACTIONS</th>
+              </tr>
+            </thead>
 
-        <tbody>
-          <% categories.forEach((category, index) => { %>
-          <tr class="border-b border-gray-700">
+            <tbody>
+              <% categories.forEach((category, index)=> { %>
+                <tr class="border-b border-gray-700">
 
-            <td class="p-3 text-gray-300"><%= index + 1 %></td>
+                  <td class="p-3 text-gray-300">
+                    <%= index + 1 %>
+                  </td>
 
-            <td class="p-3 font-semibold text-white"><%= category.name %></td>
+                  <td class="p-3 font-semibold text-white">
+                    <%= category.name %>
+                  </td>
 
-            <td class="p-3 text-gray-300">
+                  <td class="p-3 text-gray-300">
+                    <%= category.description %>
+                  </td>
+
+                  <td class="p-3">
+                    <div>
+                      <span class="font-semibold" id='CatOffer-<%= category._id %>'>
+                        <%= category.offer ? category.offer + '%' : '' %>
+                      </span>
+
+                      <div class="mt-2 flex gap-2" id="offer-<%= category._id %>">
+
+                        <% if(category.offer> 0){ %>
+
+                          <button onclick="editOffer('<%= category._id %>')"
+                            class="bg-yellow-400 text-black text-sm px-2 py-1 rounded">
+                            Edit
+                          </button>
+
+                          <button onclick="removeOffer('<%= category._id %>')"
+                            class="bg-red-500 text-white text-sm px-2 py-1 rounded">
+                            Remove
+                          </button>
+
+                          <% } else { %>
+
+                            <button onclick="addOffer('<%= category._id %>')"
+                              class="bg-green-500 text-white text-sm px-2 py-1 rounded">
+                              Add Offer
+                            </button>
+
+                            <% } %>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td class="p-3 flex gap-2">
+                    <div id="action-<%= category._id %>">
+                      <% if(category.status==="Unlisted" ){ %>
+
+                        <button onclick="Listed('<%= category._id %>', '<%= category.name %>')"
+                          class="bg-green-500 px-3 py-1 rounded">
+                          List
+                        </button>
+
+                        <% } else { %>
+
+                          <button onclick="Unlisted('<%= category._id %>', '<%= category.name %>')"
+                            class="bg-red-600 px-3 py-1 rounded">
+                            Unlist
+                          </button>
+
+                          <% } %>
+
+                            <a href="/admin/categories/edit-category/<%= category._id %>"
+                              class="text-yellow-300 text-xl">
+                              ✎
+                            </a>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+      <!-- MOBILE CARDS – SMALL SCREEN VIEW -->
+      <div class="md:hidden space-y-4 px-4">
+
+        <% categories.forEach((category, index)=> { %>
+          <div class="bg-[#1e293b] p-4 rounded-lg shadow-lg">
+
+            <p class="text-sm text-gray-400">#<%= index + 1 %>
+            </p>
+
+            <h3 class="text-xl font-semibold mt-1">
+              <%= category.name %>
+            </h3>
+
+            <p class="text-gray-300 text-sm mt-2">
               <%= category.description %>
-            </td>
+            </p>
 
-            <td class="p-3">
-              <div>
-                <span class="font-semibold">
+            <!-- OFFER SECTION -->
+            <div class="mt-3">
+              <p class="text-gray-200 font-semibold">
+                Offer:
+                <span class="text-cyan-300" id='MobileCatOffer-<%= category._id %>'>
                   <%= category.offer ? category.offer + '%' : '' %>
                 </span>
+              </p>
 
-                <div class="mt-2 flex gap-2">
-                  <% if(category.offer > 0){ %>
+              <div class="mt-2 flex gap-2" id="Moboffer-<%= category._id %>">
+                <% if(category.offer> 0){ %>
 
-                    <button onclick="editOffer('<%= category._id %>')"
-                      class="bg-yellow-400 text-black text-sm px-2 py-1 rounded">
-                      Edit
-                    </button>
+                  <button onclick="editOffer('<%= category._id %>')"
+                    class="bg-yellow-400 text-black text-xs px-3 py-1 rounded">
+                    Edit
+                  </button>
 
-                    <button onclick="removeOffer('<%= category._id %>')"
-                      class="bg-red-500 text-white text-sm px-2 py-1 rounded">
-                      Remove
-                    </button>
+                  <button onclick="removeOffer('<%= category._id %>')"
+                    class="bg-red-500 text-white text-xs px-3 py-1 rounded">
+                    Remove
+                  </button>
 
                   <% } else { %>
 
                     <button onclick="addOffer('<%= category._id %>')"
-                      class="bg-green-500 text-white text-sm px-2 py-1 rounded">
+                      class="bg-green-500 text-white text-xs px-3 py-1 rounded">
                       Add Offer
                     </button>
 
-                  <% } %>
-                </div>
+                    <% } %>
               </div>
-            </td>
+            </div>
 
-            <td class="p-3 flex gap-2">
-              <% if(category.status === "Unlisted"){ %>
+            <!-- ACTION BUTTONS -->
+            <div class="flex justify-between items-center mt-4" id="MobileAction-<%= category._id %>">
+
+              <% if(category.status==="Unlisted" ){ %>
 
                 <button onclick="Listed('<%= category._id %>', '<%= category.name %>')"
-                  class="bg-green-500 px-3 py-1 rounded">
+                  class="bg-green-600 px-4 py-1 rounded text-white text-sm">
                   List
                 </button>
 
-              <% } else { %>
+                <% } else { %>
 
-                <button onclick="Unlisted('<%= category._id %>', '<%= category.name %>')"
-                  class="bg-red-600 px-3 py-1 rounded">
-                  Unlist
-                </button>
+                  <button onclick="Unlisted('<%= category._id %>', '<%= category.name %>')"
+                    class="bg-red-600 px-4 py-1 rounded text-white text-sm">
+                    Unlist
+                  </button>
 
+                  <% } %>
+
+                    <a href="/admin/categories/edit-category/<%= category._id %>" class="text-yellow-300 text-xl">✎</a>
+
+            </div>
+
+          </div>
+          <% }) %>
+
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div style="color: #fff;">Showing <%= currentPage %> of <%= totalPages %>
+        </div>
+        <nav>
+          <ul class="pagination mb-0">
+            <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
+              <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
+            </li>
+
+            <% for (let i=1; i <=totalPages; i++) { %>
+              <li class="page-item <%= currentPage == i ? 'active' : '' %>">
+                <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                  <%= i %>
+                </a>
+              </li>
               <% } %>
 
-              <a href="/admin/categories/edit-category/<%= category._id %>"
-                class="text-yellow-300 text-xl">
-                ✎
-              </a>
+                <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
+                  <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
+                </li>
+          </ul>
+        </nav>
 
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-
-    </div>
-  </div>
-
-  <!-- MOBILE CARDS – SMALL SCREEN VIEW -->
-  <div class="md:hidden space-y-4 px-4">
-
-    <% categories.forEach((category, index)=> { %>
-    <div class="bg-[#1e293b] p-4 rounded-lg shadow-lg">
-
-      <p class="text-sm text-gray-400">#<%= index + 1 %></p>
-
-      <h3 class="text-xl font-semibold mt-1"><%= category.name %></h3>
-
-      <p class="text-gray-300 text-sm mt-2"><%= category.description %></p>
-
-      <!-- OFFER SECTION -->
-      <div class="mt-3">
-        <p class="text-gray-200 font-semibold">
-          Offer:
-          <span class="text-cyan-300"><%= category.offer ? category.offer + '%' : '' %></span>
-        </p>
-
-        <div class="mt-2 flex gap-2">
-          <% if(category.offer > 0){ %>
-
-            <button onclick="editOffer('<%= category._id %>')"
-              class="bg-yellow-400 text-black text-xs px-3 py-1 rounded">
-              Edit
-            </button>
-
-            <button onclick="removeOffer('<%= category._id %>')"
-              class="bg-red-500 text-white text-xs px-3 py-1 rounded">
-              Remove
-            </button>
-
-          <% } else { %>
-
-            <button onclick="addOffer('<%= category._id %>')"
-              class="bg-green-500 text-white text-xs px-3 py-1 rounded">
-              Add Offer
-            </button>
-
-          <% } %>
-        </div>
       </div>
+    </div>
 
-      <!-- ACTION BUTTONS -->
-      <div class="flex justify-between items-center mt-4">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
 
-        <% if(category.status === "Unlisted"){ %>
+      document.getElementById("categorySearch").addEventListener("keyup", function (e) {
+        const searchValue = e.target.value.trim();
 
-          <button onclick="Listed('<%= category._id %>', '<%= category.name %>')"
-            class="bg-green-600 px-4 py-1 rounded text-white text-sm">
-            List
-          </button>
+        const url = new URL(window.location.origin + "/admin/categories");
+        if (searchValue) {
+          url.searchParams.set("search", searchValue);
+        }
+        window.location.href = url.toString();
+      });
 
-        <% } else { %>
 
-          <button onclick="Unlisted('<%= category._id %>', '<%= category.name %>')"
-            class="bg-red-600 px-4 py-1 rounded text-white text-sm">
+
+
+      function Unlisted(id, name) {
+        Swal.fire({
+          title: 'Unlisted',
+          text: "do you want Unlist this Category?",
+          icon: "warning",
+          showConfirmButton: true,
+          showCancelButton: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.patch("/admin/categories/Unlist-category", { id })
+              .then(function (responce) {
+                if (responce.data.success) {
+                  Swal.fire({
+                    title: 'Success',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                  }).then(() => {
+                    let parentDiv = document.getElementById(`action-${id}`);
+                    parentDiv.innerHTML = `
+              <button onclick="Listed('${id}', '${name}')"
+                  class="bg-green-500 px-3 py-1 rounded">
+                  List
+                </button>
+                <a href="/admin/categories/edit-category/${id}"
+          class="text-yellow-300 text-xl">✎</a>
+            `;
+                    let MobParentDiv = document.getElementById(`MobileAction-${id}`);
+                    MobParentDiv.innerHTML = `
+              <button onclick="Listed('${id}', '${name}')"
+                  class="bg-green-500 px-3 py-1 rounded">
+                  List
+                </button>
+                <a href="/admin/categories/edit-category/${id}"
+          class="text-yellow-300 text-xl">✎</a>
+            `;
+                  })
+                }
+              })
+          }
+        })
+      }
+
+      function Listed(id, name) {
+        Swal.fire({
+          tittle: "List the Category",
+          text: "do you want list the Category",
+          icon: "warning",
+          showConfirmButton: true,
+          showCancelButton: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.patch("/admin/categories/list-category", { id })
+              .then(function (responce) {
+                if (responce.data.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    showConfirmButton: false,
+                    timer: 1500
+                  }).then(() => {
+
+                    let parentDiv = document.getElementById(`action-${id}`);
+                    parentDiv.innerHTML = `
+              <button onclick="Unlisted('${id}', '${name}')"
+            class="bg-red-600 px-3 py-1 rounded">
             Unlist
           </button>
-
-        <% } %>
-
-        <a href="/admin/categories/edit-category/<%= category._id %>"
+         <a href="/admin/categories/edit-category/${id}"
           class="text-yellow-300 text-xl">✎</a>
 
-      </div>
+            `;
 
-    </div>
-    <% }) %>
-
-  </div>
-
-  <div class="d-flex justify-content-between align-items-center mt-3">
-    <div style="color: #fff;">Showing <%= currentPage %> of <%= totalPages %>
-    </div>
-    <nav>
-      <ul class="pagination mb-0">
-        <li class="page-item <%= currentPage == 1 ? 'disabled' : '' %>">
-          <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">‹</a>
-        </li>
-
-        <% for (let i=1; i <=totalPages; i++) { %>
-          <li class="page-item <%= currentPage == i ? 'active' : '' %>">
-            <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
-              <%= i %>
-            </a>
-          </li>
-          <% } %>
-
-            <li class="page-item <%= currentPage == totalPages ? 'disabled' : '' %>">
-              <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">›</a>
-            </li>
-      </ul>
-    </nav>
-
-  </div>
-</div>
-
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-      <script>
-
-        document.getElementById("categorySearch").addEventListener("keyup", function (e) {
-          const searchValue = e.target.value.trim();
-
-          const url = new URL(window.location.origin + "/admin/categories");
-          if (searchValue) {
-            url.searchParams.set("search", searchValue);
+                    let MobParentDiv = document.getElementById(`MobileAction-${id}`);
+                    MobParentDiv.innerHTML = `
+              <button onclick="Unlisted('${id}', '${name}')"
+            class="bg-red-600 px-3 py-1 rounded">
+            Unlist
+          </button>
+         <a href="/admin/categories/edit-category/${id}"
+          class="text-yellow-300 text-xl">✎</a>
+            `;
+                  })
+                }
+              })
           }
-          window.location.href = url.toString();
+        })
+      }
+
+      function removeOffer(categoryId) {
+        Swal.fire({
+          title: 'Remove Offer',
+          text: "Are you sure you want to remove this offer?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, remove it"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.post("/admin/categories/remove-category-offer", { id: categoryId })
+              .then(response => {
+                if (response.data.success) {
+                  Swal.fire({
+                    title: 'Offer Removed',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                  }).then(() => {
+                    let parentDiv = document.getElementById(`offer-${categoryId}`);
+                    parentDiv.innerHTML = `
+                            <button onclick="addOffer('${categoryId}')"
+                              class="bg-green-500 text-white text-sm px-2 py-1 rounded">
+                              Add Offer
+                            </button>
+            `;
+                    let MobparentDiv = document.getElementById(`Moboffer-${categoryId}`);
+                    MobparentDiv.innerHTML = `
+                            <button onclick="addOffer('${categoryId}')"
+                              class="bg-green-500 text-white text-sm px-2 py-1 rounded">
+                              Add Offer
+                            </button>
+            `;
+            const spanElem = document.getElementById(`CatOffer-${categoryId}`)
+            spanElem.innerText ='';
+            const MobspanElem = document.getElementById(`MobileCatOffer-${categoryId}`)
+            MobspanElem.innerText =''
+                  });
+                }
+              });
+          }
+        });
+      }
+
+
+      async function addOffer(categoryId) {
+        const { value: offer } = await Swal.fire({
+          title: 'Add Offer',
+          input: 'number',
+          inputLabel: 'Enter Offer Percentage',
+          inputPlaceholder: '%',
+          inputAttributes: {
+            min: 1,
+            max: 99,
+            step: 1
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Add Offer',
+          preConfirm: (value) => {
+            if (!value || value <= 0 || value >= 100) {
+              Swal.showValidationMessage('Please enter a valid percentage (1–99)');
+            }
+            return value;
+          }
         });
 
+        if (offer) {
+          try {
+            const response = await axios.post('/admin/categories/add-category-offer', {
+              id: categoryId,
+              offer: offer
+            });
 
+            if (response.data.success) {
+              Swal.fire({
+                title: 'Offer Added!',
+                text: `Offer of ${offer}% added successfully.`,
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                let parentDiv = document.getElementById(`offer-${categoryId}`);
+                parentDiv.innerHTML = `
+               <td class="p-3">
+                    <div>
+                      <div class="mt-2 flex gap-2" id="offer-${categoryId}">
 
+                          <button onclick="editOffer('${categoryId}')"
+                            class="bg-yellow-400 text-black text-sm px-2 py-1 rounded">
+                            Edit
+                          </button>
 
-        function Unlisted(id, name) {
-          Swal.fire({
-            title: 'Unlisted',
-            text: "do you want Unlist this Category?",
-            icon: "warning",
-            showConfirmButton: true,
-            showCancelButton: true
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.patch("/admin/categories/Unlist-category", { id })
-                .then(function (responce) {
-                  if (responce.data.success) {
-                    Swal.fire({
-                      title: `${name} unlisted`,
-                      icon: 'success',
-                      showConfirmButton: false,
-                      timer: 1500
-                    }).then(() => {
-                      window.location.reload()
-                    })
-                  }
-                })
+                          <button onclick="removeOffer('${categoryId}')"
+                            class="bg-red-500 text-white text-sm px-2 py-1 rounded">
+                            Remove
+                          </button>
+                      </div>
+                    </div>
+                  </td>
+            `;
+                let MobparentDiv = document.getElementById(`Moboffer-${categoryId}`);
+                MobparentDiv.innerHTML = `
+              <div class="mt-3">
+
+              <div class="mt-2 flex gap-2" id="Moboffer-${categoryId}">
+          
+                  <button onclick="editOffer('${categoryId}')"
+                    class="bg-yellow-400 text-black text-xs px-3 py-1 rounded">
+                    Edit
+                  </button>
+
+                  <button onclick="removeOffer('${categoryId}')"
+                    class="bg-red-500 text-white text-xs px-3 py-1 rounded">
+                    Remove
+                  </button>
+              </div>
+            </div>
+            `;
+            const spanElem = document.getElementById(`CatOffer-${categoryId}`)
+            spanElem.innerText = `${offer}%`
+            const MobspanElem = document.getElementById(`MobileCatOffer-${categoryId}`)
+            MobspanElem.innerText = `${offer}%`
+              });
+            } else {
+              Swal.fire('Error', 'Failed to add offer.', 'error');
             }
-          })
+          } catch (error) {
+            console.error('Error adding offer:', error);
+            Swal.fire('Error', 'Something went wrong while adding the offer.', 'error');
+          }
         }
+      }
 
-        function Listed(id, name) {
-          Swal.fire({
-            tittle: "List the Category",
-            text: "do you want list the Category",
-            icon: "warning",
-            showConfirmButton: true,
-            showCancelButton: true
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.patch("/admin/categories/list-category", { id })
-                .then(function (responce) {
-                  if (responce.data.success) {
-                    Swal.fire({
-                      title: `${name} listed`,
-                      icon: 'success',
-                      showConfirmButton: false,
-                      timer: 1500
-                    }).then(() => {
-                      window.location.reload()
-                    })
-                  }
-                })
-            }
-          })
-        }
 
-        function removeOffer(categoryId) {
-          Swal.fire({
-            title: 'Remove Offer',
-            text: "Are you sure you want to remove this offer?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, remove it"
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.post("/admin/categories/remove-category-offer", { id: categoryId })
-                .then(response => {
-                  if (response.data.success) {
-                    Swal.fire({
-                      title: 'Offer Removed',
-                      icon: 'success',
-                      showConfirmButton: false,
-                      timer: 1500
-                    }).then(() => {
-                      window.location.reload();
-                    });
-                  }
-                });
-            }
-          });
-        }
+      async function editOffer(categoryId) {
+        try {
+          const response = await axios.get(`/admin/categories/get-category-offer/${categoryId}`);
+          const currentOffer = response.data.offer || 0;
 
-        async function addOffer(categoryId) {
-          const { value: offer } = await Swal.fire({
-            title: 'Add Offer',
+          const { value: newOffer } = await Swal.fire({
+            title: 'Edit Offer',
             input: 'number',
-            inputLabel: 'Enter Offer Percentage',
+            inputLabel: 'Update Offer Percentage',
+            inputValue: currentOffer,
             inputPlaceholder: '%',
             inputAttributes: {
               min: 1,
@@ -339,7 +499,7 @@
               step: 1
             },
             showCancelButton: true,
-            confirmButtonText: 'Add Offer',
+            confirmButtonText: 'Update Offer',
             preConfirm: (value) => {
               if (!value || value <= 0 || value >= 100) {
                 Swal.showValidationMessage('Please enter a valid percentage (1–99)');
@@ -348,85 +508,36 @@
             }
           });
 
-          if (offer) {
-            try {
-              const response = await axios.post('/admin/categories/add-category-offer', {
-                id: categoryId,
-                offer: offer
-              });
-
-              if (response.data.success) {
-                Swal.fire({
-                  title: 'Offer Added!',
-                  text: `Offer of ${offer}% added successfully.`,
-                  icon: 'success',
-                  showConfirmButton: false,
-                  timer: 1500
-                }).then(() => {
-                  window.location.reload();
-                });
-              } else {
-                Swal.fire('Error', 'Failed to add offer.', 'error');
-              }
-            } catch (error) {
-              console.error('Error adding offer:', error);
-              Swal.fire('Error', 'Something went wrong while adding the offer.', 'error');
-            }
-          }
-        }
-        async function editOffer(categoryId) {
-          try {
-            const response = await axios.get(`/admin/categories/get-category-offer/${categoryId}`);
-            const currentOffer = response.data.offer || 0;
-
-            const { value: newOffer } = await Swal.fire({
-              title: 'Edit Offer',
-              input: 'number',
-              inputLabel: 'Update Offer Percentage',
-              inputValue: currentOffer,
-              inputPlaceholder: '%',
-              inputAttributes: {
-                min: 1,
-                max: 99,
-                step: 1
-              },
-              showCancelButton: true,
-              confirmButtonText: 'Update Offer',
-              preConfirm: (value) => {
-                if (!value || value <= 0 || value >= 100) {
-                  Swal.showValidationMessage('Please enter a valid percentage (1–99)');
-                }
-                return value;
-              }
+          if (newOffer !== undefined) {
+            const updateRes = await axios.patch('/admin/categories/edit-category-offer', {
+              id: categoryId,
+              offer: newOffer
             });
 
-            if (newOffer !== undefined) {
-              const updateRes = await axios.patch('/admin/categories/edit-category-offer', {
-                id: categoryId,
-                offer: newOffer
+            if (updateRes.data.success) {
+              Swal.fire({
+                title: 'Offer Updated!',
+                text: `New offer of ${newOffer}% saved successfully.`,
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                let parentDiv = document.getElementById(`CatOffer-${categoryId}`);
+                parentDiv.innerText = `${newOffer}%`
+                let MobparentDiv = document.getElementById(`MobileCatOffer-${categoryId}`);
+                MobparentDiv.innerText = `${newOffer}%`
               });
-
-              if (updateRes.data.success) {
-                Swal.fire({
-                  title: 'Offer Updated!',
-                  text: `New offer of ${newOffer}% saved successfully.`,
-                  icon: 'success',
-                  showConfirmButton: false,
-                  timer: 1500
-                }).then(() => {
-                  window.location.reload();
-                });
-              } else {
-                Swal.fire('Error', 'Failed to update offer.', 'error');
-              }
+            } else {
+              Swal.fire('Error', 'Failed to update offer.', 'error');
             }
-          } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Something went wrong while editing the offer.', 'error');
           }
+        } catch (error) {
+          console.error(error);
+          Swal.fire('Error', 'Something went wrong while editing the offer.', 'error');
         }
+      }
 
-      </script>
+    </script>
   </body>
 
   </html>

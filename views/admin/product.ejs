@@ -80,17 +80,21 @@
             <td class="px-4 py-3 text-sm">₹ <%= product.regularPrice %></td>
 
             <td class="px-4 py-3 text-sm">
-              <select class="bg-[#0b1220] text-white px-2 py-1 rounded">
+              <select class="bg-[#0b1220] text-white px-2 py-1 rounded" id="variantSelect-<%= product._id %>">
                 <% product.variant.forEach(v => { %>
                 <option><%= v.size %>: ₹<%= v.salePrice.toFixed(2) %></option>
                 <% }) %>
               </select>
             </td>
 
-            <td class="px-4 py-3 text-sm">
-              <span><%= product.productOffer ? product.productOffer + '%' : '' %></span>
+            <td class="px-4 py-3 text-sm" >
+              
+              <span id="offerSpan-<%= product._id %>">
+                <%= product.productOffer ? product.productOffer + '%' : '' %>
+              </span>
+            
 
-              <div class="mt-2">
+              <div class="mt-2" id="offer-<%= product._id %>">
                 <% if(product.productOffer > 0) { %>
                 <button onclick="editOffer('<%= product._id %>')"
                   class=" text-decorating-none text-xs px-2 py-1 rounded bg-yellow-400 text-black mr-1">Edit</button>
@@ -108,7 +112,7 @@
             <td class="px-4 py-3 text-sm"><%= product.quatity %></td>
 
             <td class="px-4 py-3">
-              <div class="flex gap-2">
+              <div class="flex gap-2" id="productAction-<%= product._id %>">
                 <a href="/admin/Products/edit-product/<%= product._id %>"
                   class="px-3 py-1 text-sm rounded bg-white/10 hover:bg-white/20">✎</a>
 
@@ -153,29 +157,35 @@
             </div>
 
             <div>
-              <span class="text-xs text-gray-400">Sale</span>
-              <div>
-                <% if(product.variant.length) { %>
-                <%= product.variant[0].size %> :
-                ₹<%= product.variant[0].salePrice.toFixed(2) %>
-                <% } else { %>-<% } %>
-              </div>
-            </div>
-
-            <div>
               <span class="text-xs text-gray-400">Stock</span>
               <div><%= product.quatity %></div>
             </div>
           </div>
+            <div class="px-0 py-2 text-sm">
+              <select class="bg-[#0b1220] text-white px-2 py-1 rounded"  id="MOBvariantSelect-<%= product._id %>">
+                <% product.variant.forEach(v => { %>
+                <option><%= v.size %>: ₹<%= v.salePrice.toFixed(2) %></option>
+                <% }) %>
+              </select>
+            </div>
 
-          <div class="mt-3 flex flex-wrap gap-2">
+
+          <td class="px-4 py-3 text-sm" >
+            <p>Offer:
+              <span id="MOBofferSpan-<%= product._id %>">
+                <%= product.productOffer ? product.productOffer + '%' : '' %>
+              </span>
+              </p>
+<div>
+          <div class="mt-3 flex flex-wrap gap-2" id="MOBoffer-<%= product._id %>">
             <% if(product.productOffer > 0) { %>
             <button onclick="editOffer('<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-yellow-400 text-black">Edit Offer</button>
             <button onclick="removeOffer('<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-red-600 text-white">Remove</button>
             <% } else { %>
             <button onclick="addOffer('<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-green-600 text-white">Add Offer</button>
             <% } %>
-
+            </div>
+            <div id="MOBproductAction-<%= product._id %>">
             <a href="/admin/Products/edit-product/<%= product._id %>" class="text-xs px-2 py-1 rounded bg-white/10">Edit</a>
 
             <% if(!product.isBlocked) { %>
@@ -183,6 +193,7 @@
             <% } else { %>
             <button onclick="confirmUnblockProduct(event,'<%= product._id %>')" class="text-xs px-2 py-1 rounded bg-green-600 text-white">Unblock</button>
             <% } %>
+            </div>
           </div>
         </div>
       </div>
@@ -264,15 +275,28 @@
                                         text: data.message,
                                         icon: 'success'
                                     }).then(() => {
-                                        location.reload()
+                                        let blockId =document.getElementById(`productAction-${productId}`)
+                                        blockId.innerHTML =`
+                                        <div class="flex gap-2" id="productAction-${productId}">
+                                        <a href="/admin/Products/edit-product/${productId}"
+                  class="px-3 py-1 text-sm rounded bg-white/10 hover:bg-white/20">✎</a>
+                                         <button onclick="confirmUnblockProduct(event,'${productId}')"
+                  class="px-3 py-1 rounded bg-green-600 text-white">Unblock</button>
+                                       </div>
+                                        `;
+                                        let MOBblockId =document.getElementById(`MOBproductAction-${productId}`)
+                                        MOBblockId.innerHTML =`
+                                        <div id="MOBproductAction-${productId}">
+              <a href="/admin/Products/edit-product/${productId}" class="text-xs px-2 py-1 rounded bg-white/10">Edit</a>
+<button onclick="confirmUnblockProduct(event,'${productId}')" class="text-xs px-2 py-1 rounded bg-green-600 text-white">Unblock</button>
+                                                         </div>
+                                        `;
                                     })
                                 } else {
                                     Swal.fire({
                                         title: 'Failed!',
                                         text: data.message,
                                         icon: 'error'
-                                    }).then(() => {
-                                        location.reload()
                                     })
                                 }
                             })
@@ -313,15 +337,28 @@
                                         text: data.message,
                                         icon: 'success'
                                     }).then(() => {
-                                        location.reload()
+                                       let blockId =document.getElementById(`productAction-${productId}`)
+                                        blockId.innerHTML =`
+                                        <div class="flex gap-2" id="productAction-${productId}">
+                                        <a href="/admin/Products/edit-product/${productId}"
+                  class="px-3 py-1 text-sm rounded bg-white/10 hover:bg-white/20">✎</a>
+                                        <button onclick="confirmBlockProduct(event,'${productId}')"
+                  class="px-3 py-1 rounded bg-red-600 text-white">Block</button>
+                                       </div>
+                                        `;
+                                        let MOBblockId =document.getElementById(`MOBproductAction-${productId}`)
+                                        MOBblockId.innerHTML =`
+                                        <div id="MOBproductAction-${productId}">
+              <a href="/admin/Products/edit-product/${productId}" class="text-xs px-2 py-1 rounded bg-white/10">Edit</a>
+<button onclick="confirmBlockProduct(event,'${productId}')" class="text-xs px-2 py-1 rounded bg-red-600 text-white">Block</button>
+                                                         </div>
+                                        `;
                                     })
                                 } else {
                                     Swal.fire({
                                         title: 'Failed!',
                                         text: data.message,
                                         icon: 'error'
-                                    }).then(() => {
-                                        location.reload()
                                     })
                                 }
                             }).catch((error) => {
@@ -336,7 +373,7 @@
                 });
             }
 
-            function removeOffer(categoryId) {
+            function removeOffer(productId) {
   Swal.fire({
     title: 'Remove Offer',
     text: "Are you sure you want to remove this offer?",
@@ -345,7 +382,7 @@
     confirmButtonText: "Yes, remove it"
   }).then((result) => {
     if (result.isConfirmed) {
-      axios.post("/admin/Products/remove-product-offer", { id: categoryId })
+      axios.post("/admin/Products/remove-product-offer", { id: productId })
         .then(response => {
           if (response.data.success) {
             Swal.fire({
@@ -354,7 +391,37 @@
               showConfirmButton: false,
               timer: 1500
             }).then(() => {
-              window.location.reload();
+              document.getElementById(`offer-${productId}`).innerHTML =
+                `<button onclick="addOffer('${productId}')" class="text-xs px-2 py-1 rounded bg-green-600 text-white">Add Offer</button>`;
+
+              document.getElementById(`offerSpan-${productId}`).innerText = '';
+              document.getElementById(`MOBofferSpan-${productId}`).innerText = '';
+
+              document.getElementById(`MOBoffer-${productId}`).innerHTML =
+                `<button onclick="addOffer('${productId}')" class="text-xs px-2 py-1 rounded bg-green-600 text-white">Add Offer</button>`;
+
+              //  Update variant dropdown WITHOUT RELOAD
+              const selectElem = document.getElementById(`variantSelect-${productId}`);
+
+              if (selectElem && response.data.salePrices) {
+                selectElem.innerHTML = "";
+                response.data.salePrices.forEach(v => {
+                  const option = document.createElement("option");
+                  option.textContent = `${v.size}: ₹${v.salePrice.toFixed(2)}`;
+                  selectElem.appendChild(option);
+                });
+              }
+              const MOBselectElem = document.getElementById(`MOBvariantSelect-${productId}`);
+
+              if (MOBselectElem && response.data.salePrices) {
+                MOBselectElem.innerHTML = "";
+                response.data.salePrices.forEach(v => {
+                  const option = document.createElement("option");
+                  option.textContent = `${v.size}: ₹${v.salePrice.toFixed(2)}`;
+                  MOBselectElem.appendChild(option);
+                });
+              }
+             
             });
           }
         });
@@ -368,14 +435,10 @@ async function addOffer(productId) {
     input: 'number',
     inputLabel: 'Enter Offer Percentage',
     inputPlaceholder: '%',
-    inputAttributes: {
-      min: 1,
-      max: 99,
-      step: 1
-    },
+    inputAttributes: { min: 1, max: 99, step: 1 },
     showCancelButton: true,
     confirmButtonText: 'Add Offer',
-    preConfirm: (value) => {
+    preConfirm(value) {
       if (!value || value <= 0 || value >= 100) {
         Swal.showValidationMessage('Please enter a valid percentage (1–99)');
       }
@@ -383,36 +446,84 @@ async function addOffer(productId) {
     }
   });
 
-  if (offer) {
-    try {
-      const response = await axios.post('/admin/Products/add-product-offer', {
-        id: productId,
-        offer: offer
-      });
+  if (!offer) return;
 
-      if (response.data.success) {
-        Swal.fire({
-          title: 'Offer Added!',
-          text: `Final Offer: ${response.data.finalOffer}%. Sale Price: ₹${response.data.salePrice}`,
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 1500
-        }).then(() => {
-          window.location.reload();
-        });
-      } else {
-        Swal.fire('Error', 'Failed to add offer.', 'error');
-      }
-    } catch (error) {
-      console.error('Error adding offer:', error);
-      Swal.fire('Error', 'Something went wrong while adding the offer.', 'error');
+  try {
+    const response = await axios.post(
+      '/admin/Products/add-product-offer',
+      { id: productId, offer },
+      { validateStatus: status => status !== 500 }
+    );
+
+    if (!response.data.success) {
+      return Swal.fire('Error', 'Failed to add offer.', 'error');
     }
+
+    Swal.fire({
+      title: 'Offer Added!',
+      text: `Final Offer: ${response.data.finalOffer}%.`,
+      icon: 'success',
+      showConfirmButton: false,
+      timer: 1500
+    }).then(() => {
+
+      //Update variant prices
+      
+      const selectElem = document.getElementById(`variantSelect-${productId}`);
+
+if (selectElem && response.data.salePrices) {
+  selectElem.innerHTML = '';
+  response.data.salePrices.forEach(v => {
+    const option = document.createElement('option');
+    option.textContent = `${v.size}: ₹${v.salePrice.toFixed(2)}`;
+    selectElem.appendChild(option);
+  });
+}
+      const MOBselectElem = document.getElementById(`MOBvariantSelect-${productId}`);
+
+if (MOBselectElem && response.data.salePrices) {
+  MOBselectElem.innerHTML = '';
+  response.data.salePrices.forEach(v => {
+    const option = document.createElement('option');
+    option.textContent = `${v.size}: ₹${v.salePrice.toFixed(2)}`;
+    MOBselectElem.appendChild(option);
+  });
+}
+      //  Update the buttons
+     
+      let parentDiv = document.getElementById(`offer-${productId}`);
+      parentDiv.innerHTML = `
+        <button onclick="editOffer('${productId}')" class="text-xs px-2 py-1 rounded bg-yellow-400 text-black mr-1">Edit</button>
+        <button onclick="removeOffer('${productId}')" class="text-xs px-2 py-1 rounded bg-red-600 text-white">Remove</button>
+      `;
+
+      // Update offer percentage text
+
+      document.getElementById(`offerSpan-${productId}`).innerText =
+        ` ${response.data.finalOffer}%`;
+
+      //  Update mobile buttons
+
+      let mobParent = document.getElementById(`MOBoffer-${productId}`);
+      mobParent.innerHTML = `
+        <button onclick="editOffer('${productId}')" class="text-xs px-2 py-1 rounded bg-yellow-400 text-black">Edit Offer</button>
+        <button onclick="removeOffer('${productId}')" class="text-xs px-2 py-1 rounded bg-red-600 text-white">Remove</button>
+      `;
+
+      document.getElementById(`MOBofferSpan-${productId}`).innerText =
+        ` ${response.data.finalOffer}%`;
+    });
+
+  } catch (err) {
+    console.error(err);
+    Swal.fire('Error', 'Something went wrong while adding the offer.', 'error');
   }
 }
 
-  async function editOffer(categoryId) {
+
+  async function editOffer(productId) {
   try {
-    const response = await axios.get(`/admin/Products/get-product-offer/${categoryId}`);
+    const response = await axios.get(`/admin/Products/get-product-offer/${productId}`,{validateStatus:((status=>status!==500))});
     const currentOffer = response.data.offer || 0;
 
     const { value: newOffer } = await Swal.fire({
@@ -438,7 +549,7 @@ async function addOffer(productId) {
 
     if (newOffer !== undefined) {
       const updateRes = await axios.patch('/admin/Products/edit-product-offer', {
-        id: categoryId,
+        id: productId,
         offer: newOffer
       });
 
@@ -450,7 +561,28 @@ async function addOffer(productId) {
           showConfirmButton: false,
           timer: 1500
         }).then(() => {
-          window.location.reload();
+           document.getElementById(`offerSpan-${productId}`).innerText = `${newOffer}%`;
+    document.getElementById(`MOBofferSpan-${productId}`).innerText = `${newOffer}%`;
+
+    // Update variant price dropdown
+    const selectElem = document.getElementById(`variantSelect-${productId}`);
+    if (selectElem && updateRes.data.salePrices) {
+      selectElem.innerHTML = "";
+      updateRes.data.salePrices.forEach(v => {
+        const option = document.createElement("option");
+        option.textContent = `${v.size}: ₹${v.salePrice.toFixed(2)}`;
+        selectElem.appendChild(option);
+      });
+    }
+    const MOBselectElem = document.getElementById(`MOBvariantSelect-${productId}`);
+    if (MOBselectElem && updateRes.data.salePrices) {
+      MOBselectElem.innerHTML = "";
+      updateRes.data.salePrices.forEach(v => {
+        const option = document.createElement("option");
+        option.textContent = `${v.size}: ₹${v.salePrice.toFixed(2)}`;
+        MOBselectElem.appendChild(option);
+      });
+    }
         });
       } else {
         Swal.fire('Error', 'Failed to update offer.', 'error');

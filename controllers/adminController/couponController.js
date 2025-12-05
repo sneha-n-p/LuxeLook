@@ -9,15 +9,6 @@ const StatusCode = require('../../statusCode')
 const logger = require('../../helpers/logger')
 
 
- function formatToIndianDate(date) {
-  return new Date(date).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
-}
-
-
 const loadCoupon = async (req, res) => {
   try {
     let search = ""
