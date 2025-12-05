@@ -320,7 +320,7 @@
       <form id="editAddressForm" action="/addresses/edit-address/<%= address._id %>" method="POST" class="row g-3">
         <div class="col-md-6">
           <label class="form-label" for="name">Name</label>
-          <input type="text" id="name" class="form-control" name="name" value="<%= address.name %>" >
+          <input type="text" id="name" class="form-control" name="name" value="<%= address.name %>" maxlength="30">
           <div id="Error1" class="error-message"></div>
         </div>
         <div class="col-md-6">
